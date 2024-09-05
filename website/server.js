@@ -18,6 +18,22 @@ const server = app.listen(4000, function() {
 });
 
 /*
+    Connect MySql
+*/
+const con = mysql.createConnection({
+    host: "localhost",
+    user: "scott",
+    password: "oracle",
+    database: "myhearts"
+});
+
+con.connect(function(err) {
+    if (err) throw err;
+    console.log("connected!");
+});
+
+
+/*
     Configuration de EJS
 */
 app.set("views", path.join(__dirname, "views"));
