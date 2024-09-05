@@ -1,5 +1,5 @@
--- Généré par Oracle SQL Developer Data Modeler 23.1.0.087.0806
---   à :        2024-09-05 15:30:41 HAE
+-- GÃ©nÃ©rÃ© par Oracle SQL Developer Data Modeler 23.1.0.087.0806
+--   Ã  :        2024-09-05 15:30:41 HAE
 --   site :      Oracle Database 11g
 --   type :      Oracle Database 11g
 
@@ -83,7 +83,7 @@ ALTER TABLE relation_5
 
 
 
--- Rapport récapitulatif d'Oracle SQL Developer Data Modeler : 
+-- Rapport rÃ©capitulatif d'Oracle SQL Developer Data Modeler : 
 -- 
 -- CREATE TABLE                             5
 -- CREATE INDEX                             0
