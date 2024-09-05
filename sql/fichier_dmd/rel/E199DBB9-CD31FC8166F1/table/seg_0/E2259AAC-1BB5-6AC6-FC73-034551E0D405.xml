@@ -1,0 +1,75 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Table class="oracle.dbtools.crest.model.design.relational.Table" directorySegmentName="seg_0" id="E2259AAC-1BB5-6AC6-FC73-034551E0D405" name="lieu">
+<createdBy>2249463</createdBy>
+<createdTime>2024-08-27 15:34:42 UTC</createdTime>
+<generatorID>18E5DA19-3164-60E6-E33E-E22A9C740F68</generatorID>
+<ownerDesignName>fichier_dmd</ownerDesignName>
+<allowColumnReorder>false</allowColumnReorder>
+<existDependencyGenerateInDDl>true</existDependencyGenerateInDDl>
+<parsed>true</parsed>
+<columns itemClass="oracle.dbtools.crest.model.design.relational.Column">
+<Column name="id_lieu" id="04AB36AB-21BE-4E2E-4F3C-B03A2CC7EDA0">
+<createdBy>2249463</createdBy>
+<createdTime>2024-08-27 15:34:42 UTC</createdTime>
+<generatorID>375E7859-606F-4276-0B42-DBA56D0F6BFC</generatorID>
+<ownerDesignName>fichier_dmd</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="nom" id="81E63F65-3CA4-6AEB-61DD-5E9747526C8A">
+<createdBy>2249463</createdBy>
+<createdTime>2024-08-27 15:34:42 UTC</createdTime>
+<generatorID>8FBCA10D-B8A0-682C-827F-E7C536D17F43</generatorID>
+<ownerDesignName>fichier_dmd</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>100</dataTypeSize>
+<ownDataTypeParameters>100,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="type_lieu" id="BC2DF411-1670-2EDB-A5A8-AE6F64C4561F">
+<createdBy>2249463</createdBy>
+<createdTime>2024-08-27 15:34:42 UTC</createdTime>
+<generatorID>15167222-3BA2-2B1C-919D-B98D0D109D71</generatorID>
+<ownerDesignName>fichier_dmd</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>100</dataTypeSize>
+<ownDataTypeParameters>100,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="adresse" id="9ADB4710-B8F8-8E13-159F-46248552A615">
+<createdBy>2249463</createdBy>
+<createdTime>2024-08-27 15:34:42 UTC</createdTime>
+<generatorID>961EB86E-512B-132C-A01D-4817CA46673F</generatorID>
+<ownerDesignName>fichier_dmd</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>100</dataTypeSize>
+<ownDataTypeParameters>100,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+</columns>
+<indexes itemClass="oracle.dbtools.crest.model.design.relational.Index">
+<ind_PK_UK id="284FC33F-C228-FFDE-5EAD-D281ED2E5FC6" name="lieu_PK">
+<createdBy>2249463</createdBy>
+<createdTime>2024-08-27 15:34:42 UTC</createdTime>
+<generatorID>B67A0D2B-69A3-E468-7C0D-98CBDBE9907A</generatorID>
+<ownerDesignName>fichier_dmd</ownerDesignName>
+<pk>true</pk>
+<indexState>Primary Constraint</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="04AB36AB-21BE-4E2E-4F3C-B03A2CC7EDA0"/>
+</indexColumnUsage>
+</ind_PK_UK>
+</indexes>
+</Table>

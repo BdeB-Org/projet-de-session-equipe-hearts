@@ -1,0 +1,108 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Table class="oracle.dbtools.crest.model.design.relational.Table" directorySegmentName="seg_0" id="EAB88D97-8371-0EC9-9930-F8ABF83E1497" name="abonnement">
+<createdBy>2249463</createdBy>
+<createdTime>2024-08-27 15:34:42 UTC</createdTime>
+<generatorID>DD6DD592-D592-37BC-D61C-95CAE65EA0D5</generatorID>
+<ownerDesignName>fichier_dmd</ownerDesignName>
+<allowColumnReorder>false</allowColumnReorder>
+<existDependencyGenerateInDDl>true</existDependencyGenerateInDDl>
+<parsed>true</parsed>
+<columns itemClass="oracle.dbtools.crest.model.design.relational.Column">
+<Column name="id_abonnement" id="6622AFBC-874E-1968-7896-E7BA9A22563E">
+<createdBy>2249463</createdBy>
+<createdTime>2024-08-27 15:34:42 UTC</createdTime>
+<generatorID>EA06B368-0A7C-B8AD-4E60-AE4C1EA366E5</generatorID>
+<ownerDesignName>fichier_dmd</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="nom" id="22FF6538-D0DB-7771-1A00-BA69593049F6">
+<createdBy>2249463</createdBy>
+<createdTime>2024-08-27 15:34:42 UTC</createdTime>
+<generatorID>5FD130E9-7529-2C94-C61F-E3F454FAA14D</generatorID>
+<ownerDesignName>fichier_dmd</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>100</dataTypeSize>
+<ownDataTypeParameters>100,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="prix" id="EC3AB158-1419-8719-B7F9-45FCBB80E14F">
+<createdBy>2249463</createdBy>
+<createdTime>2024-08-27 15:34:42 UTC</createdTime>
+<generatorID>862C5FC0-70C3-C24A-77B0-5A8040AF78A5</generatorID>
+<ownerDesignName>fichier_dmd</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT026</logicalDatatype>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="duree" id="A36BA178-86A6-6F10-876C-31AD578226C4">
+<createdBy>2249463</createdBy>
+<createdTime>2024-08-27 15:34:42 UTC</createdTime>
+<generatorID>B55FEB36-D03E-E6C5-6DF8-2A1633F2AAA5</generatorID>
+<ownerDesignName>fichier_dmd</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="date_creation" id="486929DD-D4C6-F955-AAB9-CB9B7F2228DD">
+<createdBy>2249463</createdBy>
+<createdTime>2024-08-27 15:34:42 UTC</createdTime>
+<generatorID>E3F9EF3F-3A9A-8F0B-ADA1-36F2081E2992</generatorID>
+<ownerDesignName>fichier_dmd</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT007</logicalDatatype>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="utilisateur_id_utilisateur" id="EB898FB5-9179-7833-5710-CEB0FF3786F7">
+<createdBy>2249463</createdBy>
+<createdTime>2024-08-27 15:34:42 UTC</createdTime>
+<generatorID>F9AFB111-E50D-F4DA-57B9-3F13504C9A2D</generatorID>
+<ownerDesignName>fichier_dmd</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<previousColumn>false</previousColumn>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="878747B1-7D9D-EE67-DB69-B1263AA7FB6A" referredColumn="71E266A8-7517-2C68-8384-EB4EA2C28644"/>
+</associations>
+</Column>
+</columns>
+<indexes itemClass="oracle.dbtools.crest.model.design.relational.Index">
+<ind_PK_UK id="483F8A55-5B39-1DD7-D25B-09006B3F9ECC" name="abonnement_PK">
+<createdBy>2249463</createdBy>
+<createdTime>2024-08-27 15:34:42 UTC</createdTime>
+<generatorID>62750A41-FAA2-E20C-08BB-CE10B05FB26B</generatorID>
+<ownerDesignName>fichier_dmd</ownerDesignName>
+<pk>true</pk>
+<indexState>Primary Constraint</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="6622AFBC-874E-1968-7896-E7BA9A22563E"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="8800B052-18E3-409E-D794-7BD772F57EF2" name="abonnement_utilisateur_FK">
+<createdBy>2249463</createdBy>
+<createdTime>2024-08-27 15:34:42 UTC</createdTime>
+<generatorID>E0082747-D2A5-6931-7A9B-E0D6CE924FC8</generatorID>
+<ownerDesignName>fichier_dmd</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="EB898FB5-9179-7833-5710-CEB0FF3786F7"/>
+</indexColumnUsage>
+</ind_PK_UK>
+</indexes>
+</Table>
