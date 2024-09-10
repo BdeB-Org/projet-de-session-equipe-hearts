@@ -1,4 +1,4 @@
-Pour deployer notre application, 
+# Pour deployer notre application 
 1. Ouvrir CMD(terminal) et entrez cette ligne de commande : docker run -d -p 3306:3306 --name heart-server -e MYSQL_ROOT_PASSWORD=oracle -e MYSQL_DATABASE=scott -e MYSQL_USER=scott -e MYSQL_PASSWORD=oracle mysql/mysql-server:latest
    et
 2.  docker run --name mongo -d -p 27017:27017 mongodb/mongodb-community-server:latest
