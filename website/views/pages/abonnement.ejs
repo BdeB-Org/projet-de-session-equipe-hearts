@@ -1,15 +1,117 @@
 <%- include ("../partials/header.ejs") %>
-    <!DOCTYPE html>
-    <html lang="en">
+    <link href="https://fonts.googleapis.com/css2?family=Inknut+Antiqua:wght@400;700&display=swap" rel="stylesheet">
 
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Document</title>
-    </head>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
 
-    <body>
-    </body>
+            font-family: 'Inknut Antiqua', serif;
+            color: #0a0833;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
 
-    </html>
+        .pricing-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 30px;
+        }
+
+        .pricing-card {
+            background-color: white;
+            border-radius: 15px;
+            width: 200px;
+            padding: 20px;
+            text-align: center;
+            position: relative;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-header {
+            background-color: #f4a6a6;
+            color: #0a0833;
+            padding: 10px;
+            border-radius: 10px 10px 0 0;
+            font-size: 20px;
+            position: absolute;
+            top: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80%;
+        }
+
+        .price {
+            font-size: 24px;
+            margin: 20px 0;
+            color: #0a0833;
+        }
+
+        .features {
+            font-size: 14px;
+            color: #0a0833;
+            list-style: none;
+            padding: 0;
+            margin: 0 0 20px;
+        }
+
+        .buy-button {
+            background-color: #f4a6a6;
+            color: #0a0833;
+            padding: 10px;
+            border-radius: 0 0 10px 10px;
+            text-decoration: none;
+            font-weight: bold;
+            display: inline-block;
+            width: 100%;
+            cursor: pointer;
+            border: none;
+            font-size: 16px;
+        }
+
+        .buy-button:hover {
+            background-color: #e58888;
+        }
+    </style>
+
+<body>
+    <div class="pricing-container">
+
+        <div class="pricing-card">
+            <div class="card-header">Basic</div>
+            <div class="price">0$</div>
+            <ul class="features">
+                <li>Limited Swipes (5 par jours)</li>
+            </ul>
+            <button class="buy-button">Acheter</button>
+        </div>
+
+
+        <div class="pricing-card">
+            <div class="card-header">Premium</div>
+            <div class="price">19.47$</div>
+            <ul class="features">
+                <li>100 swipes a chaques semaines</li>
+            </ul>
+            <button class="buy-button">Acheter</button>
+        </div>
+
+
+        <div class="pricing-card">
+            <div class="card-header">Diamond</div>
+            <div class="price">25.47$</div>
+            <ul class="features">
+                <li>Swipes Illimité</li>
+            </ul>
+            <button class="buy-button">Acheter</button>
+        </div>
+
+
+    </div>
+</body>
+</html>
+
     <%- include ("../partials/footer.ejs") %>
