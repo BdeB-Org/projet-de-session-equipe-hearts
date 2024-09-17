@@ -6,7 +6,7 @@
 4. Cliquez sur les 3 petits points et allez dans le terminal du conteneur gym-server.
 5. Entrez la commande dans la terminal du gym-server: mysql -u root -p et entrez le mot de passe : oracle 
 6. Exécutez la ligne de commande en dessous dans Docker Desktop du gym-server ** OUVRIR LE README POUR COPY PASTE (NE PAS UTILISER LE PREVIEW) **
-7. Ouvrir le fichier github dans visual studio code et aller dans le répertoire \git_web\CoolKidsClub-Gym\GYM\Projet_etudiant1>
+7. Ouvrir le fichier github dans visual studio code et aller dans le répertoire \git_web\Hearts\hearts\Projet_etudiant1>
 8. Connectez a Mongo en utilsant l'extension MongoDB (feuille d'arbre) dans visual studio code
 9. Exécuter le server avec : node server.js
 10. Ouvrez http://localhost:4000/ dans votre navigateur web.
