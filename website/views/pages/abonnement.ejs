@@ -25,7 +25,7 @@
             background-color: white;
             border-radius: 15px;
             width: 200px;
-            padding: 20px;
+            height: 300px;
             text-align: center;
             position: relative;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
@@ -43,6 +43,12 @@
             transform: translateX(-50%);
             width: 80%;
         }
+        .card-content {
+            padding: 20px; 
+            box-sizing: border-box; 
+            height: calc(100% - 40px); 
+        }
+
 
         .price {
             font-size: 24px;
@@ -62,15 +68,16 @@
             background-color: #f4a6a6;
             color: #0a0833;
             padding: 10px;
-            border-radius: 0 0 10px 10px;
             text-decoration: none;
             font-weight: bold;
-            display: inline-block;
             width: 100%;
             cursor: pointer;
             border: none;
             font-size: 16px;
+            box-sizing: border-box;
+            border-radius: 0 0 15px 15px; 
         }
+
 
         .buy-button:hover {
             background-color: #e58888;
@@ -81,31 +88,37 @@
     <div class="pricing-container">
 
         <div class="pricing-card">
+            <div class="card-content">
             <div class="card-header">Basic</div>
             <div class="price">0$</div>
             <ul class="features">
                 <li>Limited Swipes (5 par jours)</li>
             </ul>
+        </div>
             <button class="buy-button">Acheter</button>
         </div>
 
 
         <div class="pricing-card">
+            <div class="card-content">
             <div class="card-header">Premium</div>
             <div class="price">19.47$</div>
             <ul class="features">
                 <li>100 swipes a chaques semaines</li>
             </ul>
+        </div>
             <button class="buy-button">Acheter</button>
         </div>
 
 
         <div class="pricing-card">
+            <div class="card-content">
             <div class="card-header">Diamond</div>
             <div class="price">25.47$</div>
             <ul class="features">
                 <li>Swipes Illimité</li>
             </ul>
+        </div>
             <button class="buy-button">Acheter</button>
         </div>
 
