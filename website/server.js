@@ -10,6 +10,10 @@ const app = express();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+app.set("views", path.join(__dirname, "views"));
+app.set("view engine", "ejs");
+
+app.use(express.static(path.join(__dirname, 'css')));
 /*
     Connect to server
 */
@@ -20,17 +24,17 @@ const server = app.listen(4000, function () {
 /*
     Connect MySql
 */
-const con = mysql.createConnection({
-    host: "localhost",
-    user: "scott",
-    password: "oracle",
-    database: "myhearts"
-});
+// const con = mysql.createConnection({
+//     host: "localhost",
+//     user: "scott",
+//     password: "oracle",
+//     database: "myhearts"
+// });
 
-con.connect(function (err) {
-    if (err) throw err;
-    console.log("connected!");
-});
+// con.connect(function (err) {
+//     if (err) throw err;
+//     console.log("connected!");
+// });
 
 
 /*
@@ -66,7 +70,7 @@ app.get("/event/creationCompte", function (req, res) {
     });
 });
 
-app.get("/event/Abonnement", function (req, res) {
+app.get("/event/abonnement", function (req, res) {
     res.render("pages/abonnement", {
         siteTitle: "Créer Compte",
         pageTitle: "Créer Compte",
