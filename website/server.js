@@ -9,6 +9,7 @@ import dateFormat from "dateformat";
 const app = express();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+app.use(express.static("public"));
 
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "ejs");
@@ -42,6 +43,8 @@ const server = app.listen(4000, function () {
 */
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "ejs");
+app.use('/images', express.static(path.join(__dirname, 'images')));
+
 
 
 /*
@@ -72,17 +75,18 @@ app.get("/event/creationCompte", function (req, res) {
 
 app.get("/event/abonnement", function (req, res) {
     res.render("pages/abonnement", {
-        siteTitle: "Créer Compte",
-        pageTitle: "Créer Compte",
+        siteTitle: "Abonnez-Vous",
+        pageTitle: "Abonnez-Vous",
     });
 });
 
 app.get("/event/apropos", function (req, res) {
     res.render("pages/apropos", {
-        siteTitle: "Créer Compte",
-        pageTitle: "Créer Compte",
+        siteTitle: "Aprpoos",
+        pageTitle: "A Propos",
     });
 });
+
 
 /*
     LES POSTS
