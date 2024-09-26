@@ -15,6 +15,8 @@ app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "ejs");
 
 app.use(express.static(path.join(__dirname, 'css')));
+app.use('/js', express.static(path.join(__dirname, 'js')));
+
 /*
     Connect to server
 */
@@ -59,8 +61,8 @@ app.get("/", function (req, res) {
     });
 });
 
-app.get("/event/connect", function (req, res) {
-    res.render("pages/connexion", {
+app.get("/event/inscription", function (req, res) {
+    res.render("pages/inscription", {
         siteTitle: "Connexion",
         pageTitle: "Connectez-vous",
     });

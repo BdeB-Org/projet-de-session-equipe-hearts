@@ -11,7 +11,6 @@
     </head>
 
     <body>
-
         <div class="container-wrapper">
 
             <div class="container" id="container">
@@ -21,14 +20,14 @@
                         <div class="social-icons">
                             <a href="#" class="icons"><i class="fa-brands fa-google"></i></a>
                             <a href="#" class="icons"><i class="fa-brands fa-facebook"></i></a>
-                            <a href="#" class="icons"><i class="fa-brands fa-github"></i></a>
-                            <a href="#" class="icons"><i class="fa-brands fa-linkedin"></i></i></a>
+                            <a href="#" class="icons"><i class="fa-brands fa-apple"></i></a>
+                            <a href="#" class="icons"><i class="fa-brands fa-twitter"></i></a>
                         </div>
                         <span>ou utiliser votre courriel...</span>
-                        <input type="text" placeholder="Nom">
-                        <input type="email" placeholder="Courriel">
-                        <input type="password" placeholder="Mot de passe">
-                        <button>S'inscrire</button>
+                        <input type="email" placeholder="Courriel" required>
+                        <input type="password" placeholder="Mot de passe" required>
+                        <input type="password" placeholder="Vérifiez votre mot de passe" required>
+                        <button type="button" onclick="redirectInscription(event)">S'inscrire</button>
                     </form>
                 </div>
 
@@ -39,14 +38,14 @@
                         <div class="social-icons">
                             <a href="#" class="icons"><i class="fa-brands fa-google"></i></a>
                             <a href="#" class="icons"><i class="fa-brands fa-facebook"></i></a>
-                            <a href="#" class="icons"><i class="fa-brands fa-github"></i></a>
-                            <a href="#" class="icons"><i class="fa-brands fa-linkedin"></i></i></a>
+                            <a href="#" class="icons"><i class="fa-brands fa-apple"></i></a>
+                            <a href="#" class="icons"><i class="fa-brands fa-twitter"></i></a>
                         </div>
                         <span>ou utiliser votre courriel...</span>
-                        <input type="email" placeholder="Courriel">
-                        <input type="password" placeholder="Mot de passe">
+                        <input type="email" placeholder="Courriel" required>
+                        <input type="password" placeholder="Mot de passe" required>
                         <a href="#" class="mdp_button">Mot de passe oublié?</a>
-                        <button>SE CONNECTER</button>
+                        <button type="button" onclick="redirectAccueil(event)">SE CONNECTER</button>
                     </form>
                 </div>
 
@@ -67,19 +66,8 @@
                 </div>
             </div>
         </div>
-        <script>
-            const container = document.getElementById('container');
-            const registerBtn = document.getElementById('register');
-            const loginBtn = document.getElementById('login');
 
-            registerBtn.addEventListener('click', () => {
-                container.classList.add("active");
-            });
-
-            loginBtn.addEventListener('click', () => {
-                container.classList.remove("active");
-            });
-        </script>
+        <script src="/js/creationCompte.js"></script>
     </body>
 
     </html>

@@ -1,0 +1,90 @@
+<%- include ("../partials/header.ejs") %>
+    <!DOCTYPE html>
+    <html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Hearts</title>
+        <link rel="stylesheet" href="/inscription.css">
+    </head>
+
+    <body>
+
+
+        <style>
+            .step input {
+                width: 200px;
+            }
+        </style>
+        <div class="form_inscription">
+            <form id="myForm" novalidate>
+                <!-- Phone Number (with code verification) -->
+                <div class="step" id="step-1">
+                    <input type="tel" placeholder="Numéro Format: 514-235-7369" pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}" required>
+                </div>
+                
+                <!-- First Name -->
+                <div class="step" id="step-2">
+                    <input type="text" placeholder="Prénom" required>
+                </div>
+            
+                <!-- Last Name -->
+                <div class="step" id="step-3">
+                    <input type="text" placeholder="Nom de famille">
+                </div>
+            
+                <!-- Birthdate -->
+                <div class="step" id="step-4">
+                    <input type="date" placeholder="Date de naissance" required>
+                </div>
+            
+                <!-- Gender (M/W) -->
+                <div class="step" id="step-5">
+                    <select required>
+                        <option value="" disabled selected>Genre</option>
+                        <option value="H">Homme</option>
+                        <option value="F">Femme</option>
+                        <option value="F">Autre</option>
+                    </select>
+                </div>
+            
+                <!-- Sexual Orientation -->
+                <div class="step" id="step-6">
+                    <select required>
+                        <option value="" disabled selected>Orientation sexuelle (hétéro, gay, lesbienne, bi)</option>
+                        <option value="hétéro">Hétérosexuel</option>
+                        <option value="gay">Gay</option>
+                        <option value="lesbienne">Lesbienne</option>
+                        <option value="bi">Bisexuel</option>
+                    </select>
+                </div>
+            
+                <!-- Looking for? (CARDS) -->
+                <div class="step" id="step-7">
+                    <input type="text" placeholder="Que cherchez-vous? (Cartes)" required>
+                </div>
+            
+                <!-- What do you like? -->
+                <div class="step" id="step-8">
+                    <input type="text" placeholder="Qu'est-ce que vous aimez?" required>
+                </div>
+            
+                <!-- Pictures (2-6) -->
+                <div class="step" id="step-9">
+                    <input type="file" accept="image/*" multiple placeholder="Photos (2-6)" required>
+                </div>
+            
+                <!-- Submit button -->
+                <input type="submit" value="Soumettre">
+            </form>
+            
+
+
+        </div>
+
+        <script src="/js/inscription.js"></script>
+    </body>
+
+    </html>
+    <%- include ("../partials/footer.ejs") %>
