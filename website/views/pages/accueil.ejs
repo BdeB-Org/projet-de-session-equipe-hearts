@@ -1,15 +1,193 @@
 <%- include ("../partials/header.ejs") %>
-    <!DOCTYPE html>
-    <html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Document</title>
-    </head>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Card Flip Animation</title>
+    <style>
+        body {
+            background-color: #000000;
+            position: relative;
+            height: 100vh;
+            margin: 0;
+            justify-content: center;
+            align-items: center;
+        }
 
-    <body>
-    </body>
+        .cards {
+            position: relative;
+        }
 
-    </html>
-    <%- include ("../partials/footer.ejs") %>
+        .card {
+            perspective: 1000px;
+            position: absolute;
+        }
+
+        .card-inner {
+            width: 100%;
+            height: 100%;
+            transform-style: preserve-3d;
+            transition: transform 0.6s ease-in-out;
+            transform-origin: center; /* Center the flip on the card itself */
+        }
+
+        .card:hover .card-inner {
+            transform: rotateY(180deg); /* Flip the card */
+        }
+
+        .card-front,
+        .card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 15px;
+        }
+
+        .card-front img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 15px;
+        }
+
+        .card-back {
+            transform: rotateY(180deg);
+            background: linear-gradient(135deg, #f093fb, #f5576c); /* Gradient background */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+            color: #fff;
+            text-align: center;
+            padding: 20px;
+            line-height: 1.5;
+            box-shadow: 0px 4px 20px rgba(255, 99, 132, 0.8); /* Box shadow for pop */
+            transition: background 0.4s ease-in-out;
+        }
+
+        .card-back:hover {
+            background: linear-gradient(135deg, #f093fb, #f5576c);
+        }
+
+        .card-back p {
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 0.5s ease-in-out forwards 0.3s;
+        }
+
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Individual card sizes */
+        .card-1 img {
+            width: 280px;
+            height: 480px;
+            border-radius: 15px;
+        }
+
+        .card-2 img {
+            width: 285px;
+            height: 460px;
+            border-radius: 15px;
+        }
+
+        .card-3 img {
+            width: 300px;
+            height: 530px;
+            border-radius: 15px;
+        }
+
+        .card-4 img {
+            width: 320px;
+            height: 430px;
+            border-radius: 15px;
+        }
+
+        /* Positioning each card individually */
+        .card-1 {
+            top: 100px;
+            left: 200px;
+            width: 280px; /* Set fixed width */
+            height: 480px; /* Set fixed height */
+        }
+
+        .card-2 {
+            top: 110px;
+            left: 600px;
+            width: 285px; /* Set fixed width */
+            height: 460px; /* Set fixed height */
+        }
+
+        .card-3 {
+            top: 75px;
+            left: 1000px;
+            width: 300px; /* Set fixed width */
+            height: 530px; /* Set fixed height */
+        }
+
+        .card-4 {
+            top: 120px;
+            left: 1400px;
+            width: 320px; /* Set fixed width */
+            height: 430px; /* Set fixed height */
+        }
+    </style>
+</head>
+
+<body>
+    <div class="cards">
+        <div class="card card-1">
+            <div class="card-inner">
+                <div class="card-front">
+                    <img src="/images/joker_neon_converted-removebg-preview.png" alt="Joker">
+                </div>
+                <div class="card-back">
+                    <p>Pour ceux qui cherchent un "ami... avec un petit plus", sans trop de complications !</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="card card-2">
+            <div class="card-inner">
+                <div class="card-front">
+                    <img src="/images/file-removebg-preview.png" alt="Card 2">
+                </div>
+                <div class="card-back">
+                    <p>A venir</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="card card-3">
+            <div class="card-inner">
+                <div class="card-front">
+                    <img src="/images/file__1_-removebg-preview.png" alt="Card 3">
+                </div>
+                <div class="card-back">
+                    <p>Quand tu veux passer une bonne soirée... sans les discussions du lendemain.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="card card-4">
+            <div class="card-inner">
+                <div class="card-front">
+                    <img src="/images/file__2_-removebg-preview.png" alt="Card 4">
+                </div>
+                <div class="card-back">
+                    <p>Pour les rois et reines du cœur, en quête d'une histoire qui dure et qui compte.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
+<%- include ("../partials/footer.ejs") %>
