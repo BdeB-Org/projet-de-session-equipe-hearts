@@ -19,6 +19,52 @@ CREATE DATABASE myhearts;
 
 USE myhearts;
 
+CREATE TABLE e_utilisateur (
+    e_id INT AUTO_INCREMENT NOT NULL,
+    e_nom VARCHAR(100) NOT NULL,
+    e_prenom VARCHAR(100) NOT NULL,
+    date_naissance DATE NOT NULL,
+    e_courriel VARCHAR(100) NOT NULL,
+    e_photo LONGBLOB NOT NULL,
+    e_location TEXT NOT NULL,
+    e_number TEXT NOT NULL,
+    PRIMARY KEY (e_id)
+);
+
+CREATE TABLE e_abonnement (
+    e_id INT NOT NULL,
+    e_nom VARCHAR(100) NOT NULL,
+    prix DECIMAL(10, 2) 
+    e_duree INT NOT NULL,
+    e_date_creation DATE NOT NULL,
+    e_utilisateur_id_utilisateur INT NOT NULL,
+    PRIMARY KEY (e_id),
+
+);
+
+CREATE TABLE lieu (
+    id_lieu INT NOT NULL,
+    nom VARCHAR(100) NOT NULL,
+    type_lieu VARCHAR(100),
+    adresse VARCHAR(100),
+    PRIMARY KEY (id_lieu)
+);
+
+CREATE TABLE preference (
+    id_preference INT NOT NULL,
+    utilisateur_id_utilisateur INT,
+    type_pref VARCHAR(100) NOT NULL,
+    PRIMARY KEY (id_preference),
+    FOREIGN KEY (utilisateur_id_utilisateur) REFERENCES utilisateur(id_utilisateur)
+);
+
+CREATE TABLE relation_5 (
+    utilisateur_id_utilisateur INT NOT NULL,
+    lieu_id_lieu INT NOT NULL,
+    PRIMARY KEY (utilisateur_id_utilisateur, lieu_id_lieu),
+    FOREIGN KEY (lieu_id_lieu) REFERENCES lieu(id_lieu),
+    FOREIGN KEY (utilisateur_id_utilisateur) REFERENCES utilisateur(id_utilisateur)
+);
 
 GRANT ALL PRIVILEGES ON *.* TO 'scott'@'%';
 ALTER USER 'scott'@'%' IDENTIFIED WITH mysql_native_password BY 'oracle';
