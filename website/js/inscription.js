@@ -1,38 +1,31 @@
-const phoneInput = document.getElementById('phone');
-const firstNameInput = document.getElementById('firstName');
-const form = document.getElementById('myForm');
+document.addEventListener('DOMContentLoaded', () => {
+    const steps = document.querySelectorAll('.step');
+    let currentStep = 0;
 
-phoneInput.addEventListener('input', function() {
-    if (phoneInput.validity.patternMismatch) {
-        phoneInput.setCustomValidity("Le numéro de téléphone doit être au format 514-232-4223.");
-    } else {
-        phoneInput.setCustomValidity(""); // Clear the error if the input is valid
-    }
-});
+    // Show the first step
+    steps[currentStep].classList.add('active');
 
-firstNameInput.addEventListener('input', function() {
-    if (firstNameInput.validity.valueMissing) {
-        firstNameInput.setCustomValidity("Veuillez entrer votre prénom.");
-    } else {
-        firstNameInput.setCustomValidity(""); // Clear the error if the input is valid
-    }
-});
+    // Add event listeners to "Next" buttons
+    document.querySelectorAll('.next-button').forEach((button, index) => {
+        button.addEventListener('click', () => {
+            if (validateStep(index)) {
+                steps[currentStep].classList.remove('active');
+                currentStep++;
+                if (currentStep < steps.length) {
+                    steps[currentStep].classList.add('active');
+                }
+            }
+        });
+    });
 
-form.addEventListener('submit', function(event) {
-    // Show error messages next to inputs
-    if (!phoneInput.checkValidity()) {
-        document.getElementById('phoneError').textContent = phoneInput.validationMessage;
-    } else {
-        document.getElementById('phoneError').textContent = "";
-    }
-
-    if (!firstNameInput.checkValidity()) {
-        document.getElementById('firstNameError').textContent = firstNameInput.validationMessage;
-    } else {
-        document.getElementById('firstNameError').textContent = "";
-    }
-
-    if (!form.checkValidity()) {
-        event.preventDefault(); // Prevent form submission if invalid
+    function validateStep(stepIndex) {
+        const inputs = steps[stepIndex].querySelectorAll('input, select');
+        for (let input of inputs) {
+            if (!input.checkValidity()) {
+                input.reportValidity();
+                return false;
+            }
+        }
+        return true;
     }
 });

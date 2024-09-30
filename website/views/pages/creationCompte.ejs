@@ -15,7 +15,7 @@
 
             <div class="container" id="container">
                 <div class="form-container sign-up">
-                    <form>
+                    <form onsubmit="redirectInscription(event)">
                         <h1>Créer un compte</h1>
                         <div class="social-icons">
                             <a href="#" class="icons"><i class="fa-brands fa-google"></i></a>
@@ -24,16 +24,24 @@
                             <a href="#" class="icons"><i class="fa-brands fa-twitter"></i></a>
                         </div>
                         <span>ou utiliser votre courriel...</span>
-                        <input type="email" placeholder="Courriel" required>
-                        <input type="password" placeholder="Mot de passe" required>
-                        <input type="password" placeholder="Vérifiez votre mot de passe" required>
-                        <button type="button" onclick="redirectInscription(event)">S'inscrire</button>
+                    
+                        <input type="email" id="courriel_insc" placeholder="Courriel" required>
+                        <span class="message-erreur" id="erreur-email"></span>
+                    
+                        <input type="password" id="mdp_insc" placeholder="Mot de passe" required>
+                        <span class="message-erreur" id="erreur-mdp"></span>
+                    
+                        <input type="password" id="verif-mdp_insc" placeholder="Vérifiez votre mot de passe" required>
+                        <span class="message-erreur" id="erreur-mdp-verif"></span>
+                    
+                        <button type="submit">S'inscrire</button>
                     </form>
+                    
                 </div>
 
 
                 <div class="form-container sign-in">
-                    <form>
+                    <form onsubmit="redirectInscription(event)">
                         <h1>Se Connecter</h1>
                         <div class="social-icons">
                             <a href="#" class="icons"><i class="fa-brands fa-google"></i></a>
@@ -42,10 +50,11 @@
                             <a href="#" class="icons"><i class="fa-brands fa-twitter"></i></a>
                         </div>
                         <span>ou utiliser votre courriel...</span>
-                        <input type="email" placeholder="Courriel" required>
-                        <input type="password" placeholder="Mot de passe" required>
+                        <input type="email" id="courriel" placeholder="Courriel" required>
+                        <input type="password" id="mdp" placeholder="Mot de passe" required>
                         <a href="#" class="mdp_button">Mot de passe oublié?</a>
-                        <button type="button" onclick="redirectAccueil(event)">SE CONNECTER</button>
+                        <button type="submit">SE CONNECTER</button>
+                        
                     </form>
                 </div>
 

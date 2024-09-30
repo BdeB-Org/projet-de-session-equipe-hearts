@@ -267,5 +267,9 @@ body {
     transform: translateX(0);
 }
 
-
-
+.message-erreur {
+    color: red;
+    font-size: 0.9em;
+    display: none;
+    margin-top: 5px;
+}
