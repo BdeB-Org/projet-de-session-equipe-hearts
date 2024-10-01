@@ -7,38 +7,46 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hearts</title>
     <link rel="stylesheet" href="/inscription.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400..900&display=swap" rel="stylesheet">
 </head>
 
 <body>
-    <div class="form_inscription">
-        <form id="myForm">
+    <main class="form_inscription">
+        <form id="myForm" class="orbitron-font">
             <!-- Phone Number (with code verification) -->
-            <div class="step" id="step-1">
-                <input type="tel" placeholder="Numéro Format: 514-235-7369" pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}" required>
+            <div class="step label" id="step-1">
+                <label for="phone">Numéro Format: 514-235-7369</label>
+                <input type="tel" id="phone" placeholder="514-235-7369" pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}" required>
                 <button type="button" class="next-button">Next</button>
             </div>
 
             <!-- First Name -->
             <div class="step" id="step-2">
-                <input type="text" placeholder="Prénom" required>
+                <label for="first-name">Prénom</label>
+                <input type="text" id="first-name" placeholder="Prénom" required>
                 <button type="button" class="next-button">Next</button>
             </div>
 
             <!-- Last Name -->
             <div class="step" id="step-3">
-                <input type="text" placeholder="Nom de famille">
+                <label for="last-name">Nom de famille</label>
+                <input type="text" id="last-name" placeholder="Nom de famille" required>
                 <button type="button" class="next-button">Next</button>
             </div>
 
             <!-- Birthdate -->
             <div class="step" id="step-4">
-                <input type="date" placeholder="Date de naissance" required>
+                <label for="birthdate">Date de naissance</label>
+                <input type="date" id="birthdate" required>
                 <button type="button" class="next-button">Next</button>
             </div>
 
             <!-- Gender (M/W) -->
             <div class="step" id="step-5">
-                <select required>
+                <label for="gender">Genre</label>
+                <select id="gender" required>
                     <option value="" disabled selected>Genre</option>
                     <option value="H">Homme</option>
                     <option value="F">Femme</option>
@@ -49,8 +57,9 @@
 
             <!-- Sexual Orientation -->
             <div class="step" id="step-6">
-                <select required>
-                    <option value="" disabled selected>Orientation sexuelle (hétéro, gay, lesbienne, bi)</option>
+                <label for="orientation">Orientation sexuelle</label>
+                <select id="orientation" required>
+                    <option value="" disabled selected>Orientation sexuelle</option>
                     <option value="hétéro">Hétérosexuel</option>
                     <option value="gay">Gay</option>
                     <option value="lesbienne">Lesbienne</option>
@@ -61,19 +70,22 @@
 
             <!-- Looking for? (CARDS) -->
             <div class="step" id="step-7">
-                <input type="text" placeholder="Que cherchez-vous? (Cartes)" required>
+                <label for="looking-for">Que cherchez-vous? (Cartes)</label>
+                <input type="text" id="looking-for" placeholder="Que cherchez-vous?" required>
                 <button type="button" class="next-button">Next</button>
             </div>
 
             <!-- What do you like? -->
             <div class="step" id="step-8">
-                <input type="text" placeholder="Qu'est-ce que vous aimez?" required>
+                <label for="likes">Qu'est-ce que vous aimez?</label>
+                <input type="text" id="likes" placeholder="Qu'est-ce que vous aimez?" required>
                 <button type="button" class="next-button">Next</button>
             </div>
 
             <!-- Pictures (2-6) -->
             <div class="step" id="step-9">
-                <input type="file" accept="image/*" multiple placeholder="Photos (2-6)" required>
+                <label for="photos">Photos (2-6)</label>
+                <input type="file" id="photos" accept="image/*" multiple required>
                 <button type="button" class="next-button">Next</button>
             </div>
 
@@ -82,7 +94,7 @@
                 <input type="submit" value="Soumettre">
             </div>
         </form>
-    </div>
+    </main>
 
     <script src="/js/inscription.js"></script>
 </body>

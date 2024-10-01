@@ -82,16 +82,15 @@
     }
 
     .screen>.screen-image {
-      background-image: url("https://images.unsplash.com/photo-1607419726991-5fc7e74cda67?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D");
+      background-image: url("https://images.unsplash.com/photo-1561344640-2453889cde5b?q=80&w=1934&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D");
       height: 100%;
       width: 100%;
       position: absolute;
       z-index: 1;
       left: 0;
       top: 0;
-      background-size: 300%;
-      background-position: 0% 0%;
-      filter: sepia(100%) hue-rotate(160deg);
+      background-size: cover; 
+      background-position: center; 
       opacity: 0.6;
       animation: pan-image 15s linear infinite;
     }
@@ -331,8 +330,8 @@
 </body>
 
 <script>
- const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789€";
-let interval = null;
+const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789€";
+let intervals = [];
 
 // SCREENS
 const screens = document.querySelectorAll(".screen");
@@ -340,46 +339,50 @@ const screens = document.querySelectorAll(".screen");
 screens.forEach(screen => {
   const name = screen.querySelector(".name");
   const price = screen.querySelector(".price");
-  const features = screen.querySelector(".features li");
-
-  // Array of elements to encrypt
+  const features = screen.querySelector(".features");
   const elementsToEncrypt = [name, price, features];
 
   screen.onmouseenter = () => {
-    let iteration = 0;
+    elementsToEncrypt.forEach((element, index) => {
+      if (element.dataset.value) {
+        let iteration = 0;
 
-    clearInterval(interval);
-    interval = setInterval(() => {
-      elementsToEncrypt.forEach(element => {
-        if (element.dataset.value) {
+        if (intervals[index]) {
+          clearInterval(intervals[index]);
+        }
+
+        intervals[index] = setInterval(() => {
           element.innerText = element.dataset.value
             .split("")
-            .map((letter, index) => {
-              if (index < iteration) {
-                return element.dataset.value[index];
+            .map((letter, idx) => {
+              if (idx < iteration) {
+                return element.dataset.value[idx];
               }
               return letters[Math.floor(Math.random() * letters.length)];
             })
             .join("");
-        }
-      });
 
-      if (iteration >= name.dataset.value.length) {
-        clearInterval(interval);
+          if (iteration >= element.dataset.value.length) {
+            clearInterval(intervals[index]);
+          }
+          iteration += 1 / 3;
+        }, 30);
       }
-      iteration += 1 / 3;
-    }, 30);
+    });
   };
 
   screen.onmouseleave = () => {
-    clearInterval(interval);
-    elementsToEncrypt.forEach(element => {
+    elementsToEncrypt.forEach((element, index) => {
+      if (intervals[index]) {
+        clearInterval(intervals[index]);
+      }
       if (element.dataset.value) {
         element.innerText = element.dataset.value; 
       }
     });
   };
 });
+
 
 </script>
 
