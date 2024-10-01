@@ -5,6 +5,7 @@ import { fileURLToPath } from "url";
 import mysql from "mysql";
 import { body, validationResult } from "express-validator";
 import dateFormat from "dateformat";
+import bcrypt from 'bcrypt';
 
 const app = express();
 const __filename = fileURLToPath(import.meta.url);
@@ -12,6 +13,8 @@ const __dirname = path.dirname(__filename);
 app.use(express.static("public"));
 
 app.use(express.static('website'));
+
+app.use('/fonts', express.static(path.join(__dirname, 'fonts')));
 
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "ejs");
@@ -29,17 +32,29 @@ const server = app.listen(4000, function () {
 /*
     Connect MySql
 */
-//  const con = mysql.createConnection({
-//      host: "localhost",
-//      user: "scott",
-//      password: "oracle",
-//     database: "myhearts"
-//  });
+ const con = mysql.createConnection({
+     host: "localhost",
+     user: "scott",
+     password: "oracle",
+    database: "myhearts"
+ });
 
-//  con.connect(function (err) {
-//     if (err) throw err;
-//     console.log("connected!");
-//  });
+ app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+
+app.use(session({
+    secret: 'your-secret-key', 
+    resave: false,
+    saveUninitialized: true,
+    cookie: { secure: false } 
+}));
+
+
+ con.connect(function (err) {
+    if (err) throw err;
+    console.log("connected!");
+ });
 
 
 /*
@@ -102,3 +117,36 @@ app.get("/event/apropos", function (req, res) {
 /*
     LES POSTS
 */
+
+
+app.post('/event/creationCompte', (req, res) => {
+    const { email, password } = req.body;
+
+
+    const verifyUserQuery = "SELECT * FROM e_utilisateur WHERE E_COURRIEL = ?";
+    con.query(verifyUserQuery, [email], (err, result) => {
+        if (err) {
+            console.error("Error verifying user:", err);
+            return res.status(500).send("Internal Server Error");
+        }
+
+        if (result.length > 0) {
+            return res.status(400).send("Email already in use");
+        }
+        bcrypt.hash(password, 10, (hashErr, hashedPassword) => {
+            if (hashErr) {
+                console.error("Error hashing password:", hashErr);
+                return res.status(500).send("Internal Server Error");
+            }
+
+            const insertUserQuery = "INSERT INTO e_utilisateur (E_COURRIEL, E_PASSWORD) VALUES (?, ?)";
+            con.query(insertUserQuery, [email, hashedPassword], (insertErr) => {
+                if (insertErr) {
+                    console.error("Error inserting user:", insertErr);
+                    return res.status(500).send("Internal Server Error");
+                }
+                res.status(201).send("User created successfully");
+            });
+        });
+    });
+});

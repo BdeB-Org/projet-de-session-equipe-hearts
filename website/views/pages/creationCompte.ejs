@@ -16,7 +16,7 @@
 
             <div class="container" id="container">
                 <div class="form-container sign-up">
-                    <form onsubmit="redirectInscription(event)">
+                    <form method="post" action="/event/creationCompte">
                         <h1>Créer un compte</h1>
                         <div class="social-icons">
                             <a href="#" class="icons"><i class="fa-brands fa-google"></i></a>
@@ -34,9 +34,9 @@
                     
                         <input type="password" id="verif-mdp_insc" placeholder="Vérifiez votre mot de passe" required>
                         <span class="message-erreur" id="erreur-mdp-verif"></span>
+                    </form>
                     
                         <button type="submit">S'inscrire</button>
-                    </form>
                     
                 </div>
 
