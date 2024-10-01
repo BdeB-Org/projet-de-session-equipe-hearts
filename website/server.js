@@ -11,6 +11,10 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 app.use(express.static("public"));
 
+app.use(express.static('website'));
+
+app.use('/fonts', express.static(path.join(__dirname, 'fonts')));
+
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "ejs");
 
