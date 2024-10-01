@@ -16,36 +16,36 @@
     <main class="form_inscription">
         <form id="myForm" class="orbitron-font">
             <!-- Phone Number (with code verification) -->
-            <div class="step label" id="step-1">
-                <label for="phone">Numéro Format: 514-235-7369</label>
-                <input type="tel" id="phone" placeholder="514-235-7369" pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}" required>
+            <div class="step" id="step-1">
+                <!-- <label for="phone">Numéro Format: 514-235-7369</label> -->
+                <input type="tel" id="phone" placeholder="Numéro Format: 514-235-7369" pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}" required>
                 <button type="button" class="next-button">Next</button>
             </div>
 
             <!-- First Name -->
             <div class="step" id="step-2">
-                <label for="first-name">Prénom</label>
+                <!-- <label for="first-name">Prénom</label> -->
                 <input type="text" id="first-name" placeholder="Prénom" required>
                 <button type="button" class="next-button">Next</button>
             </div>
 
             <!-- Last Name -->
             <div class="step" id="step-3">
-                <label for="last-name">Nom de famille</label>
+                <!-- <label for="last-name">Nom de famille</label> -->
                 <input type="text" id="last-name" placeholder="Nom de famille" required>
                 <button type="button" class="next-button">Next</button>
             </div>
 
             <!-- Birthdate -->
             <div class="step" id="step-4">
-                <label for="birthdate">Date de naissance</label>
+                <!-- <label for="birthdate">Date de naissance</label> -->
                 <input type="date" id="birthdate" required>
                 <button type="button" class="next-button">Next</button>
             </div>
 
             <!-- Gender (M/W) -->
             <div class="step" id="step-5">
-                <label for="gender">Genre</label>
+                <!-- <label for="gender">Genre</label> -->
                 <select id="gender" required>
                     <option value="" disabled selected>Genre</option>
                     <option value="H">Homme</option>
@@ -57,7 +57,7 @@
 
             <!-- Sexual Orientation -->
             <div class="step" id="step-6">
-                <label for="orientation">Orientation sexuelle</label>
+                <!-- <label for="orientation">Orientation sexuelle</label> -->
                 <select id="orientation" required>
                     <option value="" disabled selected>Orientation sexuelle</option>
                     <option value="hétéro">Hétérosexuel</option>
@@ -70,21 +70,21 @@
 
             <!-- Looking for? (CARDS) -->
             <div class="step" id="step-7">
-                <label for="looking-for">Que cherchez-vous? (Cartes)</label>
+                <!-- <label for="looking-for">Que cherchez-vous? (Cartes)</label> -->
                 <input type="text" id="looking-for" placeholder="Que cherchez-vous?" required>
                 <button type="button" class="next-button">Next</button>
             </div>
 
             <!-- What do you like? -->
             <div class="step" id="step-8">
-                <label for="likes">Qu'est-ce que vous aimez?</label>
+                <!-- <label for="likes">Qu'est-ce que vous aimez?</label> -->
                 <input type="text" id="likes" placeholder="Qu'est-ce que vous aimez?" required>
                 <button type="button" class="next-button">Next</button>
             </div>
 
             <!-- Pictures (2-6) -->
             <div class="step" id="step-9">
-                <label for="photos">Photos (2-6)</label>
+                <!-- <label for="photos">Photos (2-6)</label> -->
                 <input type="file" id="photos" accept="image/*" multiple required>
                 <button type="button" class="next-button">Next</button>
             </div>
