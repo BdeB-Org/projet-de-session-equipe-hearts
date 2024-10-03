@@ -16,6 +16,7 @@
 
             <div class="container" id="container">
                 <div class="form-container sign-up">
+                    <form onsubmit="redirectInscription(event)">
                         <h1>Créer un compte</h1>
                         <div class="social-icons">
                             <a href="#" class="icons"><i class="fa-brands fa-google"></i></a>
@@ -33,15 +34,22 @@
                     
                         <input type="password" id="verif-mdp_insc" placeholder="Vérifiez votre mot de passe" required>
                         <span class="message-erreur" id="erreur-mdp-verif"></span>
+<<<<<<< HEAD
                         <button type="submit">S'inscrire</button>
                     </form>
                     
                         
+=======
+                    
+                        <button type="submit">S'inscrire</button>
+                    </form>
+>>>>>>> 681b7149d0f386ace938db1c12200862b7c3650b
                     
                 </div>
 
 
                 <div class="form-container sign-in">
+                    <form method= "post" action="/event/connect">
                         <h1>Se Connecter</h1>
                         <div class="social-icons">
                             <a href="#" class="icons"><i class="fa-brands fa-google"></i></a>
@@ -50,6 +58,8 @@
                             <a href="#" class="icons"><i class="fa-brands fa-twitter"></i></a>
                         </div>
                         <span>ou utiliser votre courriel...</span>
+                        <input type="email" id="courriel" name="email" placeholder="Courriel" required>
+                        <input type="password" id="mdp" name="password" placeholder="Mot de passe" required>
                         <a href="#" class="mdp_button">Mot de passe oublié?</a>
                         <button type="submit">SE CONNECTER</button>
                         
