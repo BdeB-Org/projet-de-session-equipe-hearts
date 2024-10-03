@@ -1,61 +1,108 @@
-.orbitron-font {
-    font-family: "Orbitron", sans-serif;
-    font-optical-sizing: auto;
-    font-weight: 600; /* You may change this based on design needs */
-  }
-  
-  .step input {
-    font-family: "Orbitron", sans-serif;
-    background: linear-gradient(90deg, #F4F4F4 15%, #FFA3AC 75%);
-    border: none;
-    margin: 8px 0;
-    padding: 10px 15px;
-    font-size: 13px;
-    border-radius: 8px;
-    width: 230px;
-    outline: none;
-    color: #333;
-    transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
-  }
-  
-  .step input:focus {
-    border: 2px solid #FF7991;
-    box-shadow: 0px 0px 8px rgba(255, 163, 172, 0.5);
-    transform: scale(1.02);
-    color: #FF7991;
-  }
-  
-  .step input::placeholder {
-    color: #888;
-  }
-  
-  .step input:focus::placeholder {
-    color: #FFB3BB;
-  } 
-  form {
-    width: 100%;
-  }
-  
-  .step {
-    display: none;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    transition: opacity 0.5s ease-in-out;
-  }
-  
-  .step.active {
-    display: flex;
-    opacity: 1;
-    /* Add padding and border if necessary */
-    padding: 20px; /* Adjust this value to increase the spacing around the content */
-    width: 100%; /* Ensures it takes full width of the container */
-}
-
 body {
-    margin: 0;
+  margin: 0;
+  font-family: "Orbitron", sans-serif;
+  background-color: #000;
 }
 
-.form_inscription{
-    margin-top: 300px;
+.form_inscription {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start; /* Aligns content to the top */
+  margin-top: 50px;
+  width: 100%;
+  height: 100vh; /* Full view height */
+  padding-top: 50px; /* Provides padding to move content up */
+}
+
+.grid-container {
+  display: grid;
+  grid-template-columns: 1.2fr 1.2fr 1fr 1fr; /* Make image columns slightly bigger */
+  grid-gap: 40px; /* Increase spacing between columns */
+  width: 95%; /* Adjust for better spacing on larger screens */
+  max-width: 1600px; /* Allow a larger max width for bigger screens */
+  align-items: start;
+  margin-top: -20px; /* Adjust vertical alignment slightly */
+}
+
+.image-section {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: auto;
+}
+
+.image-section img {
+  width: 100%;
+  height: auto;
+  max-width: 100%; /* Keep images responsive */
+  border-radius: 10px;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2); /* Slightly larger shadow for emphasis */
+}
+
+.form-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 30px; /* Increased padding for more space inside the form */
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 15px;
+  box-shadow: 0px 20px 25px rgba(0, 0, 0, 0.3); /* Elevation shadow */
+  transform: translateY(-20px);
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
+}
+
+.form-section:hover {
+  box-shadow: 0px 30px 35px rgba(0, 0, 0, 0.4); /* Increase shadow on hover */
+  transform: translateY(-25px);
+}
+
+.step {
+  width: 100%;
+  margin: 16px 0; /* Increase space between input fields */
+  transition: opacity 0.5s ease-in-out;
+}
+
+.step input, .step select {
+  font-family: "Orbitron", sans-serif;
+  background: linear-gradient(90deg, #F4F4F4 15%, #FFA3AC 75%);
+  border: none;
+  margin: 12px 0; /* More margin to space out inputs */
+  padding: 15px 20px; /* Increased padding for larger input fields */
+  font-size: 16px; /* Increase font size */
+  border-radius: 10px;
+  width: 100%;
+  outline: none;
+  color: #333;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
+}
+
+.step input:focus, .step select:focus {
+  border: 2px solid #FF7991;
+  box-shadow: 0px 0px 10px rgba(255, 163, 172, 0.5);
+  transform: scale(1.03); /* Slight scale on focus for emphasis */
+  color: #FF7991;
+}
+
+.submit-button-container {
+  grid-column: 3 / span 2; /* Center the button between both form columns */
+  display: flex;
+  justify-content: center;
+  margin-top: 40px; /* Increased spacing from forms to button */
+}
+
+.next-button {
+  font-family: "Orbitron", sans-serif;
+  padding: 15px 30px; /* Increased button size */
+  background-color: #FF7991;
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  font-size: 18px; /* Make button text larger */
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.next-button:hover {
+  background-color: #e06578;
+  transform: scale(1.1); /* Increase button size slightly on hover */
 }
