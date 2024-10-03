@@ -14,15 +14,19 @@
             margin: 0;
             justify-content: center;
             align-items: center;
+            transition: filter 0.5s ease-in-out;
         }
 
         .cards {
             position: relative;
+            transition: filter 0.5s ease-in-out;
         }
 
         .card {
             perspective: 1000px;
             position: absolute;
+            transition: filter 0.5s ease-in-out;
+            cursor: pointer;
         }
 
         .card-inner {
@@ -30,11 +34,20 @@
             height: 100%;
             transform-style: preserve-3d;
             transition: transform 0.6s ease-in-out;
-            transform-origin: center; 
+            transform-origin: center;
         }
 
         .card:hover .card-inner {
-            transform: rotateY(180deg); 
+            transform: rotateY(180deg);
+        }
+
+        .card:hover ~ * {
+            filter: brightness(0.2);
+        }
+
+        .card:hover {
+            filter: brightness(1);
+            z-index: 10;
         }
 
         .card-front,
@@ -55,7 +68,8 @@
 
         .card-back {
             transform: rotateY(180deg);
-            background: linear-gradient(135deg, #f093fb, #f5576c); 
+            background: url('/images/background_.png') no-repeat center center;
+            background-size: cover;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -64,128 +78,174 @@
             text-align: center;
             padding: 20px;
             line-height: 1.5;
-            box-shadow: 0px 4px 20px rgba(255, 99, 132, 0.8); 
-            transition: background 0.4s ease-in-out;
+            transition: background 0.4s ease-in-out, box-shadow 0.4s ease-in-out;
+            border-radius: 15px;
         }
 
-        .card-back:hover {
-            background: linear-gradient(135deg, #f093fb, #f5576c);
+        .card:hover .card-back {
+            animation: flashingLights 1s infinite alternate ease-in-out;
         }
 
-        .card-back p {
-            opacity: 0;
-            transform: translateY(20px);
-            animation: fadeInUp 0.5s ease-in-out forwards 0.3s;
-        }
-
-        @keyframes fadeInUp {
-            to {
-                opacity: 1;
-                transform: translateY(0);
+        @keyframes flashingLights {
+            0% {
+                filter: brightness(1.2);
             }
-        }
-
-        
-        .card-1 img {
-            width: 280px;
-            height: 480px;
-            border-radius: 15px;
-        }
-
-        .card-2 img {
-            width: 285px;
-            height: 460px;
-            border-radius: 15px;
-        }
-
-        .card-3 img {
-            width: 300px;
-            height: 530px;
-            border-radius: 15px;
-        }
-
-        .card-4 img {
-            width: 320px;
-            height: 430px;
-            border-radius: 15px;
+            50% {
+                filter: brightness(2.5);
+            }
+            100% {
+                filter: brightness(1.2);
+            }
         }
 
         .card-1 {
             top: 100px;
             left: 200px;
-            width: 280px; 
-            height: 480px; 
+            width: 280px;
+            height: 480px;
         }
 
         .card-2 {
             top: 110px;
             left: 600px;
-            width: 285px; 
-            height: 460px; 
+            width: 285px;
+            height: 460px;
         }
 
         .card-3 {
-            top: 75px;
+            top: 85px;
             left: 1000px;
-            width: 300px; 
-            height: 530px; 
+            width: 290px;
+            height: 520px;
         }
 
         .card-4 {
             top: 120px;
             left: 1400px;
-            width: 320px; 
-            height: 430px; 
+            width: 320px;
+            height: 430px;
+        }
+
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #1a1a1a;
+            padding: 40px;
+            color: #fff;
+            border-radius: 15px;
+            box-shadow: 0 0 20px 10px rgba(255, 255, 255, 0.8);
+            z-index: 20;
+            max-width: 400px;
+            text-align: center;
+            animation: fadeIn 0.5s ease-in-out forwards;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translate(-50%, -60%);
+            }
+            to {
+                opacity: 1;
+                transform: translate(-50%, -50%);
+            }
+        }
+
+        .modal-close {
+            cursor: pointer;
+            color: #f093fb;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+
+        .modal-close:hover {
+            text-decoration: underline;
         }
     </style>
 </head>
 
 <body>
     <div class="cards">
-        <div class="card card-1">
+        <div class="card card-1" data-description="Pour ceux qui cherchent un 'ami... avec un petit plus', sans trop de complications !">
             <div class="card-inner">
                 <div class="card-front">
                     <img src="/images/joker_neon_converted-removebg-preview.png" alt="Joker">
                 </div>
                 <div class="card-back">
-                    <p>Pour ceux qui cherchent un "ami... avec un petit plus", sans trop de complications !</p>
+                    <!-- Arrière-plan par défaut -->
                 </div>
             </div>
         </div>
 
-        <div class="card card-2">
+        <div class="card card-2" data-description="Pour ceux qui veulent juste apprendre à se connaître, sans se prendre la tête... et sans passer par la case lit !">
             <div class="card-inner">
                 <div class="card-front">
                     <img src="/images/file-removebg-preview.png" alt="Card 2">
                 </div>
                 <div class="card-back">
-                    <p>Pour ceux qui veulent juste apprendre à se connaître, sans se prendre la tête... et sans passer par la case lit !</p>
+                    <!-- Arrière-plan par défaut -->
                 </div>
             </div>
         </div>
 
-        <div class="card card-3">
+        <div class="card card-3" data-description="Quand tu veux passer une bonne soirée... sans les discussions du lendemain.">
             <div class="card-inner">
                 <div class="card-front">
                     <img src="/images/file__1_-removebg-preview.png" alt="Card 3">
                 </div>
                 <div class="card-back">
-                    <p>Quand tu veux passer une bonne soirée... sans les discussions du lendemain.</p>
+                    <!-- Arrière-plan avec taille personnalisée pour la carte 3 -->
                 </div>
             </div>
         </div>
 
-        <div class="card card-4">
+        <div class="card card-4" data-description="Pour les rois et reines du cœur, en quête d'une histoire qui dure et qui compte.">
             <div class="card-inner">
                 <div class="card-front">
                     <img src="/images/file__2_-removebg-preview.png" alt="Card 4">
                 </div>
                 <div class="card-back">
-                    <p>Pour les rois et reines du cœur, en quête d'une histoire qui dure et qui compte.</p>
+                    <!-- Arrière-plan avec taille personnalisée pour la carte 4 -->
                 </div>
             </div>
         </div>
     </div>
+
+    <!-- Modal for card description -->
+    <div id="modal" class="modal">
+        <p id="modal-description"></p>
+        <div class="modal-close" onclick="closeModal()">Fermer</div>
+    </div>
+
+    <script>
+        // JavaScript for modal handling
+        const cards = document.querySelectorAll('.card');
+        const modal = document.getElementById('modal');
+        const modalDescription = document.getElementById('modal-description');
+
+        cards.forEach(card => {
+            card.addEventListener('click', () => {
+                const description = card.getAttribute('data-description');
+                modalDescription.textContent = description;
+                modal.style.display = 'block';
+            });
+        });
+
+        function closeModal() {
+            modal.style.display = 'none';
+        }
+
+        // Close modal when clicking outside of it
+        window.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                closeModal();
+            }
+        });
+    </script>
 </body>
 
 </html>
