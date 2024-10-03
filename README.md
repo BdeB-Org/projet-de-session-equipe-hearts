@@ -22,7 +22,7 @@ CREATE TABLE e_utilisateur (
     e_photo LONGBLOB NOT NULL,
     e_location TEXT NOT NULL,
     e_number TEXT NOT NULL,
-    e_password TEXT NOT NULL,
+    e_password VARCHAR(255),
     PRIMARY KEY (e_id)
 );
 
