@@ -56,6 +56,7 @@ app.use(session({
     console.log("connected!");
  });
 
+ 
 
 /*
     Configuration de EJS
@@ -119,9 +120,8 @@ app.get("/event/apropos", function (req, res) {
 */
 
 
-app.post('/event/creationCompte', (req, res) => {
+app.post('/event/connect', (req, res) => {
     const { email, password } = req.body;
-
 
     const verifyUserQuery = "SELECT * FROM e_utilisateur WHERE E_COURRIEL = ?";
     con.query(verifyUserQuery, [email], (err, result) => {
@@ -130,23 +130,18 @@ app.post('/event/creationCompte', (req, res) => {
             return res.status(500).send("Internal Server Error");
         }
 
-        if (result.length > 0) {
-            return res.status(400).send("Email already in use");
+        if (result.length === 0) {
+            return res.status(401).send("Email not found");
         }
-        bcrypt.hash(password, 10, (hashErr, hashedPassword) => {
-            if (hashErr) {
-                console.error("Error hashing password:", hashErr);
-                return res.status(500).send("Internal Server Error");
-            }
 
-            const insertUserQuery = "INSERT INTO e_utilisateur (E_COURRIEL, E_PASSWORD) VALUES (?, ?)";
-            con.query(insertUserQuery, [email, hashedPassword], (insertErr) => {
-                if (insertErr) {
-                    console.error("Error inserting user:", insertErr);
-                    return res.status(500).send("Internal Server Error");
-                }
-                res.status(201).send("User created successfully");
-            });
-        });
+        const user = result[0];
+        console.log("Retrieved user:", user);
+
+        if (password === user.E_PASSWORD) {
+            req.session.user = user;
+            res.redirect('/');
+        } else {
+            res.status(401).send("Incorrect password");
+        }
     });
 });
