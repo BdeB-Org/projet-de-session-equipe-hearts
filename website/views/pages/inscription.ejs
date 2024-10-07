@@ -1,82 +1,100 @@
 <%- include ("../partials/header.ejs") %>
-<!DOCTYPE html>
-<html lang="en">
+    <!DOCTYPE html>
+    <html lang="en">
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hearts</title>
-    <link rel="stylesheet" href="/inscription.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400..900&display=swap" rel="stylesheet">
-</head>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Hearts</title>
+        <link rel="stylesheet" href="/inscription.css">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400..900&display=swap" rel="stylesheet">
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
 
-<body>
-    <main class="form_inscription">
-        <div class="grid-container">
-            <!-- Left Image - 1 -->
-            <div class="image-section image1">
-                <img src="/images/swiper.png">
-            </div>
-            <!-- Left Image - 2 -->
-            <div class="image-section image2">
-                <img src="/images/swiper2.png">
-            </div>
-            <!-- Right Form Column 1 (First Half) -->
-            <div class="form-section form-section-1">
-                <form id="myForm" class="orbitron-font">
-                    <!-- Email -->
-                    <div class="step" id="step-0">
-                        <input type="email" id="email" placeholder="Adresse e-mail" required>
-                    </div>
 
-                    <!-- Password -->
-                    <div class="step" id="step-1">
-                        <input type="password" id="password" placeholder="Mot de passe" minlength="6" required>
-                    </div>
+        <svg xmlns="http://www.w3.org/2000/svg" version="1.1">
+            <defs>
+                <filter id="glow-effect" x="-50%" y="-50%" width="200%" height="200%">
+                    <feGaussianBlur stdDeviation="6" result="coloredBlur"></feGaussianBlur>
+                    <feMerge>
+                        <feMergeNode in="coloredBlur"></feMergeNode>
+                        <feMergeNode in="SourceGraphic"></feMergeNode>
+                    </feMerge>
+                </filter>
+            </defs>
+        </svg>
 
-                    <!-- Verify Password -->
-                    <div class="step" id="step-2">
-                        <input type="password" id="verify-password" placeholder="Vérifiez le mot de passe" minlength="6" required>
-                    </div>
 
-                    <!-- Phone Number (with code verification) -->
-                    <div class="step" id="step-3">
-                        <input type="tel" id="phone" placeholder="Numéro Format: 514-235-7369" pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}" required>
-                    </div>
+    </head>
 
-                    <!-- First Name -->
-                    <div class="step" id="step-4">
-                        <input type="text" id="first-name" placeholder="Prénom" required>
-                    </div>
+    <body>
+        <main class="form_inscription">
+            <div class="grid-container">
+                <!-- Left Image - 1 -->
+                <div class="image-section image1">
+                    <img src="/images/swiper.png">
+                </div>
+                <!-- Left Image - 2 -->
+                <div class="image-section image2">
+                    <img src="/images/swiper2.png">
+                </div>
+                <!-- Right Form Column 1 (First Half) -->
+                <div class="form-section form-section-1">
+                    <form id="myForm" class="orbitron-font">
+                        <!-- Email -->
+                        <div class="step" id="step-0">
+                            <input type="email" id="email" placeholder="Adresse e-mail" required>
+                        </div>
 
-                    <!-- Last Name -->
-                    <div class="step" id="step-5">
+                        <!-- Password -->
+                        <div class="step" id="step-1">
+                            <input type="password" id="password" placeholder="Mot de passe" minlength="6" required>
+                        </div>
+
+                        <!-- Verify Password -->
+                        <div class="step" id="step-2">
+                            <input type="password" id="verify-password" placeholder="Vérifiez le mot de passe"
+                                minlength="6" required>
+                        </div>
+
+                        <!-- Phone Number (with code verification) -->
+                        <div class="step" id="step-3">
+                            <input type="tel" id="phone" placeholder="Numéro: 514-235-7369"
+                                pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}" required>
+                        </div>
+
+                        <!-- First Name -->
+                        <div class="step" id="step-4">
+                            <input type="text" id="first-name" placeholder="Prénom  (Affiché)" required>
+                        </div>
+
+                        <!-- Last Name -->
+                        <!-- <div class="step" id="step-5">
                         <input type="text" id="last-name" placeholder="Nom de famille" required>
-                    </div>
-                </form>
-            </div>
-            <!-- Right Form Column 2 (Second Half) -->
-            <div class="form-section form-section-2">
-                <form id="myForm2" class="orbitron-font">
-                    <!-- Birthdate -->
-                    <div class="step" id="step-6">
-                        <input type="date" id="birthdate" required>
-                    </div>
+                    </div> -->
+                    </form>
+                </div>
+                <!-- Right Form Column 2 (Second Half) -->
+                <div class="form-section form-section-2">
+                    <form id="myForm2" class="orbitron-font">
+                        <!-- Birthdate -->
+                        <div class="step" id="step-6">
+                            <input type="date" id="birthdate" required>
+                        </div>
 
-                    <!-- Gender (M/W) -->
-                    <div class="step" id="step-7">
-                        <select id="gender" required>
-                            <option value="" disabled selected>Genre</option>
-                            <option value="H">Homme</option>
-                            <option value="F">Femme</option>
-                            <option value="O">Autre</option>
-                        </select>
-                    </div>
+                        <!-- Gender (M/W) -->
+                        <div class="step" id="step-7">
+                            <select id="gender" required>
+                                <option value="" disabled selected>Genre</option>
+                                <option value="H">Homme</option>
+                                <option value="F">Femme</option>
+                                <option value="O">Autre</option>
+                            </select>
+                        </div>
 
-                    <!-- Sexual Orientation -->
-                    <div class="step" id="step-8">
+                        <!-- Sexual Orientation -->
+                        <!-- <div class="step" id="step-8">
                         <select id="orientation" required>
                             <option value="" disabled selected>Orientation sexuelle</option>
                             <option value="hétéro">Hétérosexuel</option>
@@ -84,33 +102,40 @@
                             <option value="lesbienne">Lesbienne</option>
                             <option value="bi">Bisexuel</option>
                         </select>
-                    </div>
+                    </div> -->
 
-                    <!-- Looking for? (CARDS) -->
-                    <div class="step" id="step-9">
-                        <input type="text" id="looking-for" placeholder="Que cherchez-vous?" required>
-                    </div>
+                        <!-- Looking for? (CARDS) -->
+                        <p>Que cherchez-vous?</p>
+                        <div class="icon-container">
 
-                    <!-- What do you like? -->
-                    <div class="step" id="step-10">
-                        <input type="text" id="likes" placeholder="Qu'est-ce que vous aimez?" required>
-                    </div>
+                            <img src="/images/ace.png" class="icon" id="ace" alt="Ace">
+                            <img src="/images/joker.png" class="icon" id="joker" alt="Joker">
+                            <img src="/images/queen.png" class="icon" id="queen" alt="Queen">
+                            <img src="/images/king.png" class="icon" id="king" alt="King">
+                        </div>
 
-                    <!-- Pictures (2-6) -->
-                    <div class="step" id="step-11">
-                        <input type="file" id="photos" accept="image/*" multiple required>
-                    </div>
-                </form>
+
+
+                        <!-- What do you like? -->
+                        <div class="step" id="step-10">
+                            <input type="text" id="likes" placeholder="Qu'est-ce que vous aimez?" required>
+                        </div>
+
+                        <!-- Pictures (2-6) -->
+                        <div class="step" id="step-11">
+                            <input type="file" id="photos" accept="image/*" multiple required>
+                        </div>
+                    </form>
+                </div>
+                <!-- Submit Button Outside Both Form Sections -->
+                <div class="submit-button-container">
+                    <button type="submit" form="myForm2" class="next-button">Soumettre</button>
+                </div>
             </div>
-            <!-- Submit Button Outside Both Form Sections -->
-            <div class="submit-button-container">
-                <button type="submit" form="myForm2" class="next-button">Soumettre</button>
-            </div>
-        </div>
-    </main>
+        </main>
 
-    <script src="/js/inscription.js"></script>
-</body>
+        <script src="/js/inscription.js"></script>
+    </body>
 
-</html>
-<%- include ("../partials/footer.ejs") %>
+    </html>
+    <%- include ("../partials/footer.ejs") %>

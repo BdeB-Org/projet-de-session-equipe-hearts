@@ -45,3 +45,25 @@ document.addEventListener('DOMContentLoaded', () => {
         return true;
     }
 });
+
+// Select all icons and the Joker image
+const icons = document.querySelectorAll('.icon');
+
+// Add event listeners to each icon
+icons.forEach(icon => {
+    icon.addEventListener('click', () => {
+        // Remove 'selected' class from all icons
+        icons.forEach(i => i.classList.remove('selected'));
+        
+        // Add 'selected' class to the clicked icon
+        icon.classList.add('selected');
+    });
+});
+document.querySelectorAll('.icon').forEach(icon => {
+    icon.addEventListener('click', function() {
+        // Remove 'selected' class from all icons
+        document.querySelectorAll('.icon').forEach(i => i.classList.remove('selected'));
+        // Add 'selected' class to the clicked icon
+        this.classList.add('selected');
+    });
+});

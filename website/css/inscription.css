@@ -106,3 +106,56 @@ body {
   background-color: #e06578;
   transform: scale(1.1); /* Increase button size slightly on hover */
 }
+
+
+/* For the container around the question and icons */
+.icon-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 30px;
+  padding: 20px;
+  background: linear-gradient(90deg, #FF7991 0%, #F4F4F4 100%); /* Gradient matching inputs */
+  border-radius: 15px;
+  box-shadow: 0 4px 8px rgba(255, 163, 172, 0.5); /* Soft shadow for depth */
+}
+
+/* Style the question text */
+.icon-container {
+  background: linear-gradient(90deg, #FF7991 0%, #F4F4F4 100%);
+  padding: 20px;
+  border-radius: 15px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 30px;
+  box-shadow: 0 4px 8px rgba(255, 163, 172, 0.5);
+}
+
+/* Icons styling */
+img.icon {
+  width: 20%;
+  height: auto;
+  padding: 10px;
+  transition: transform 0.3s ease, filter 0.3s ease; /* Ensure filter transition is included */
+}
+
+/* Glowing effect for the selected icon */
+img.icon.selected {
+  filter: url(#glow-effect); /* Apply the glow filter */
+  transform: scale(1.2); /* Slightly increase size on selection */
+}
+
+/* Adjust the question text to match the design */
+p {
+  color: #FF7991; /* Use the same pink tone from the gradient */
+  font-size: 16px;
+  text-align: center;
+  margin-bottom: 10px;
+  font-weight: bold;
+}
+
+/* Special styling for the King icon */
+#king {
+  width: 28%;
+}

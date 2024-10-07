@@ -120,7 +120,6 @@ app.get("/event/apropos", function (req, res) {
 */
 
 
-<<<<<<< HEAD
 // app.post('/event/creationCompte', (req, res) => {
 //     const { email, password } = req.body;
 
@@ -152,30 +151,3 @@ app.get("/event/apropos", function (req, res) {
 //         });
 //     });
 // });
-=======
-app.post('/event/connect', (req, res) => {
-    const { email, password } = req.body;
-
-    const verifyUserQuery = "SELECT * FROM e_utilisateur WHERE E_COURRIEL = ?";
-    con.query(verifyUserQuery, [email], (err, result) => {
-        if (err) {
-            console.error("Error verifying user:", err);
-            return res.status(500).send("Internal Server Error");
-        }
-
-        if (result.length === 0) {
-            return res.status(401).send("Email not found");
-        }
-
-        const user = result[0];
-        console.log("Retrieved user:", user);
-
-        if (password === user.E_PASSWORD) {
-            req.session.user = user;
-            res.redirect('/');
-        } else {
-            res.status(401).send("Incorrect password");
-        }
-    });
-});
->>>>>>> 681b7149d0f386ace938db1c12200862b7c3650b
