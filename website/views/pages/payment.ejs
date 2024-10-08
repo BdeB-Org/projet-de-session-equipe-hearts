@@ -52,7 +52,6 @@
             padding: 10px;
             margin-bottom: 20px;
             border: 2px solid transparent;
-            /* Removed the green border */
             border-radius: 5px;
             background-color: #ffff00;
             /* Yellow */
@@ -60,11 +59,6 @@
             font-size: 1em;
             text-align: center;
             box-shadow: 0 0 5px rgba(255, 0, 127, 0.5);
-        }
-
-        input[readonly] {
-            background-color: #444;
-            cursor: not-allowed;
         }
 
         .button {
@@ -85,9 +79,7 @@
             box-shadow: 0 0 20px #ff007f;
         }
 
-        /* 
-        MODAL
-        */
+        /* MODAL */
         .modal {
             display: none;
             /* Hidden by default */
@@ -113,28 +105,8 @@
             margin: auto;
         }
 
-        .form-group {
-            margin-bottom: 15px;
-        }
-
-        .form-group label {
-            display: block;
-            color: #ff007f;
-            margin-bottom: 5px;
-        }
-
-        .form-group input {
-            width: 100%;
-            padding: 10px;
-            border: 2px solid #f7dc6f;
-            border-radius: 5px;
-            background-color: rgba(255, 255, 255, 0.1);
-            color: white;
-        }
-
         .submit-button {
             background-color: #ff007f;
-            /* Bright pink */
             color: white;
             padding: 10px 20px;
             border: none;
@@ -143,14 +115,11 @@
             font-size: 1.2em;
             transition: background-color 0.3s, transform 0.3s;
             width: 100%;
-            /* Make the button full-width */
         }
 
         .submit-button:hover {
-            background-color: #00ff00;
-            /* Neon green on hover */
+            background-color: #fbff00a7;
             transform: scale(1.05);
-            /* Slightly enlarge on hover */
         }
 
         .close {
@@ -167,10 +136,8 @@
             cursor: pointer;
         }
 
-        /* Receipt styles */
         .receipt {
             background-color: rgba(255, 255, 0, 0.1);
-            /* Light yellow background */
             padding: 10px;
             border-radius: 5px;
             margin: 20px 0;
@@ -189,7 +156,7 @@
             <h1>Payer Votre Abonnement</h1>
             <p>Merci de choisir votre plan.</p>
 
-            <!-- Display Receipt Information -->
+            <!-- Receipt -->
             <div class="receipt">
                 <div class="receipt-item">
                     <span><strong>Name of Subscription:</strong></span>
@@ -222,67 +189,36 @@
             </form>
         </div>
 
+        <!-- MODAL -->
         <div id="card-modal" class="modal">
             <div class="modal-content">
                 <span class="close" onclick="closeModal()">&times;</span>
                 <h2 style="color: #ff007f;">Enter Card Details</h2>
-                <form id="card-details-form">
-                    <div class="form-group">
-                        <label for="name">Name:</label>
-                        <input type="text" id="name" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="surname">Surname:</label>
-                        <input type="text" id="surname" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="postal-code">Postal Code:</label>
-                        <input type="text" id="postal-code" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="phone-number">Phone Number:</label>
-                        <input type="text" id="phone-number" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="address">Address:</label>
-                        <input type="text" id="address" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="card-number">Card Number:</label>
-                        <input type="text" id="card-number" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="expiry">Expiry Date:</label>
-                        <input type="text" id="expiry" placeholder="MM/YY" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="cvv">CVV:</label>
-                        <input type="text" id="cvv" required>
-                    </div>
-                    <button type="submit" class="submit-button">Submit Payment</button>
-                </form>
+                <div id="card-container"></div>
+                <button class="submit-button" id="submit-button">Submit Payment</button>
             </div>
         </div>
+
+        <script src="https://sandbox.web.squarecdn.com/v1/square.js"></script>
         <script>
-            // Get the amount from the URL parameters
             const urlParams = new URLSearchParams(window.location.search);
             const amount = parseFloat(urlParams.get('amount')) || 0;
+
             if (amount) {
                 document.getElementById('amount').value = amount;
-                document.getElementById('initial-amount').innerText = `$${amount.toFixed(2)}`; // Initial amount
+                document.getElementById('initial-amount').innerText = `$${amount.toFixed(2)}`;
 
-                const tvqRate = 0.09975; // Example TVQ rate
-                const tpsRate = 0.05; // Example TPS rate
+                const tvqRate = 0.09975;
+                const tpsRate = 0.05;
 
                 const tvqAmount = amount * tvqRate;
                 const tpsAmount = amount * tpsRate;
                 const totalAmount = amount + tvqAmount + tpsAmount;
 
-                document.getElementById('tvq-amount').innerText = `$${tvqAmount.toFixed(2)}`; // TVQ amount
-                document.getElementById('tps-amount').innerText = `$${tpsAmount.toFixed(2)}`; // TPS amount
-                document.getElementById('total-amount').innerText = `$${totalAmount.toFixed(2)}`; // Total amount
+                document.getElementById('tvq-amount').innerText = `$${tvqAmount.toFixed(2)}`;
+                document.getElementById('tps-amount').innerText = `$${tpsAmount.toFixed(2)}`;
+                document.getElementById('total-amount').innerText = `$${totalAmount.toFixed(2)}`;
 
-                // Set the amount input to the total amount
                 document.getElementById('amount').value = totalAmount.toFixed(2);
             }
 
@@ -297,48 +233,48 @@
                 modal.style.display = "none"; // Close the modal
             }
 
-            document.getElementById('card-details-form').addEventListener('submit', async function (event) {
-                event.preventDefault();
+            const payments = Square.payments('sandbox-sq0idb-shiPBy7gPbmt9DCjtx3jYw'); // Replace with your Square Application ID
 
-                const name = document.getElementById('name').value;
-                const surname = document.getElementById('surname').value;
-                const postalCode = document.getElementById('postal-code').value;
-                const phoneNumber = document.getElementById('phone-number').value;
-                const address = document.getElementById('address').value;
-                const cardNumber = document.getElementById('card-number').value;
-                const expiry = document.getElementById('expiry').value;
-                const cvv = document.getElementById('cvv').value;
+            async function initializeCard() {
+                const card = await payments.card();
+                await card.attach('#card-container');
 
-                console.log('Card Details:', name, surname, postalCode, phoneNumber, address, cardNumber, expiry, cvv);
+                document.getElementById('submit-button').addEventListener('click', async () => {
+                    const result = await card.tokenize();
+                    if (result.status === 'OK') {
+                        const sourceId = result.token; // Get the tokenized source ID
+                        const amount = document.getElementById('amount').value; // This should be the total amount in dollars
 
-                // Process payment here with card details
-                // For demonstration, we'll just close the modal
-                closeModal(); // Close the modal after submission
+                        // Calculate total amount in cents
+                        const totalAmountInCents = amount * 100; // Convert to cents
 
-                // After closing the modal, you can proceed with further actions like sending card details to your server
-            });
+                        // Log for debugging
+                        console.log('Source ID:', sourceId);
+                        console.log('Total Amount (Cents):', totalAmountInCents);
 
-            document.getElementById('payment-form').addEventListener('submit', async (event) => {
-                event.preventDefault();
-                const amount = document.getElementById('amount').value;
+                        // Send payment data to your server
+                        const response = await fetch('/event/payment', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({ sourceId, amount: totalAmountInCents }) // Use totalAmountInCents
+                        });
 
-                // Send payment data to your server
-                const response = await fetch('/event/payment', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ amount })
+                        const paymentResult = await response.json();
+                        if (paymentResult.success) {
+                            alert('Payment successful!');
+                            window.location.href = '/'; // Redirect to the homepage or confirmation page
+                        } else {
+                            alert('Payment failed: ' + paymentResult.message);
+                        }
+                    } else {
+                        alert('Tokenization failed: ' + result.errors[0].message);
+                    }
                 });
+            }
 
-                const result = await response.json();
-                if (result.success) {
-                    alert('Payment successful!');
-                    window.location.href = '/'; // Redirect to the homepage or confirmation page
-                } else {
-                    alert('Payment failed: ' + result.message);
-                }
-            });
+            initializeCard();
         </script>
 
         <%- include("../partials/footer.ejs") %>

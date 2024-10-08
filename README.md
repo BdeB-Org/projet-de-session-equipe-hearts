@@ -28,13 +28,10 @@ CREATE TABLE e_utilisateur (
 
 CREATE TABLE e_abonnement (
     e_id INT NOT NULL,
-    e_nom VARCHAR(100) NOT NULL,
-    prix DECIMAL(10, 2) 
+    e_type VARCHAR(100) NOT NULL,
+    prix DECIMAL(10, 2) NOT NULL,
     e_duree INT NOT NULL,
-    e_date_creation DATE NOT NULL,
-    e_utilisateur_id_utilisateur INT NOT NULL,
-    PRIMARY KEY (e_id),
-
+    PRIMARY KEY (e_id)
 );
 
 CREATE TABLE lieu (
