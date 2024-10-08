@@ -291,7 +291,8 @@
             <ul class="features" data-value="5 Swipes par Jour">
               <li>5 Swipes par Jour</li>
             </ul>
-            <button type="submit" class="button">Choisir Basique</button>
+            <button onclick="goToPayment(0)" class="custom_butt">Acheter</button>
+
           </div>
         </div>
       </div>
@@ -306,7 +307,8 @@
             <ul class="features" data-value="100 Swipes par Semaine">
               <li>100 Swipes par Semaine</li>
             </ul>
-            <button type="submit" class="button">Choisir Premium</button>
+            <button onclick="goToPayment(19.47)" class="custom_butt">Acheter</button>
+
           </div>
         </div>
       </div>
@@ -321,7 +323,8 @@
             <ul class="features" data-value="Swipes Illimités">
               <li>Swipes Illimités</li>
             </ul>
-            <button type="submit" class="button">Choisir Diamant</button>
+            <button onclick="goToPayment(25.47)" class="custom_butt">Acheter</button>
+
           </div>
         </div>
       </div>
@@ -329,6 +332,12 @@
   </body>
 
   <script>
+
+    function goToPayment(price) {
+      window.location.href = `/event/payment?amount=${price}`;
+    }
+
+
     const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789€";
     let intervals = [];
 

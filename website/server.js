@@ -65,6 +65,43 @@ app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "ejs");
 app.use('/images', express.static(path.join(__dirname, 'images')));
 
+/*
+Configuration API SQUARE FIOHSAIOGFHASIPFH
+*/
+
+import { Client, Environment } from 'square';
+
+const squareClient = new Client({
+    environment: Environment.Sandbox,
+    accessToken: process.env.SQUARE_ACCESS_TOKEN
+});
+
+// Payment route
+app.post('/event/payment', async (req, res) => {
+    const { amount } = req.body;
+
+    // Create a payment request
+    const paymentRequest = {
+        sourceId: 'YOUR_SOURCE_ID',
+        amount: amount * 100,
+        currency: 'CAD',
+    };
+
+    try {
+        const response = await squareClient.paymentsApi.createPayment(paymentRequest);
+        console.log(response);
+        return res.json({ success: true, paymentId: response.result.payment.id });
+    } catch (error) {
+        console.error("Error processing payment:", error);
+        return res.status(500).json({ success: false, message: error.message });
+    }
+});
+
+import dotenv from 'dotenv';
+dotenv.config();
+
+
+
 
 
 /*
@@ -75,6 +112,14 @@ app.get("/", function (req, res) {
     res.render("pages/accueil", {
         siteTitle: "Index",
         pageTitle: "index",
+        userDetails: req.session.user,
+    });
+});
+
+app.get("/event/payment", function (req, res) {
+    res.render("pages/payment", {
+        siteTitle: "Payment",
+        pageTitle: "Payment",
         userDetails: req.session.user,
     });
 });
