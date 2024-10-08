@@ -16,14 +16,18 @@
         <svg xmlns="http://www.w3.org/2000/svg" version="1.1">
             <defs>
                 <filter id="glow-effect" x="-50%" y="-50%" width="200%" height="200%">
-                    <feGaussianBlur stdDeviation="6" result="coloredBlur"></feGaussianBlur>
+                    <!-- Add a white color for the glow -->
+                    <feFlood flood-color="white" result="flood"></feFlood>
+                    <feComposite in="flood" in2="SourceGraphic" operator="in" result="mask"></feComposite>
+                    <feGaussianBlur in="mask" stdDeviation="6" result="blurred"></feGaussianBlur>
                     <feMerge>
-                        <feMergeNode in="coloredBlur"></feMergeNode>
+                        <feMergeNode in="blurred"></feMergeNode>
                         <feMergeNode in="SourceGraphic"></feMergeNode>
                     </feMerge>
                 </filter>
             </defs>
         </svg>
+        
 
 
     </head>
