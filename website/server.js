@@ -211,13 +211,16 @@ app.get("/event/swipe", function (req, res) {
     });
 });
 
-app.get("/event/userDetails", function (req, res) {
+app.get("/event/profil", function (req, res) {
     if (!req.session.user) {
-        return res.redirect('/event/creationCompte');
+        // Si l'utilisateur n'est pas connecté, on le redirige vers la page de connexion
+        return res.redirect("/event/inscription");
     }
-    res.render("pages/userDetails", {
-        siteTitle: "User Details",
-        pageTitle: "User Details",
+    
+    // Si l'utilisateur est connecté, on affiche son profil
+    res.render("pages/profil", {
+        siteTitle: "Profil",
+        pageTitle: "Votre Profil",
         userDetails: req.session.user,
     });
 });
