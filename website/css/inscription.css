@@ -8,10 +8,10 @@ body {
   display: flex;
   justify-content: center;
   align-items: flex-start; /* Aligns content to the top */
-  margin-top: 50px;
+  /* margin-top: 50px; */
   width: 100%;
   height: 100vh; /* Full view height */
-  padding-top: 50px; /* Provides padding to move content up */
+  /* padding-top: 50px; Provides padding to move content up */
 }
 
 .grid-container {
@@ -21,7 +21,7 @@ body {
   width: 95%; /* Adjust for better spacing on larger screens */
   max-width: 1600px; /* Allow a larger max width for bigger screens */
   align-items: start;
-  margin-top: -20px; /* Adjust vertical alignment slightly */
+   margin-top: -100px; /* Adjust vertical alignment slightly */
 }
 
 .image-section {
@@ -118,6 +118,7 @@ body {
   background: linear-gradient(90deg, #FF7991 0%, #F4F4F4 100%); /* Gradient matching inputs */
   border-radius: 15px;
   box-shadow: 0 4px 8px rgba(255, 163, 172, 0.5); /* Soft shadow for depth */
+  height: 40px;
 }
 
 /* Style the question text */
@@ -128,15 +129,15 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-top: 30px;
+  margin-top: 20px;
   box-shadow: 0 4px 8px rgba(255, 163, 172, 0.5);
 }
 
 /* Icons styling */
 img.icon {
-  width: 20%;
+  width: 22%;
   height: auto;
-  padding: 10px;
+  padding: 5px;
   transition: transform 0.3s ease, filter 0.3s ease; /* Ensure filter transition is included */
 }
 
@@ -156,6 +157,12 @@ p {
 }
 
 /* Special styling for the King icon */
-#king {
-  width: 28%;
+
+#joker {
+  width: 30%;
 }
+#ace {
+  width: 20%;
+  height: auto;
+}
+

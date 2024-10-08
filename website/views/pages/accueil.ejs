@@ -41,17 +41,15 @@
             transform: rotateY(180deg);
         }
 
-        .card.dimming {
-                filter: brightness(0.2);
-                /* Dimming effect */
-            }
+        .card:hover ~ * {
+            filter: brightness(0.2);
+        }
 
-            .card:hover {
-                z-index: 10;
-                /* Bring the hovered card to the front */
-                filter: brightness(1);
-                /* Brightness for the hovered card */
-            }
+        .card:hover {
+            filter: brightness(1);
+            z-index: 10;
+        }
+
         .card-front,
         .card-back {
             position: absolute;
@@ -247,23 +245,6 @@
                 closeModal();
             }
         });
-
-        cards.forEach(card => {
-                card.addEventListener('mouseover', () => {
-                    cards.forEach(otherCard => {
-                        if (otherCard !== card) {
-                            otherCard.classList.add('dimming'); // Add dimming class to non-hovered cards
-                        }
-                    });
-                });
-
-                card.addEventListener('mouseout', () => {
-                    cards.forEach(otherCard => {
-                        otherCard.classList.remove('dimming'); // Remove dimming class when not hovered
-                    });
-                });
-            });
-            
     </script>
 </body>
 
