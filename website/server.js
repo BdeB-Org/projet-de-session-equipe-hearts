@@ -159,6 +159,27 @@ app.get("/event/apropos", function (req, res) {
     });
 });
 
+app.get("/event/swipe", function (req, res) {
+    res.render("pages/swipe", {
+        siteTitle: "Aprpoos",
+        pageTitle: "A Propos",
+        userDetails: req.session.user,
+
+    });
+});
+
+app.get("/event/userDetails", function (req, res) {
+    if (!req.session.user) {
+        return res.redirect('/event/creationCompte');
+    }
+    res.render("pages/userDetails", {
+        siteTitle: "User Details",
+        pageTitle: "User Details",
+        userDetails: req.session.user,
+    });
+});
+
+
 
 /*
     LES POSTS
@@ -182,6 +203,7 @@ app.post('/event/connect', (req, res) => {
         console.log("Retrieved user:", user);
         if (password === user.e_password) {
             req.session.user = user;
+            console.log("the user is connected")
             res.redirect('/');
         } else {
             console.log(password);
@@ -190,4 +212,14 @@ app.post('/event/connect', (req, res) => {
         };
     });
 
+});
+
+app.post('/event/logout', (req, res) => {
+    req.session.destroy((err) => {
+        if (err) {
+            console.error("Error while logging out:", err);
+            return res.status(500).send("Internal Server Error");
+        }
+        res.redirect('/');
+    });
 });

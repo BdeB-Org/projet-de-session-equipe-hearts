@@ -93,6 +93,11 @@
             /* Match the navbar height */
             display: block;
         }
+
+        .user-name {
+            color: white;
+            margin-left: 5px;
+        }
     </style>
 </head>
 
@@ -104,26 +109,49 @@
                     <img src="/images/logo_black.png" alt="Hearts Logo">
                 </a>
             </div>
-            <div class="right-wrapper">
-                <svg class="app-menu" width="24px" height="24px" viewBox="0 0 26.75 26.75" fill="#fff">
-                    <circle cx="3.25" cy="3.25" r="3.25" />
-                    <circle cx="13.38" cy="3.25" r="3.25" />
-                    <circle cx="23.5" cy="3.25" r="3.25" />
-                    <circle cx="3.25" cy="13.38" r="3.25" />
-                    <circle cx="13.38" cy="13.38" r="3.25" />
-                    <circle cx="23.5" cy="13.38" r="3.25" />
-                    <circle cx="3.25" cy="23.5" r="3.25" />
-                    <circle cx="13.38" cy="23.5" r="3.25" />
-                    <circle cx="23.5" cy="23.5" r="3.25" />
-                </svg>
+            <div class="right-wrapper" style="display: flex; align-items: center;">
+                <% if (userDetails) { %>
+                    <div class="user-info" style="display: flex; align-items: center; margin-right: 20px;">
+                        <img id="user-photo" src="/images/default_user.png" alt="User Icon"
+                            style="border-radius: 50%; height: 40px; width: 40px; background: white; margin-right: 10px;" />
+                        <span id="user-name" class="user-name">
+                            <%= userDetails.e_prenom %>
+                                <%= userDetails.e_nom %>
+                        </span>
+                    </div>
+                    <% } %>
+                        <svg class="app-menu" width="24px" height="24px" viewBox="0 0 26.75 26.75" fill="#fff">
+                            <circle cx="3.25" cy="3.25" r="3.25" />
+                            <circle cx="13.38" cy="3.25" r="3.25" />
+                            <circle cx="23.5" cy="3.25" r="3.25" />
+                            <circle cx="3.25" cy="13.38" r="3.25" />
+                            <circle cx="13.38" cy="13.38" r="3.25" />
+                            <circle cx="23.5" cy="13.38" r="3.25" />
+                            <circle cx="3.25" cy="23.5" r="3.25" />
+                            <circle cx="13.38" cy="23.5" r="3.25" />
+                            <circle cx="23.5" cy="23.5" r="3.25" />
+                        </svg>
             </div>
         </div>
         <nav class="navbar" id="navbar">
             <a class="navbar-item" href="/">Accueil</a>
-            <a class="navbar-item" href="/event/creationCompte">Connexion</a>
-            <a class="navbar-item" href="/event/abonnement">Abonnement</a>
-            <a class="navbar-item" href="/event/swipe">Swipe</a>
-            <a class="navbar-item" href="/event/inscription">Inscription</a>
+            <% if (!userDetails) { %>
+                <a class="navbar-item" id="connexionLink" href="/event/creationCompte">Connexion</a>
+                <a class="navbar-item" id="inscriptionLink" href="/event/inscription">Inscription</a>
+                <% } %>
+                    <% if (userDetails) { %>
+                        <form action="/event/logout" method="post" style="display: inline;">
+                            <button type="submit" class="navbar-item"
+                                style="background: none; border: none; color: white; cursor: pointer;">
+                                Déconnectez
+                            </button>
+                        </form>
+                        <% } %>
+
+                            <a class="navbar-item" href="/event/abonnement">Abonnement</a>
+                            <% if (!userDetails) { %>
+                                <a class="navbar-item" href="/event/swipe">Swipe</a>
+                                <% } %>
         </nav>
         <div class="navbar-placeholder" id="navbarPlaceholder"></div>
         <div class="animation-square" id="animationSquare"></div>
@@ -159,6 +187,7 @@
                 navbarVisible = true;
             }
         });
+
 
     </script>
 </body>

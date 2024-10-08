@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>
+        <%= siteTitle %>
+    </title>
+    <link rel="stylesheet" href="/css/styles.css"> <!-- Link to your CSS file -->
+</head>
+
+<body>
+    <header>
+        <!-- Include your modified header here -->
+    </header>
+
+    <main>
+        <h1>User Details</h1>
+
+        <section>
+            <h2>Change Password</h2>
+            <form id="change-password-form" method="post" action="/event/changePassword">
+                <label for="current-password">Current Password:</label>
+                <input type="password" id="current-password" name="current-password" required>
+
+                <label for="new-password">New Password:</label>
+                <input type="password" id="new-password" name="new-password" required>
+
+                <label for="confirm-password">Confirm New Password:</label>
+                <input type="password" id="confirm-password" name="confirm-password" required>
+
+                <button type="submit">Change Password</button>
+            </form>
+        </section>
+
+        <section>
+            <h2>Modify Subscriptions</h2>
+            <form id="modify-subscription-form" method="post" action="/event/modifySubscription">
+                <label for="subscription">Select Subscription:</label>
+                <select id="subscription" name="subscription">
+                    <option value="basic">Basic</option>
+                    <option value="premium">Premium</option>
+                    <option value="diamond">Diamond</option>
+                </select>
+
+                <button type="submit">Update Subscription</button>
+            </form>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 Your Website</p>
+    </footer>
+</body>
+
+</html>
