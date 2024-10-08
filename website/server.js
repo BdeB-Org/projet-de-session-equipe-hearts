@@ -6,6 +6,12 @@ import mysql from "mysql";
 import { body, validationResult } from "express-validator";
 import dateFormat from "dateformat";
 import bcrypt from 'bcrypt';
+import { Client, Environment } from 'square';
+import dotenv from 'dotenv';
+
+
+dotenv.config();
+
 
 const app = express();
 const __filename = fileURLToPath(import.meta.url);
@@ -54,6 +60,7 @@ app.use(session({
 con.connect(function (err) {
     if (err) throw err;
     console.log("connected!");
+    initializeSubscriptions();
 });
 
 
@@ -69,40 +76,74 @@ app.use('/images', express.static(path.join(__dirname, 'images')));
 Configuration API SQUARE FIOHSAIOGFHASIPFH
 */
 
-import { Client, Environment } from 'square';
 
+
+// Square API client setup
 const squareClient = new Client({
     environment: Environment.Sandbox,
     accessToken: process.env.SQUARE_ACCESS_TOKEN
 });
-
 // Payment route
-app.post('/event/payment', async (req, res) => {
-    const { amount } = req.body;
 
-    // Create a payment request
+
+app.post('/event/payment', async (req, res) => {
+    const { amount, sourceId } = req.body; // Ensure amount is in cents
+
+    const idempotencyKey = `idempotency-key-${Date.now()}`;
+
     const paymentRequest = {
-        sourceId: 'YOUR_SOURCE_ID',
-        amount: amount * 100,
-        currency: 'CAD',
+        sourceId: sourceId,
+        amountMoney: {
+            amount: amount,
+            currency: 'CAD'
+        },
+        idempotencyKey: idempotencyKey,
     };
+
+    console.log("Payment Request:", paymentRequest);
 
     try {
         const response = await squareClient.paymentsApi.createPayment(paymentRequest);
-        console.log(response);
-        return res.json({ success: true, paymentId: response.result.payment.id });
+        // After successful payment, render the confirmation page
+        res.render("pages/confirmation", {
+            siteTitle: "Payment Confirmation",
+            pageTitle: "Payment Confirmation",
+            subscriptionName: "Your Subscription Name Here", // Pass the actual subscription name
+            amountPaid: (amount / 100).toFixed(2), // Convert cents to dollars
+            paymentId: response.result.payment.id
+        });
     } catch (error) {
         console.error("Error processing payment:", error);
         return res.status(500).json({ success: false, message: error.message });
     }
 });
 
-import dotenv from 'dotenv';
-dotenv.config();
+const initializeSubscriptions = () => {
+    const subscriptions = [
+        { e_id: 1, e_type: 'Basic', prix: 0.00, e_duree: 30 },
+        { e_id: 2, e_type: 'Premium', prix: 9.99, e_duree: 30 },
+        { e_id: 3, e_type: 'Diamond', prix: 19.99, e_duree: 30 }
+    ];
 
+    subscriptions.forEach(subscription => {
+        const insertQuery = `
+            INSERT INTO e_abonnement (e_id, e_type, prix, e_duree)
+            VALUES (?, ?, ?, ?)
+            ON DUPLICATE KEY UPDATE
+                e_type = VALUES(e_type),
+                prix = VALUES(prix),
+                e_duree = VALUES(e_duree);
+        `;
 
-
-
+        con.query(insertQuery, [subscription.e_id, subscription.e_type, subscription.prix, subscription.e_duree], (err) => {
+            if (err) {
+                console.error(`Error inserting subscription ${subscription.e_type}:`, err);
+            } else {
+                console.log(`Subscription ${subscription.e_type} added/updated successfully.`);
+            }
+        });
+    });
+};
 
 /*
    PAGES DE GET
@@ -141,14 +182,16 @@ app.get("/event/creationCompte", function (req, res) {
     });
 });
 
-app.get("/event/abonnement", function (req, res) {
-    res.render("pages/abonnement", {
-        siteTitle: "Abonnez-Vous",
-        pageTitle: "Abonnez-Vous",
+app.get("/event/payment", function (req, res) {
+    const subscriptionName = "Your Subscription Name Here"; // Retrieve the subscription name dynamically
+    res.render("pages/payment", {
+        siteTitle: "Payment",
+        pageTitle: "Payment",
         userDetails: req.session.user,
-
+        subscriptionName: subscriptionName // Pass subscription name
     });
 });
+
 
 app.get("/event/apropos", function (req, res) {
     res.render("pages/apropos", {

@@ -1,0 +1,48 @@
+<%- include("../partials/header.ejs") %>
+
+    <style>
+        body {
+            background-color: #0d0d0d;
+            color: #ff007f;
+            text-align: center;
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        .confirmation-container {
+            margin: auto;
+            max-width: 400px;
+            padding: 20px;
+            border: 2px solid #00bfff;
+            border-radius: 10px;
+            background: rgba(10, 10, 10, 0.9);
+            box-shadow: 0 0 20px rgba(255, 0, 127, 0.5);
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .details {
+            font-size: 1.2em;
+            margin: 10px 0;
+        }
+    </style>
+
+    <body>
+        <div class="confirmation-container">
+            <h1>Payment Successful!</h1>
+            <p class="details">Thank you for your payment.</p>
+            <p class="details"><strong>Name of Subscription:</strong>
+                <%= subscriptionName %>
+            </p>
+            <p class="details"><strong>Amount Paid:</strong>
+                <%= amountPaid %>
+            </p>
+            <p class="details"><strong>Payment ID:</strong>
+                <%= paymentId %>
+            </p>
+        </div>
+    </body>
+
+    <%- include("../partials/footer.ejs") %>
