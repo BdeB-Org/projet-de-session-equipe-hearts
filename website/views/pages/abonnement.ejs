@@ -1,5 +1,4 @@
 <%- include ("../partials/header.ejs") %>
-  <link href="https://fonts.googleapis.com/css2?family=Inknut+Antiqua:wght@400;700&display=swap" rel="stylesheet">
 
   <style>
     /*
@@ -89,8 +88,8 @@
       z-index: 1;
       left: 0;
       top: 0;
-      background-size: cover; 
-      background-position: center; 
+      background-size: cover;
+      background-position: center;
       opacity: 0.6;
       animation: pan-image 15s linear infinite;
     }
@@ -280,110 +279,110 @@
     }
   </style>
 
-<body>
-  <div id="screens-container">
-    <div class="screen">
-      <div class="screen-image"></div>
-      <div class="screen-overlay"></div>
-      <div class="screen-content">
-        <div class="screen-user">
-          <h2 class="name" data-value="Basique">Basique</h2>
-          <p class="price" data-value="0€ / Mois">0$ / Mois</p>
-          <ul class="features" data-value="5 Swipes par Jour">
-            <li>5 Swipes par Jour</li>
-          </ul>
-          <button type="submit" class="button">Choisir Basique</button>
+  <body>
+    <div id="screens-container">
+      <div class="screen">
+        <div class="screen-image"></div>
+        <div class="screen-overlay"></div>
+        <div class="screen-content">
+          <div class="screen-user">
+            <h2 class="name" data-value="Basique">Basique</h2>
+            <p class="price" data-value="0€ / Mois">0$ / Mois</p>
+            <ul class="features" data-value="5 Swipes par Jour">
+              <li>5 Swipes par Jour</li>
+            </ul>
+            <button type="submit" class="button">Choisir Basique</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="screen">
+        <div class="screen-image"></div>
+        <div class="screen-overlay"></div>
+        <div class="screen-content">
+          <div class="screen-user">
+            <h2 class="name" data-value="Premium">Premium</h2>
+            <p class="price" data-value="19,47€ / Mois">19,47$ / Mois</p>
+            <ul class="features" data-value="100 Swipes par Semaine">
+              <li>100 Swipes par Semaine</li>
+            </ul>
+            <button type="submit" class="button">Choisir Premium</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="screen">
+        <div class="screen-image"></div>
+        <div class="screen-overlay"></div>
+        <div class="screen-content">
+          <div class="screen-user">
+            <h2 class="name" data-value="Diamant">Diamant</h2>
+            <p class="price" data-value="25,47€ / Mois">25,47$ / Mois</p>
+            <ul class="features" data-value="Swipes Illimités">
+              <li>Swipes Illimités</li>
+            </ul>
+            <button type="submit" class="button">Choisir Diamant</button>
+          </div>
         </div>
       </div>
     </div>
+  </body>
 
-    <div class="screen">
-      <div class="screen-image"></div>
-      <div class="screen-overlay"></div>
-      <div class="screen-content">
-        <div class="screen-user">
-          <h2 class="name" data-value="Premium">Premium</h2>
-          <p class="price" data-value="19,47€ / Mois">19,47$ / Mois</p>
-          <ul class="features" data-value="100 Swipes par Semaine">
-            <li>100 Swipes par Semaine</li>
-          </ul>
-          <button type="submit" class="button">Choisir Premium</button>
-        </div>
-      </div>
-    </div>
+  <script>
+    const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789€";
+    let intervals = [];
 
-    <div class="screen">
-      <div class="screen-image"></div>
-      <div class="screen-overlay"></div>
-      <div class="screen-content">
-        <div class="screen-user">
-          <h2 class="name" data-value="Diamant">Diamant</h2>
-          <p class="price" data-value="25,47€ / Mois">25,47$ / Mois</p>
-          <ul class="features" data-value="Swipes Illimités">
-            <li>Swipes Illimités</li>
-          </ul>
-          <button type="submit" class="button">Choisir Diamant</button>
-        </div>
-      </div>
-    </div>
-  </div>
-</body>
+    // SCREENS
+    const screens = document.querySelectorAll(".screen");
 
-<script>
-const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789€";
-let intervals = [];
+    screens.forEach(screen => {
+      const name = screen.querySelector(".name");
+      const price = screen.querySelector(".price");
+      const features = screen.querySelector(".features");
+      const elementsToEncrypt = [name, price, features];
 
-// SCREENS
-const screens = document.querySelectorAll(".screen");
+      screen.onmouseenter = () => {
+        elementsToEncrypt.forEach((element, index) => {
+          if (element.dataset.value) {
+            let iteration = 0;
 
-screens.forEach(screen => {
-  const name = screen.querySelector(".name");
-  const price = screen.querySelector(".price");
-  const features = screen.querySelector(".features");
-  const elementsToEncrypt = [name, price, features];
+            if (intervals[index]) {
+              clearInterval(intervals[index]);
+            }
 
-  screen.onmouseenter = () => {
-    elementsToEncrypt.forEach((element, index) => {
-      if (element.dataset.value) {
-        let iteration = 0;
+            intervals[index] = setInterval(() => {
+              element.innerText = element.dataset.value
+                .split("")
+                .map((letter, idx) => {
+                  if (idx < iteration) {
+                    return element.dataset.value[idx];
+                  }
+                  return letters[Math.floor(Math.random() * letters.length)];
+                })
+                .join("");
 
-        if (intervals[index]) {
-          clearInterval(intervals[index]);
-        }
-
-        intervals[index] = setInterval(() => {
-          element.innerText = element.dataset.value
-            .split("")
-            .map((letter, idx) => {
-              if (idx < iteration) {
-                return element.dataset.value[idx];
+              if (iteration >= element.dataset.value.length) {
+                clearInterval(intervals[index]);
               }
-              return letters[Math.floor(Math.random() * letters.length)];
-            })
-            .join("");
+              iteration += 1 / 3;
+            }, 30);
+          }
+        });
+      };
 
-          if (iteration >= element.dataset.value.length) {
+      screen.onmouseleave = () => {
+        elementsToEncrypt.forEach((element, index) => {
+          if (intervals[index]) {
             clearInterval(intervals[index]);
           }
-          iteration += 1 / 3;
-        }, 30);
-      }
+          if (element.dataset.value) {
+            element.innerText = element.dataset.value;
+          }
+        });
+      };
     });
-  };
-
-  screen.onmouseleave = () => {
-    elementsToEncrypt.forEach((element, index) => {
-      if (intervals[index]) {
-        clearInterval(intervals[index]);
-      }
-      if (element.dataset.value) {
-        element.innerText = element.dataset.value; 
-      }
-    });
-  };
-});
 
 
-</script>
+  </script>
 
-<%- include ("../partials/footer.ejs") %>
+  <%- include ("../partials/footer.ejs") %>
