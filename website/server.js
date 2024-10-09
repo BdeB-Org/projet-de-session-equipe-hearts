@@ -76,48 +76,15 @@ app.use('/images', express.static(path.join(__dirname, 'images')));
 Configuration API SQUARE FIOHSAIOGFHASIPFH
 */
 
-
-
-// Square API client setup
 const squareClient = new Client({
     environment: Environment.Sandbox,
     accessToken: process.env.SQUARE_ACCESS_TOKEN
 });
-// Payment route
 
 
-app.post('/event/payment', async (req, res) => {
-    const { amount, sourceId } = req.body; // Ensure amount is in cents
-
-    const idempotencyKey = `idempotency-key-${Date.now()}`;
-
-    const paymentRequest = {
-        sourceId: sourceId,
-        amountMoney: {
-            amount: amount,
-            currency: 'CAD'
-        },
-        idempotencyKey: idempotencyKey,
-    };
-
-    console.log("Payment Request:", paymentRequest);
-
-    try {
-        const response = await squareClient.paymentsApi.createPayment(paymentRequest);
-        // After successful payment, render the confirmation page
-        res.render("pages/confirmation", {
-            siteTitle: "Payment Confirmation",
-            pageTitle: "Payment Confirmation",
-            subscriptionName: "Your Subscription Name Here", // Pass the actual subscription name
-            amountPaid: (amount / 100).toFixed(2), // Convert cents to dollars
-            paymentId: response.result.payment.id
-        });
-    } catch (error) {
-        console.error("Error processing payment:", error);
-        return res.status(500).json({ success: false, message: error.message });
-    }
-});
-
+/*
+Inititaliser la table d'abonnement
+*/
 const initializeSubscriptions = () => {
     const subscriptions = [
         { e_id: 1, e_type: 'Basic', prix: 0.00, e_duree: 30 },
@@ -145,6 +112,7 @@ const initializeSubscriptions = () => {
     });
 };
 
+
 /*
    PAGES DE GET
 */
@@ -153,14 +121,6 @@ app.get("/", function (req, res) {
     res.render("pages/accueil", {
         siteTitle: "Index",
         pageTitle: "index",
-        userDetails: req.session.user,
-    });
-});
-
-app.get("/event/payment", function (req, res) {
-    res.render("pages/payment", {
-        siteTitle: "Payment",
-        pageTitle: "Payment",
         userDetails: req.session.user,
     });
 });
@@ -181,6 +141,25 @@ app.get("/event/creationCompte", function (req, res) {
 
     });
 });
+
+app.get("/event/abonnement", function (req, res) {
+    res.render("pages/abonnement", {
+        siteTitle: "Créer Compte",
+        pageTitle: "Créer Compte",
+        userDetails: req.session.user,
+
+    });
+});
+
+app.get("/event/confirmation", function (req, res) {
+    res.render("pages/confirmation", {
+        siteTitle: "Créer Compte",
+        pageTitle: "Créer Compte",
+        userDetails: req.session.user,
+
+    });
+});
+
 
 app.get("/event/payment", function (req, res) {
     const subscriptionName = "Your Subscription Name Here"; // Retrieve the subscription name dynamically
@@ -216,7 +195,7 @@ app.get("/event/profil", function (req, res) {
         // Si l'utilisateur n'est pas connecté, on le redirige vers la page de connexion
         return res.redirect("/event/inscription");
     }
-    
+
     // Si l'utilisateur est connecté, on affiche son profil
     res.render("pages/profil", {
         siteTitle: "Profil",
@@ -268,4 +247,30 @@ app.post('/event/logout', (req, res) => {
         }
         res.redirect('/');
     });
+});
+
+
+// Payment postes
+
+app.post('/event/payment', async (req, res) => {
+    console.log('Received payment request:', req.body); // Log incoming request
+
+    const { amount, sourceId } = req.body;
+    const paymentRequest = {
+        sourceId: sourceId,
+        amountMoney: {
+            amount: amount,
+            currency: 'CAD'
+        },
+        idempotencyKey: `idempotency-key-${Date.now()}`
+    };
+
+    try {
+        const response = await squareClient.paymentsApi.createPayment(paymentRequest);
+        console.log("Payment successful! Payment ID:", response.result.payment.id);
+        return res.json({ success: true, paymentId: response.result.payment.id });
+    } catch (error) {
+        console.error("Error processing payment:", error);
+        return res.status(500).json({ success: false, message: error.message });
+    }
 });

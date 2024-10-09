@@ -242,29 +242,26 @@
                 document.getElementById('submit-button').addEventListener('click', async () => {
                     const result = await card.tokenize();
                     if (result.status === 'OK') {
-                        const sourceId = result.token; // Get the tokenized source ID
-                        const amount = document.getElementById('amount').value; // This should be the total amount in dollars
+                        const sourceId = result.token;
+                        const amount = document.getElementById('amount').value;
 
-                        // Calculate total amount in cents
-                        const totalAmountInCents = amount * 100; // Convert to cents
+                        const totalAmountInCents = amount * 100;
 
-                        // Log for debugging
                         console.log('Source ID:', sourceId);
                         console.log('Total Amount (Cents):', totalAmountInCents);
 
-                        // Send payment data to your server
                         const response = await fetch('/event/payment', {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json'
                             },
-                            body: JSON.stringify({ sourceId, amount: totalAmountInCents }) // Use totalAmountInCents
+                            body: JSON.stringify({ sourceId, amount: totalAmountInCents })
                         });
 
                         const paymentResult = await response.json();
                         if (paymentResult.success) {
                             alert('Payment successful!');
-                            window.location.href = '/'; // Redirect to the homepage or confirmation page
+                            window.location.href = '/event/confirmation';
                         } else {
                             alert('Payment failed: ' + paymentResult.message);
                         }
