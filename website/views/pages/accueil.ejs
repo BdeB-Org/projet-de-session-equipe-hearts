@@ -42,15 +42,17 @@
                 transform: rotateY(180deg);
             }
 
-            .card:hover~* {
+            .card.dimming {
                 filter: brightness(0.2);
+                
             }
 
             .card:hover {
-                filter: brightness(1);
                 z-index: 10;
+                
+                filter: brightness(1);
+                
             }
-
             .card-front,
             .card-back {
                 position: absolute;
@@ -269,7 +271,6 @@
                     });
                 });
             });
-
 
         </script>
     </body>
