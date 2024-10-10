@@ -4,9 +4,7 @@
         /* Define colors */
         body {
             background-color: #0d0d0d;
-            /* Dark background */
             color: #ff007f;
-            /* Bright pink */
             text-align: center;
             font-family: "Orbitron", sans-serif;
             overflow: hidden;
@@ -16,33 +14,30 @@
             margin: auto;
             max-width: 400px;
             padding: 20px;
-            border: 2px solid #00bfff;
-            /* Neon blue */
+            border: 2px solid #ff007f;
             border-radius: 10px;
             background: rgba(10, 10, 10, 0.9);
             box-shadow: 0 0 20px rgba(255, 0, 127, 0.5);
-            /* Semi-transparent pink shadow */
         }
 
         h1 {
             font-size: 2.5em;
             margin-bottom: 10px;
-            text-shadow: 0 0 5px #00bfff;
-            /* Neon blue */
+            text-shadow: 0 0 5px #ff007f;
         }
 
         p {
             font-size: 1.2em;
             margin-bottom: 20px;
-            text-shadow: 0 0 5px #00bfff;
-            /* Neon blue */
+            text-shadow: 0 0 5px #ff007f;
+
         }
 
         label {
             display: block;
             margin-bottom: 5px;
             font-size: 1.1em;
-            color: #00bfff;
+            color: #ff007f;
             /* Neon blue */
         }
 
@@ -53,9 +48,6 @@
             margin-bottom: 20px;
             border: 2px solid transparent;
             border-radius: 5px;
-            background-color: #ffff00;
-            /* Yellow */
-            color: white;
             font-size: 1em;
             text-align: center;
             box-shadow: 0 0 5px rgba(255, 0, 127, 0.5);
@@ -82,7 +74,6 @@
         /* MODAL */
         .modal {
             display: none;
-            /* Hidden by default */
             position: fixed;
             z-index: 1;
             left: 0;
@@ -91,24 +82,43 @@
             height: 100%;
             overflow: auto;
             background-color: rgba(0, 0, 0, 0.8);
-            /* Black w/ opacity */
         }
 
         .modal-content {
             background-color: #1e1e1e;
-            /* Darker background for the modal */
             border-radius: 10px;
             padding: 20px;
-            box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 0 40px rgba(255, 0, 127, 0.5);
             width: 90%;
             max-width: 500px;
             margin: auto;
+            transition: all 0.3s ease;
+        }
+
+        input[type="number"],
+        input[type="text"] {
+            width: 100%;
+            padding: 15px;
+            margin-bottom: 20px;
+            border: 2px solid #ff007f;
+            border-radius: 5px;
+            font-size: 1em;
+            text-align: center;
+            background-color: #2c2c2c;
+            color: #fff;
+            transition: border-color 0.3s;
+        }
+
+        input[type="number"]:focus,
+        input[type="text"]:focus {
+            border-color: #ff007f;
+            outline: none;
         }
 
         .submit-button {
             background-color: #ff007f;
             color: white;
-            padding: 10px 20px;
+            padding: 15px;
             border: none;
             border-radius: 5px;
             cursor: pointer;
@@ -120,6 +130,10 @@
         .submit-button:hover {
             background-color: #fbff00a7;
             transform: scale(1.05);
+        }
+
+        label {
+            margin-bottom: 10px;
         }
 
         .close {
@@ -149,9 +163,48 @@
             justify-content: space-between;
             padding: 5px 0;
         }
+
+        #card-container {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #f6ff00;
+            border-radius: 5px;
+            background-color: rgb(255, 255, 255);
+            box-shadow: 0 0 15px rgba(255, 247, 13, 0.3);
+        }
+
+        input[type="text"] {
+            width: calc(100% - 20px);
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 2px solid #ff007f;
+            border-radius: 5px;
+            background-color: #2c2c2c;
+            color: #fff;
+        }
+
+        input[type="text"]:focus {
+            border-color: #ff007f;
+            outline: none;
+        }
+
+        #background-video {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: -1;
+        }
     </style>
 
     <body>
+        <video autoplay muted loop id="background-video">
+            <source src="/images/vecteezy_abstract-cyberpunk-animated-background_4846470.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
+
         <div class="payment-container">
             <h1>Payer Votre Abonnement</h1>
             <p>Merci de choisir votre plan.</p>
@@ -164,24 +217,24 @@
                 </div>
                 <div class="receipt-item">
                     <span><strong>Initial Amount:</strong></span>
-                    <span id="initial-amount"></span>
+                    <span id="initial-amount"></span> <!-- Ensure this ID matches -->
                 </div>
                 <div class="receipt-item">
-                    <span><strong>TVQ (Quebec Tax):</strong></span>
-                    <span id="tvq-amount"></span>
+                    <span><strong>TVQ:</strong></span>
+                    <span id="tvq-amount"></span> <!-- Ensure this ID matches -->
                 </div>
                 <div class="receipt-item">
                     <span><strong>TPS:</strong></span>
-                    <span id="tps-amount"></span>
+                    <span id="tps-amount"></span> <!-- Ensure this ID matches -->
                 </div>
                 <div class="receipt-item">
                     <span><strong>Total:</strong></span>
-                    <span id="total-amount"></span>
+                    <span id="total-amount"></span> <!-- Ensure this ID matches -->
                 </div>
             </div>
 
             <form id="payment-form">
-                <div>
+                <div style="display: none;">
                     <label for="amount">Montant ($):</label>
                     <input type="number" id="amount" name="amount" required readonly>
                 </div>
@@ -193,8 +246,12 @@
         <div id="card-modal" class="modal">
             <div class="modal-content">
                 <span class="close" onclick="closeModal()">&times;</span>
-                <h2 style="color: #ff007f;">Enter Card Details</h2>
-                <div id="card-container"></div>
+                <h2 style="color: #ff007f;">Saisir les détails de la carte</h2>
+                <div id="card-container">
+                    <label for="cardholder-name">Nom du titulaire de la carte:</label>
+                    <input type="text" id="cardholder-name" name="cardholder-name" placeholder="John Doe" required>
+                </div>
+
                 <button class="submit-button" id="submit-button">Submit Payment</button>
             </div>
         </div>
@@ -207,7 +264,6 @@
             document.getElementById('subscription-name').innerText = subscriptionName;
 
             if (amount) {
-                document.getElementById('amount').value = amount;
                 document.getElementById('initial-amount').innerText = `$${amount.toFixed(2)}`;
 
                 const tvqRate = 0.09975;
@@ -220,9 +276,11 @@
                 document.getElementById('tvq-amount').innerText = `$${tvqAmount.toFixed(2)}`;
                 document.getElementById('tps-amount').innerText = `$${tpsAmount.toFixed(2)}`;
                 document.getElementById('total-amount').innerText = `$${totalAmount.toFixed(2)}`;
+                document.getElementById('total-amount').value = totalAmount.toFixed(2);
 
                 document.getElementById('amount').value = totalAmount.toFixed(2);
             }
+
 
             const modal = document.getElementById("card-modal");
 
@@ -240,6 +298,7 @@
             async function initializeCard() {
                 const card = await payments.card();
                 await card.attach('#card-container');
+                zipCode: false
 
                 document.getElementById('submit-button').addEventListener('click', async () => {
                     const result = await card.tokenize();
@@ -264,11 +323,10 @@
 
                         const paymentResult = await response.json();
 
-                        // Handle redirection after payment success
+
                         if (paymentResult.redirect) {
-                            // Close the modal after payment
                             modal.style.display = "none";
-                            // Redirect to the confirmation page
+
                             window.location.href = paymentResult.redirect;
                         } else {
                             alert('Payment failed: ' + paymentResult.message);

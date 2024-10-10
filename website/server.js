@@ -27,6 +27,8 @@ app.set("view engine", "ejs");
 
 app.use(express.static(path.join(__dirname, 'css')));
 app.use('/js', express.static(path.join(__dirname, 'js')));
+app.use('/images', express.static(path.join(__dirname, '/website/images')));
+
 
 /*
     Connect to server
