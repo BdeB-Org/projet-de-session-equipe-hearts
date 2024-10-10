@@ -153,10 +153,15 @@ app.get("/event/abonnement", function (req, res) {
 
 app.get("/event/confirmation", function (req, res) {
     res.render("pages/confirmation", {
-        siteTitle: "Créer Compte",
-        pageTitle: "Créer Compte",
+        siteTitle: "Confirmation",
+        pageTitle: "Payment Confirmation",
         userDetails: req.session.user,
-
+        subscriptionType: req.session.subscriptionType || "Unknown Subscription",
+        paymentId: req.session.paymentId || "Unknown Payment ID",
+        amount: req.session.amount.toFixed(2),
+        tvqAmount: req.session.tvqAmount.toFixed(2),
+        tpsAmount: req.session.tpsAmount.toFixed(2),
+        totalAmount: req.session.totalAmount.toFixed(2)
     });
 });
 
@@ -253,6 +258,22 @@ app.post('/event/payment', async (req, res) => {
     console.log('Received payment request:', req.body);
 
     const { sourceId, amount, subscriptionType } = req.body;
+    const totalAmountInCents = amount; // Amount received in cents
+    const totalAmount = totalAmountInCents / 100; // Convert cents to dollars
+
+    const tvqRate = 0.09975;
+    const tpsRate = 0.05;
+
+    // Calculate the original amount and taxes
+    const tvqAmount = totalAmount / (1 + tvqRate + tpsRate) * tvqRate;
+    const tpsAmount = totalAmount / (1 + tvqRate + tpsRate) * tpsRate;
+    const originalAmount = totalAmount - tvqAmount - tpsAmount;
+
+    // Store the calculated amounts in the session
+    req.session.amount = originalAmount; // Original amount
+    req.session.tvqAmount = tvqAmount; // TVQ amount
+    req.session.tpsAmount = tpsAmount; // TPS amount
+    req.session.totalAmount = totalAmount; // Total amount with taxe
 
     if (!subscriptionType) {
         return res.status(400).json({ success: false, message: 'Subscription type is required' });
@@ -303,6 +324,10 @@ app.post('/event/payment', async (req, res) => {
                     console.error('Error updating user subscription:', err);
                     return res.status(500).send('Error updating user subscription');
                 }
+
+                // Store payment details in the session
+                req.session.subscriptionType = subscriptionType; // Store subscription type
+                req.session.paymentId = paymentResponse.result.payment.id; // Store payment ID
 
                 console.log("Payment successful! Payment ID:", paymentResponse.result.payment.id);
 
