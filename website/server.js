@@ -162,7 +162,7 @@ app.get("/event/confirmation", function (req, res) {
 
 
 app.get("/event/payment", function (req, res) {
-    const subscriptionName = "Your Subscription Name Here"; // Retrieve the subscription name dynamically
+    const subscriptionName = req.query.subscriptionType || "Your Subscription"; // Retrieve the subscription name dynamically
     res.render("pages/payment", {
         siteTitle: "Payment",
         pageTitle: "Payment",
@@ -250,25 +250,67 @@ app.post('/event/logout', (req, res) => {
 });
 
 
-// Payment postes
-
 app.post('/event/payment', async (req, res) => {
-    console.log('Received payment request:', req.body); // Log incoming request
+    console.log('Received payment request:', req.body);
 
-    const { amount, sourceId } = req.body;
+    const { sourceId, amount, subscriptionType } = req.body;
+
+    if (!subscriptionType) {
+        return res.status(400).json({ success: false, message: 'Subscription type is required' });
+    }
+
     const paymentRequest = {
         sourceId: sourceId,
         amountMoney: {
             amount: amount,
             currency: 'CAD'
         },
-        idempotencyKey: `idempotency-key-${Date.now()}`
+        idempotencyKey: `idempotency-key-${Date.now()}` // Ensuring idempotency for the payment
     };
 
     try {
-        const response = await squareClient.paymentsApi.createPayment(paymentRequest);
-        console.log("Payment successful! Payment ID:", response.result.payment.id);
-        return res.json({ success: true, paymentId: response.result.payment.id });
+        // Process the payment with Square API
+        const paymentResponse = await squareClient.paymentsApi.createPayment(paymentRequest);
+
+        const query = 'SELECT e_id FROM e_abonnement WHERE e_type = ?';
+        con.query(query, [subscriptionType], (err, results) => {
+            if (err) {
+                console.error('Error querying subscription details:', err);
+                return res.status(500).send('Error querying subscription details');
+            }
+
+            if (results.length === 0) {
+                console.error('Subscription type not found:', subscriptionType);
+                return res.status(404).send('Subscription type not found');
+            }
+
+            const subscriptionId = results[0].e_id;
+
+            const { e_nom, e_prenom, date_naissance, e_courriel, e_location, e_number, e_password } = req.session.user || {};
+            const formattedDateNaissance = dateFormat(date_naissance, "yyyy-mm-dd");
+            const e_photo = null;
+
+            const insertQuery = `
+            INSERT INTO e_utilisateur (e_nom, e_prenom, date_naissance, e_courriel, e_photo, e_location, e_number, e_password, abonnement_id)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+            `;
+
+            con.query(insertQuery, [e_nom, e_prenom, formattedDateNaissance, e_courriel, e_photo, e_location, e_number, e_password, subscriptionId
+            ], (err, result) => {
+                if (err) {
+                    console.error('Error inserting user:', err);
+                    return res.status(500).send('Error inserting user');
+                }
+
+                req.session.user = { e_id: result.insertId, e_nom, e_prenom, e_courriel };
+
+                console.log("Payment successful! Payment ID:", paymentResponse.result.payment.id);
+
+                // Send JSON response with redirect URL
+                res.json({ success: true, redirect: '/event/confirmation' });
+            });
+        });
+
     } catch (error) {
         console.error("Error processing payment:", error);
         return res.status(500).json({ success: false, message: error.message });

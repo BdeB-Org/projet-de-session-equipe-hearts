@@ -160,7 +160,7 @@
             <div class="receipt">
                 <div class="receipt-item">
                     <span><strong>Name of Subscription:</strong></span>
-                    <span id="subscription-name">Your Subscription</span>
+                    <span id="subscription-name"></span>
                 </div>
                 <div class="receipt-item">
                     <span><strong>Initial Amount:</strong></span>
@@ -203,6 +203,8 @@
         <script>
             const urlParams = new URLSearchParams(window.location.search);
             const amount = parseFloat(urlParams.get('amount')) || 0;
+            const subscriptionName = urlParams.get('subscriptionType');
+            document.getElementById('subscription-name').innerText = subscriptionName;
 
             if (amount) {
                 document.getElementById('amount').value = amount;
@@ -244,24 +246,30 @@
                     if (result.status === 'OK') {
                         const sourceId = result.token;
                         const amount = document.getElementById('amount').value;
+                        const subscriptionType = document.getElementById('subscription-name').innerText;
 
                         const totalAmountInCents = amount * 100;
 
                         console.log('Source ID:', sourceId);
                         console.log('Total Amount (Cents):', totalAmountInCents);
+                        console.log('Subscription Type:', subscriptionType);
 
                         const response = await fetch('/event/payment', {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json'
                             },
-                            body: JSON.stringify({ sourceId, amount: totalAmountInCents })
+                            body: JSON.stringify({ sourceId, amount: totalAmountInCents, subscriptionType })
                         });
 
                         const paymentResult = await response.json();
-                        if (paymentResult.success) {
-                            alert('Payment successful!');
-                            window.location.href = '/event/confirmation';
+
+                        // Handle redirection after payment success
+                        if (paymentResult.redirect) {
+                            // Close the modal after payment
+                            modal.style.display = "none";
+                            // Redirect to the confirmation page
+                            window.location.href = paymentResult.redirect;
                         } else {
                             alert('Payment failed: ' + paymentResult.message);
                         }
@@ -273,5 +281,6 @@
 
             initializeCard();
         </script>
+
 
         <%- include("../partials/footer.ejs") %>

@@ -291,7 +291,7 @@
             <ul class="features" data-value="5 Swipes par Jour">
               <li>5 Swipes par Jour</li>
             </ul>
-            <button onclick="goToPayment(0)" class="custom_butt">Acheter</button>
+            <button onclick="goToPayment(0, 'Basique')" class="custom_butt">Acheter</button>
 
           </div>
         </div>
@@ -307,7 +307,7 @@
             <ul class="features" data-value="100 Swipes par Semaine">
               <li>100 Swipes par Semaine</li>
             </ul>
-            <button onclick="goToPayment(19.47)" class="custom_butt">Acheter</button>
+            <button onclick="goToPayment(19.47, 'Premium')" class="custom_butt">Acheter</button>
 
           </div>
         </div>
@@ -323,7 +323,7 @@
             <ul class="features" data-value="Swipes Illimités">
               <li>Swipes Illimités</li>
             </ul>
-            <button onclick="goToPayment(25.47)" class="custom_butt">Acheter</button>
+            <button onclick="goToPayment(25.47, 'Diamant')" class="custom_butt">Acheter</button>
 
           </div>
         </div>
@@ -333,8 +333,8 @@
 
   <script>
 
-    function goToPayment(price) {
-      window.location.href = `/event/payment?amount=${price}`;
+    function goToPayment(price, subscriptionType) {
+      window.location.href = `/event/payment?amount=${price}&subscriptionType=${subscriptionType}`;
     }
 
 
