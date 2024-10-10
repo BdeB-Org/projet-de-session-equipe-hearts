@@ -291,8 +291,18 @@
             <ul class="features" data-value="5 Swipes par Jour">
               <li>5 Swipes par Jour</li>
             </ul>
-            <button onclick="goToPayment(0, 'Basique')" class="custom_butt">Acheter</button>
-
+            <% if (!userDetails) { %>
+              <button onclick="window.location.href='/event/creationCompte'" class="custom_butt">
+                Il faut être connecté pour avoir cet abonnement
+              </button>
+              <% } else if (userDetails.abonnement_id==='1' ) { %>
+                <button class="custom_butt" disabled>
+                  Vous avez déjà cet abonnement
+                </button>
+                <button onclick="goToPayment(19.47, 'Premium')" class="custom_butt">Changer de plan</button>
+                <% } else { %>
+                  <button onclick="goToPayment(0, 'Basique')" class="custom_butt">Acheter</button>
+                  <% } %>
           </div>
         </div>
       </div>
@@ -307,8 +317,18 @@
             <ul class="features" data-value="100 Swipes par Semaine">
               <li>100 Swipes par Semaine</li>
             </ul>
-            <button onclick="goToPayment(19.47, 'Premium')" class="custom_butt">Acheter</button>
-
+            <% if (!userDetails) { %>
+              <button onclick="window.location.href='/event/creationCompte'" class="custom_butt">
+                Il faut être connecté pour avoir cet abonnement
+              </button>
+              <% } else if (userDetails.abonnement_id==='2' ) { %>
+                <button class="custom_butt" disabled>
+                  Vous avez déjà cet abonnement
+                </button>
+                <button onclick="goToPayment(25.47, 'Diamant')" class="custom_butt">Changer de plan</button>
+                <% } else { %>
+                  <button onclick="goToPayment(19.47, 'Premium')" class="custom_butt">Acheter</button>
+                  <% } %>
           </div>
         </div>
       </div>
@@ -323,13 +343,24 @@
             <ul class="features" data-value="Swipes Illimités">
               <li>Swipes Illimités</li>
             </ul>
-            <button onclick="goToPayment(25.47, 'Diamant')" class="custom_butt">Acheter</button>
-
+            <% if (!userDetails) { %>
+              <button onclick="window.location.href='/event/creationCompte'" class="custom_butt">
+                Il faut être connecté pour avoir cet abonnement
+              </button>
+              <% } else if (userDetails.abonnement_id==='3' ) { %>
+                <button class="custom_butt" disabled>
+                  Vous avez déjà cet abonnement
+                </button>
+                <button onclick="goToPayment(19.47, 'Premium')" class="custom_butt">Changer de plan</button>
+                <% } else { %>
+                  <button onclick="goToPayment(25.47, 'Diamant')" class="custom_butt">Acheter</button>
+                  <% } %>
           </div>
         </div>
       </div>
     </div>
   </body>
+
 
   <script>
 

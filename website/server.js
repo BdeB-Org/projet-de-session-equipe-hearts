@@ -89,7 +89,7 @@ const initializeSubscriptions = () => {
     const subscriptions = [
         { e_id: 1, e_type: 'Basic', prix: 0.00, e_duree: 30 },
         { e_id: 2, e_type: 'Premium', prix: 9.99, e_duree: 30 },
-        { e_id: 3, e_type: 'Diamond', prix: 19.99, e_duree: 30 }
+        { e_id: 3, e_type: 'Diamant', prix: 19.99, e_duree: 30 }
     ];
 
     subscriptions.forEach(subscription => {
@@ -273,7 +273,7 @@ app.post('/event/payment', async (req, res) => {
     req.session.amount = originalAmount; // Original amount
     req.session.tvqAmount = tvqAmount; // TVQ amount
     req.session.tpsAmount = tpsAmount; // TPS amount
-    req.session.totalAmount = totalAmount; // Total amount with taxe
+    req.session.totalAmount = totalAmount; // Total amount with tax
 
     if (!subscriptionType) {
         return res.status(400).json({ success: false, message: 'Subscription type is required' });
@@ -291,6 +291,9 @@ app.post('/event/payment', async (req, res) => {
     try {
         // Process the payment with Square API
         const paymentResponse = await squareClient.paymentsApi.createPayment(paymentRequest);
+
+        // Make sure subscriptionType is correct
+        console.log("Subscription Type:", subscriptionType); // Add this line
 
         const query = 'SELECT e_id FROM e_abonnement WHERE e_type = ?';
         con.query(query, [subscriptionType], (err, results) => {
