@@ -13,6 +13,12 @@ CREATE DATABASE myhearts;
 
 USE myhearts;
 
+DROP TABLE e_utilisateur;
+DROP TABLE e_abonnement;
+DROP TABLE lieu;
+DROP TABLE preference;
+DROP TABLE relation_5;
+
 CREATE TABLE e_utilisateur (
     e_id INT AUTO_INCREMENT NOT NULL,
     e_nom VARCHAR(100) NOT NULL,
