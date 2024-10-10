@@ -19,7 +19,7 @@ CREATE TABLE e_utilisateur (
     e_prenom VARCHAR(100) NOT NULL,
     date_naissance DATE NOT NULL,
     e_courriel VARCHAR(100) NOT NULL,
-    e_photo LONGBLOB NOT NULL,
+    e_photo LONGBLOB,
     e_location TEXT NOT NULL,
     e_number TEXT NOT NULL,
     e_password VARCHAR(255),
