@@ -143,13 +143,14 @@ app.get("/event/creationCompte", function (req, res) {
 });
 
 app.get("/event/abonnement", function (req, res) {
+    console.log("User Details on Abonnement Page:", req.session.user); // Debugging line
     res.render("pages/abonnement", {
         siteTitle: "Créer Compte",
         pageTitle: "Créer Compte",
         userDetails: req.session.user,
-
     });
 });
+
 
 app.get("/event/confirmation", function (req, res) {
     res.render("pages/confirmation", {
@@ -232,17 +233,28 @@ app.post('/event/connect', (req, res) => {
         const user = result[0];
         console.log("Retrieved user:", user);
         if (password === user.e_password) {
-            req.session.user = user;
-            console.log("the user is connected")
+            // Assign user details including abonnement_id to the session
+            req.session.user = {
+                e_id: user.e_id,
+                e_nom: user.e_nom,
+                e_prenom: user.e_prenom,
+                date_naissance: user.date_naissance,
+                e_courriel: user.e_courriel,
+                e_photo: user.e_photo,
+                e_location: user.e_location,
+                e_number: user.e_number,
+                abonnement_id: user.abonnement_id // This line must be included
+            };
+            console.log("User connected:", req.session.user); // Log session details
             res.redirect('/');
         } else {
             console.log(password);
-            console.log(user.e_password); //ITS IN LOWER CAPS CUZ UHH BAHH IDK ITS IN LOWER CAPS
+            console.log(user.e_password);
             res.status(401).send("Incorrect password");
-        };
+        }
     });
-
 });
+
 
 app.post('/event/logout', (req, res) => {
     req.session.destroy((err) => {
@@ -327,6 +339,18 @@ app.post('/event/payment', async (req, res) => {
                     console.error('Error updating user subscription:', err);
                     return res.status(500).send('Error updating user subscription');
                 }
+                req.session.user.abonnement_id = subscriptionId; // Ensure session is updated
+
+                // Optional: Fetch the updated user details from the database
+                const fetchUpdatedUserQuery = "SELECT * FROM e_utilisateur WHERE e_id = ?";
+                con.query(fetchUpdatedUserQuery, [e_id], (err, updatedUserResult) => {
+                    if (err) {
+                        console.error('Error fetching updated user:', err);
+                        return;
+                    }
+                    // Update session with new user details
+                    req.session.user = updatedUserResult[0]; // Assuming updatedUserResult has user details
+                });
 
                 // Store payment details in the session
                 req.session.subscriptionType = subscriptionType; // Store subscription type
