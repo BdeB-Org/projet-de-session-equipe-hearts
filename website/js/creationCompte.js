@@ -17,26 +17,14 @@ function redirectInscription(event) {
 
     // Validate inputs here...
 
-    // Perform the AJAX request
-    fetch('/event/creationCompte', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password }),
-    })
-    .then(response => {
-        if (response.ok) {
-            window.location.href = '/'; // Redirect on success
-        } else {
-            return response.text().then(text => {
-                // Show error message
-                document.getElementById('erreur-email').innerText = text;
-            });
-        }
-    })
-    .catch(error => console.error('Error:', error));
+    // Store email and password in localStorage
+    localStorage.setItem('email', email);
+    localStorage.setItem('password', password);
+
+    // Redirect to the inscription page
+    window.location.href = '/event/inscription';
 }
+
 
 
 function redirectAccueil(event) {

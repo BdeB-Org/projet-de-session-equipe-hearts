@@ -29,6 +29,10 @@ app.use(express.static(path.join(__dirname, 'css')));
 app.use('/js', express.static(path.join(__dirname, 'js')));
 app.use('/images', express.static(path.join(__dirname, '/website/images')));
 
+app.use(express.urlencoded({ extended: true })); // For parsing application/x-www-form-urlencoded
+app.use(express.json()); // For parsing application/json
+
+
 
 /*
     Connect to server
@@ -494,9 +498,18 @@ app.post('/event/delete-account', (req, res) => {
 
 
 
-// Create a new account
-app.post('/event/inscription', (req, res) => {
+import multer from 'multer';
+
+// Set up multer for file uploads
+const upload = multer({ dest: 'uploads/' }); // or configure as needed for file storage
+
+// Use multer in the POST route
+app.post('/event/inscription', upload.single('photo'), (req, res) => {
     const { email, password, phone, firstName, lastName, birthdate } = req.body;
+
+    // Debug: print the request body and file
+    console.log(req.body);  // Should now show form values
+    console.log(req.file);  // Shows file details if a photo was uploaded
 
     // Check if email already exists
     const checkEmailQuery = "SELECT * FROM e_utilisateur WHERE e_courriel = ?";
@@ -516,18 +529,17 @@ app.post('/event/inscription', (req, res) => {
             VALUES (?, ?, ?, ?, ?, ?, ?, ?)
         `;
 
-        // Assuming e_photo and e_location are not being used right now, use placeholders
-        const defaultPhoto = null;  // Replace with actual photo handling if needed
         const defaultLocation = 'Unknown';  // Replace with location handling if needed
+        const uploadedPhoto = req.file ? req.file.filename : null; // Save the file path if photo was uploaded
 
-        con.query(insertUserQuery, [lastName, firstName, birthdate, email, defaultPhoto, defaultLocation, phone, password], (err, result) => {
+        con.query(insertUserQuery, [lastName, firstName, birthdate, email, uploadedPhoto, defaultLocation, phone, password], (err, result) => {
             if (err) {
                 console.error("Error inserting user:", err);
                 return res.status(500).send("Internal Server Error");
             }
 
             console.log("New user inserted:", result);
-            req.session.user = { email, firstName }; // Set session for the new user
+            req.session.user = { email, firstName, lastName }; // Set session for the new user
             res.redirect('/');
         });
     });
