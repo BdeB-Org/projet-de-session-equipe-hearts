@@ -200,17 +200,20 @@ app.get("/event/swipe", function (req, res) {
 
 app.get("/event/profil", function (req, res) {
     if (!req.session.user) {
-        // Si l'utilisateur n'est pas connecté, on le redirige vers la page de connexion
+        // Redirect to login page if not logged in
         return res.redirect("/event/inscription");
     }
 
-    // Si l'utilisateur est connecté, on affiche son profil
+    // Render profile page with default message and messageType
     res.render("pages/profil", {
         siteTitle: "Profil",
         pageTitle: "Votre Profil",
         userDetails: req.session.user,
+        message: null, // No message by default
+        messageType: '' // No message type by default
     });
 });
+
 
 
 
@@ -370,3 +373,116 @@ app.post('/event/payment', async (req, res) => {
         return res.status(500).json({ success: false, message: error.message });
     }
 });
+
+app.post('/event/change-password', async (req, res) => {
+    const { old_password, new_password, confirm_password } = req.body;
+    const userId = req.session.user.e_id; // Assuming user ID is stored in session
+
+    // Ensure all fields are provided
+    if (!old_password || !new_password || !confirm_password) {
+        return res.render('pages/profil', {
+            userDetails: req.session.user,
+            message: 'Tous les champs sont requis',
+            messageType: 'error'
+        });
+    }
+
+    // Check if new password and confirmation match
+    if (new_password !== confirm_password) {
+        return res.render('pages/profil', {
+            userDetails: req.session.user,
+            message: 'Les mots de passe ne correspondent pas',
+            messageType: 'error'
+        });
+    }
+
+    try {
+        // Fetch the user's current password from the database
+        const query = 'SELECT e_password FROM e_utilisateur WHERE e_id = ?';
+        con.query(query, [userId], async (err, result) => {
+            if (err) {
+                console.error('Error fetching user:', err);
+                return res.render('pages/profil', {
+                    userDetails: req.session.user,
+                    message: 'Erreur serveur. Veuillez réessayer.',
+                    messageType: 'error'
+                });
+            }
+
+            if (result.length === 0) {
+                return res.render('pages/profil', {
+                    userDetails: req.session.user,
+                    message: 'Utilisateur non trouvé',
+                    messageType: 'error'
+                });
+            }
+
+            const user = result[0];
+
+            // Compare the current password directly (for plain-text passwords)
+            if (old_password !== user.e_password) {
+                return res.render('pages/profil', {
+                    userDetails: req.session.user,
+                    message: 'Le mot de passe actuel est incorrect',
+                    messageType: 'error'
+                });
+            }
+
+            // Update the password in the database
+            const updateQuery = 'UPDATE e_utilisateur SET e_password = ? WHERE e_id = ?';
+            con.query(updateQuery, [new_password, userId], (err, result) => {
+                if (err) {
+                    console.error('Error updating password:', err);
+                    return res.render('pages/profil', {
+                        userDetails: req.session.user,
+                        message: 'Erreur lors de la mise à jour du mot de passe',
+                        messageType: 'error'
+                    });
+                }
+
+                // Update successful
+                return res.render('pages/profil', {
+                    userDetails: req.session.user,
+                    message: 'Le mot de passe a bien été changé',
+                    messageType: 'success'
+                });
+            });
+        });
+    } catch (error) {
+        console.error('Error processing password change:', error);
+        return res.render('pages/profil', {
+            userDetails: req.session.user,
+            message: 'Erreur interne. Veuillez réessayer plus tard.',
+            messageType: 'error'
+        });
+    }
+});
+
+// Assuming this is part of your server.js
+
+app.post('/event/delete-account', (req, res) => {
+    const userId = req.session.user ? req.session.user.e_id : null; // Ensure session exists
+
+    if (!userId) {
+        return res.status(400).send('Utilisateur non connecté.');
+    }
+
+    const deleteUserQuery = 'DELETE FROM e_utilisateur WHERE e_id = ?';
+
+    con.query(deleteUserQuery, [userId], (err, result) => {
+        if (err) {
+            console.error('Error deleting user:', err);
+            return res.status(500).send('Erreur interne du serveur.');
+        }
+
+        req.session.destroy((err) => {
+            if (err) {
+                console.error('Error during logout:', err);
+                return res.status(500).send('Erreur lors de la déconnexion.');
+            }
+            res.redirect('/');
+        });
+    });
+});
+
+
