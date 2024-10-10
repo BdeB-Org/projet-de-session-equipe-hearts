@@ -8,6 +8,14 @@
 7. Ouvrir le fichier github dans visual studio code et aller dans le répertoire \git_web\Hearts\hearts\Projet_etudiant1>
 8. Exécuter le server avec : node server.js
 9. Ouvrez http://localhost:4000/ dans votre navigateur web.
+10. Ajoutez les modules nodes suivants :
+
+node install
+node install multer
+npm install
+npm install dotenv
+npm install square
+
 
 CREATE DATABASE myhearts;
 
