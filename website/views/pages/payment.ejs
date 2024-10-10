@@ -197,6 +197,32 @@
             object-fit: cover;
             z-index: -1;
         }
+
+        #card-container {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 15px;
+
+        }
+
+        #cardholder-name {
+            border: 2px solid #ff69b4;
+            border-radius: 8px;
+            padding: 10px;
+            font-size: 16px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        #cardholder-name:focus {
+            border-color: #ff1493;
+        }
+
+        label {
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #ff1493;
+        }
     </style>
 
     <body>
@@ -232,7 +258,6 @@
                     <span id="total-amount"></span> <!-- Ensure this ID matches -->
                 </div>
             </div>
-
             <form id="payment-form">
                 <div style="display: none;">
                     <label for="amount">Montant ($):</label>
@@ -248,10 +273,10 @@
                 <span class="close" onclick="closeModal()">&times;</span>
                 <h2 style="color: #ff007f;">Saisir les détails de la carte</h2>
                 <div id="card-container">
-                    <label for="cardholder-name">Nom du titulaire de la carte:</label>
-                    <input type="text" id="cardholder-name" name="cardholder-name" placeholder="John Doe" required>
+                    <label for="cardholder-name" style="font-size: 0.9em;">Courriel de confirmation:</label>
+                    <input type="email" id="cardholder-name" name="cardholder-name" placeholder="exemple@mail.com" required>
                 </div>
-
+                
                 <button class="submit-button" id="submit-button">Submit Payment</button>
             </div>
         </div>

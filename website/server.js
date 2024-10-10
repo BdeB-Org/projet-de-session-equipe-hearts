@@ -164,10 +164,10 @@ app.get("/event/confirmation", function (req, res) {
         amount: req.session.amount.toFixed(2),
         tvqAmount: req.session.tvqAmount.toFixed(2),
         tpsAmount: req.session.tpsAmount.toFixed(2),
-        totalAmount: req.session.totalAmount.toFixed(2)
+        totalAmount: req.session.totalAmount.toFixed(2),
+        confirmationEmail: req.session.confirmationEmail  // Pass the email to the view
     });
 });
-
 
 app.get("/event/payment", function (req, res) {
     const subscriptionName = req.query.subscriptionType || "Your Subscription"; // Retrieve the subscription name dynamically
@@ -274,7 +274,8 @@ app.post('/event/logout', (req, res) => {
 app.post('/event/payment', async (req, res) => {
     console.log('Received payment request:', req.body);
 
-    const { sourceId, amount, subscriptionType } = req.body;
+    const { sourceId, amount, subscriptionType, 'confirmation-email': confirmationEmail } = req.body;
+
     const totalAmountInCents = amount; // Amount received in cents
     const totalAmount = totalAmountInCents / 100; // Convert cents to dollars
 
@@ -291,6 +292,8 @@ app.post('/event/payment', async (req, res) => {
     req.session.tvqAmount = tvqAmount; // TVQ amount
     req.session.tpsAmount = tpsAmount; // TPS amount
     req.session.totalAmount = totalAmount; // Total amount with tax
+
+    req.session.confirmationEmail = confirmationEmail;
 
     if (!subscriptionType) {
         return res.status(400).json({ success: false, message: 'Subscription type is required' });
@@ -526,3 +529,4 @@ app.post('/event/inscription', (req, res) => {
         });
     });
 });
+
