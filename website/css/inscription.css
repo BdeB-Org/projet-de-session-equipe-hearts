@@ -7,21 +7,20 @@ body {
 .form_inscription {
   display: flex;
   justify-content: center;
-  align-items: flex-start; /* Aligns content to the top */
-  /* margin-top: 50px; */
+  align-items: flex-start;
   width: 100%;
-  height: 100vh; /* Full view height */
-  /* padding-top: 50px; Provides padding to move content up */
+  height: 100vh;
 }
 
 .grid-container {
   display: grid;
-  grid-template-columns: 1.2fr 1.2fr 1fr 1fr; /* Make image columns slightly bigger */
-  grid-gap: 40px; /* Increase spacing between columns */
-  width: 95%; /* Adjust for better spacing on larger screens */
-  max-width: 1600px; /* Allow a larger max width for bigger screens */
+  grid-template-columns: 1fr 1fr 1fr 1fr; /* Four equal columns */
+  grid-gap: 40px; /* Spacing between columns */
+  width: 95%;
+  max-width: 1600px; /* Maximum width for large screens */
   align-items: start;
-   margin-top: -100px; /* Adjust vertical alignment slightly */
+  margin: 0 auto;
+  margin-top: -100px;
 }
 
 .image-section {
@@ -34,41 +33,31 @@ body {
 .image-section img {
   width: 100%;
   height: auto;
-  max-width: 100%; /* Keep images responsive */
+  max-width: 100%;
   border-radius: 10px;
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2); /* Slightly larger shadow for emphasis */
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
 }
 
-.form-section {
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;  /* Two equal columns for form */
+  grid-column: 3 / span 2; /* Form spans the last two columns */
+  gap: 60px;
+}
+
+.form-column {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  padding: 30px; /* Increased padding for more space inside the form */
-  background: rgba(255, 255, 255, 0.08);
-  border-radius: 15px;
-  box-shadow: 0px 20px 25px rgba(0, 0, 0, 0.3); /* Elevation shadow */
-  transform: translateY(-20px);
-  transition: box-shadow 0.3s ease, transform 0.3s ease;
+  gap: 20px;
 }
 
-.form-section:hover {
-  box-shadow: 0px 30px 35px rgba(0, 0, 0, 0.4); /* Increase shadow on hover */
-  transform: translateY(-25px);
-}
-
-.step {
-  width: 100%;
-  margin: 16px 0; /* Increase space between input fields */
-  transition: opacity 0.5s ease-in-out;
-}
-
-.step input, .step select {
+.step input,
+.step select {
   font-family: "Orbitron", sans-serif;
   background: linear-gradient(90deg, #F4F4F4 15%, #FFA3AC 75%);
   border: none;
-  margin: 12px 0; /* More margin to space out inputs */
-  padding: 15px 20px; /* Increased padding for larger input fields */
-  font-size: 16px; /* Increase font size */
+  padding: 15px 20px;
+  font-size: 16px;
   border-radius: 10px;
   width: 100%;
   outline: none;
@@ -76,93 +65,90 @@ body {
   transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
 }
 
-.step input:focus, .step select:focus {
+.step input:focus,
+.step select:focus {
   border: 2px solid #FF7991;
   box-shadow: 0px 0px 10px rgba(255, 163, 172, 0.5);
-  transform: scale(1.03); /* Slight scale on focus for emphasis */
+  transform: scale(1.03);
   color: #FF7991;
 }
 
 .submit-button-container {
-  grid-column: 3 / span 2; /* Center the button between both form columns */
+  grid-column: 1 / span 2;
   display: flex;
   justify-content: center;
-  margin-top: 40px; /* Increased spacing from forms to button */
+  margin-top: 20px;
 }
 
 .next-button {
   font-family: "Orbitron", sans-serif;
-  padding: 15px 30px; /* Increased button size */
+  padding: 15px 30px;
   background-color: #FF7991;
   color: #fff;
   border: none;
   border-radius: 12px;
-  font-size: 18px; /* Make button text larger */
+  font-size: 18px;
   cursor: pointer;
   transition: background-color 0.3s ease, transform 0.3s ease;
 }
 
 .next-button:hover {
   background-color: #e06578;
-  transform: scale(1.1); /* Increase button size slightly on hover */
+  transform: scale(1.1);
 }
 
-
-/* For the container around the question and icons */
 .icon-container {
   display: flex;
-  justify-content: center;
+  justify-content: space-around; /* Adjust to space out the icons */
   align-items: center;
-  margin-top: 30px;
-  padding: 20px;
-  background: linear-gradient(90deg, #FF7991 0%, #F4F4F4 100%); /* Gradient matching inputs */
-  border-radius: 15px;
-  box-shadow: 0 4px 8px rgba(255, 163, 172, 0.5); /* Soft shadow for depth */
-  height: 40px;
-}
-
-/* Style the question text */
-.icon-container {
+  margin-top: -15px;
+  padding: 10px;
   background: linear-gradient(90deg, #FF7991 0%, #F4F4F4 100%);
-  padding: 20px;
   border-radius: 15px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-top: 20px;
   box-shadow: 0 4px 8px rgba(255, 163, 172, 0.5);
+  z-index: 1; /* Ensure the icons are above any overlapping elements */
 }
 
-/* Icons styling */
-img.icon {
-  width: 22%;
+.icon-container img {
+  width: 60px;  /* Adjust icon size */
   height: auto;
-  padding: 5px;
-  transition: transform 0.3s ease, filter 0.3s ease; /* Ensure filter transition is included */
+  padding: 10px;
+  cursor: pointer; /* Make icons clickable */
+  z-index: 2; /* Ensure the icons themselves are clickable */
+  transition: transform 0.3s ease, filter 0.3s ease;
 }
 
-/* Glowing effect for the selected icon */
-img.icon.selected {
-  filter: url(#glow-effect); /* Apply the glow filter */
-  transform: scale(1.2); /* Slightly increase size on selection */
+.icon-container img:hover {
+  transform: scale(1.2);  /* Slight scale on hover */
 }
 
-/* Adjust the question text to match the design */
+.icon-container img.selected {
+  filter: url(#glow-effect); /* Apply white glow by default */
+  transform: scale(1.1);
+  transition: filter 0.3s ease, transform 0.3s ease;
+}
+
+
+.icon-container img:active {
+  filter: brightness(1.5);  /* Apply the glow effect on active/click */
+}
+
 p {
-  color: #FF7991; /* Use the same pink tone from the gradient */
+  color: #FF7991;
   font-size: 16px;
   text-align: center;
   margin-bottom: 10px;
+  margin-top: -5px;
   font-weight: bold;
 }
 
-/* Special styling for the King icon */
-
-#joker {
-  width: 30%;
-}
-#ace {
-  width: 20%;
-  height: auto;
+#queen.selected, #king.selected {
+  filter: url(#pink-glow-effect); /* Apply pink glow for Queen and King */
 }
 
+#joker{
+  width: 70px;
+}
+#king{
+  width: 55px;
+}

@@ -486,3 +486,43 @@ app.post('/event/delete-account', (req, res) => {
 });
 
 
+
+
+// Create a new account
+app.post('/event/inscription', (req, res) => {
+    const { email, password, phone, firstName, lastName, birthdate } = req.body;
+
+    // Check if email already exists
+    const checkEmailQuery = "SELECT * FROM e_utilisateur WHERE e_courriel = ?";
+    con.query(checkEmailQuery, [email], (err, result) => {
+        if (err) {
+            console.error("Error checking email:", err);
+            return res.status(500).send("Internal Server Error");
+        }
+
+        if (result.length > 0) {
+            return res.status(409).send("Email already in use");
+        }
+
+        // If email does not exist, insert new user
+        const insertUserQuery = `
+            INSERT INTO e_utilisateur (e_nom, e_prenom, date_naissance, e_courriel, e_photo, e_location, e_number, e_password)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        `;
+
+        // Assuming e_photo and e_location are not being used right now, use placeholders
+        const defaultPhoto = null;  // Replace with actual photo handling if needed
+        const defaultLocation = 'Unknown';  // Replace with location handling if needed
+
+        con.query(insertUserQuery, [lastName, firstName, birthdate, email, defaultPhoto, defaultLocation, phone, password], (err, result) => {
+            if (err) {
+                console.error("Error inserting user:", err);
+                return res.status(500).send("Internal Server Error");
+            }
+
+            console.log("New user inserted:", result);
+            req.session.user = { email, firstName }; // Set session for the new user
+            res.redirect('/');
+        });
+    });
+});
