@@ -274,7 +274,10 @@ app.post('/event/logout', (req, res) => {
 app.post('/event/payment', async (req, res) => {
     console.log('Received payment request:', req.body);
 
-    const { sourceId, amount, subscriptionType, 'confirmation-email': confirmationEmail } = req.body;
+    const { sourceId, amount, subscriptionType, confirmationEmail } = req.body;
+
+
+    console.log(confirmationEmail)
 
     const totalAmountInCents = amount; // Amount received in cents
     const totalAmount = totalAmountInCents / 100; // Convert cents to dollars
