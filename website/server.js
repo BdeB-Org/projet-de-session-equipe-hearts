@@ -249,7 +249,6 @@ app.post('/event/logout', (req, res) => {
     });
 });
 
-
 app.post('/event/payment', async (req, res) => {
     console.log('Received payment request:', req.body);
 
@@ -286,23 +285,24 @@ app.post('/event/payment', async (req, res) => {
 
             const subscriptionId = results[0].e_id;
 
-            const { e_nom, e_prenom, date_naissance, e_courriel, e_location, e_number, e_password } = req.session.user || {};
-            const formattedDateNaissance = dateFormat(date_naissance, "yyyy-mm-dd");
-            const e_photo = null;
+            const { e_id } = req.session.user || {}; // Get logged-in user's e_id from session
 
-            const insertQuery = `
-            INSERT INTO e_utilisateur (e_nom, e_prenom, date_naissance, e_courriel, e_photo, e_location, e_number, e_password, abonnement_id)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+            if (!e_id) {
+                return res.status(401).send('User not logged in');
+            }
+
+            // Update the logged-in user's abonnement_id instead of inserting a new user
+            const updateQuery = `
+            UPDATE e_utilisateur
+            SET abonnement_id = ?
+            WHERE e_id = ?
             `;
 
-            con.query(insertQuery, [e_nom, e_prenom, formattedDateNaissance, e_courriel, e_photo, e_location, e_number, e_password, subscriptionId
-            ], (err, result) => {
+            con.query(updateQuery, [subscriptionId, e_id], (err, result) => {
                 if (err) {
-                    console.error('Error inserting user:', err);
-                    return res.status(500).send('Error inserting user');
+                    console.error('Error updating user subscription:', err);
+                    return res.status(500).send('Error updating user subscription');
                 }
-
-                req.session.user = { e_id: result.insertId, e_nom, e_prenom, e_courriel };
 
                 console.log("Payment successful! Payment ID:", paymentResponse.result.payment.id);
 
