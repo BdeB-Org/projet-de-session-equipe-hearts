@@ -10,11 +10,12 @@
 9. Ouvrez http://localhost:4000/ dans votre navigateur web.
 10. Ajoutez les modules nodes suivants :
 
-node install
-node install multer
+npm install
+npm install multer
 npm install
 npm install dotenv
 npm install square
+npm install nodemailer
 
 
 CREATE DATABASE myhearts;
