@@ -384,6 +384,27 @@ app.post('/event/payment', async (req, res) => {
     }
 });
 
+app.post('/event/change-plan', (req, res) => {
+    const userId = req.session.user.e_id; // Retrieve user ID from session
+    const { abonnement_id } = req.body; // Get the subscription ID from the request body
+
+    // Update the user's abonnement_id in the database
+    const updateQuery = 'UPDATE e_utilisateur SET abonnement_id = ? WHERE e_id = ?';
+
+    con.query(updateQuery, [abonnement_id, userId], (err, result) => {
+        if (err) {
+            console.error('Error updating subscription:', err);
+            return res.status(500).json({ success: false, message: 'Erreur lors du changement de plan' });
+        }
+
+        // Update the session to reflect the new abonnement_id
+        req.session.user.abonnement_id = abonnement_id;
+
+        res.json({ success: true });
+    });
+});
+
+
 app.post('/event/change-password', async (req, res) => {
     const { old_password, new_password, confirm_password } = req.body;
     const userId = req.session.user.e_id; // Assuming user ID is stored in session

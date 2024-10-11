@@ -274,10 +274,17 @@
                 <h2 style="color: #ff007f;">Saisir les détails de la carte</h2>
                 <div id="card-container">
                     <label for="cardholder-name" style="font-size: 0.9em;">Courriel de confirmation:</label>
-                    <input type="email" id="cardholder-name" name="confirmationEmail" placeholder="exemple@mail.com" required>
+                    <input type="email" id="cardholder-name" name="confirmationEmail" placeholder="exemple@mail.com"
+                        required>
                 </div>
-                
+
                 <button class="submit-button" id="submit-button">Submit Payment</button>
+            </div>
+        </div>
+        <div id="loading-modal" class="modal">
+            <div class="modal-content">
+                <h2 style="color: #ff007f;">Traitement du paiement...</h2>
+                <p>Merci de patienter pendant que nous traitons votre paiement.</p>
             </div>
         </div>
 
@@ -288,7 +295,7 @@
             const subscriptionName = urlParams.get('subscriptionType');
             document.getElementById('subscription-name').innerText = subscriptionName;
             const confirmationEmail = document.getElementById('cardholder-name').value;
-            
+
             console.log('Captured Email:', confirmationEmail);
             if (amount) {
                 document.getElementById('initial-amount').innerText = `$${amount.toFixed(2)}`;
@@ -310,6 +317,7 @@
 
 
             const modal = document.getElementById("card-modal");
+            const loadingModal = document.getElementById("loading-modal");
 
             document.getElementById('payment-form').addEventListener('submit', function (event) {
                 event.preventDefault();
@@ -319,6 +327,15 @@
             function closeModal() {
                 modal.style.display = "none"; // Close the modal
             }
+
+            function showLoadingModal() {
+                loadingModal.style.display = "block"; // Show loading modal
+            }
+
+            function hideLoadingModal() {
+                loadingModal.style.display = "none"; // Hide loading modal
+            }
+
 
             const payments = Square.payments('sandbox-sq0idb-shiPBy7gPbmt9DCjtx3jYw'); // Replace with your Square Application ID
 
@@ -333,7 +350,7 @@
                         const sourceId = result.token;
                         const amount = document.getElementById('amount').value;
                         const subscriptionType = document.getElementById('subscription-name').innerText;
-                        const confirmationEmail = document.getElementById('cardholder-name').value; 
+                        const confirmationEmail = document.getElementById('cardholder-name').value;
 
                         const totalAmountInCents = amount * 100;
 
@@ -341,6 +358,8 @@
                         console.log('Total Amount (Cents):', totalAmountInCents);
                         console.log('Subscription Type:', subscriptionType);
                         console.log('Confirmation Email:', confirmationEmail);
+
+                        showLoadingModal();
 
                         const response = await fetch('/event/payment', {
                             method: 'POST',
@@ -351,6 +370,8 @@
                         });
 
                         const paymentResult = await response.json();
+
+                        hideLoadingModal();
 
 
                         if (paymentResult.redirect) {

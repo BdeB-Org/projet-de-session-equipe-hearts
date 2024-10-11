@@ -1,6 +1,15 @@
 <%- include("../partials/header.ejs") %>
 
     <style>
+        html,
+        body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow-y: auto;
+            /* Ensures the page can scroll vertically */
+        }
+
         body {
             background-color: #0d0d0d;
             color: #ff007f;
@@ -115,11 +124,11 @@
         <p class="details">Email: <span class="highlight">
                 <%= userDetails.e_courriel %>
             </span></p>
-            <p class="details">Le reçu a été envoyé à : <span class="highlight">
+        <p class="details">Le reçu a été envoyé à : <span class="highlight">
                 <%= confirmationEmail %>
             </span></p>
-            
-            
+
+
 
         <!-- Receipt -->
         <div class="receipt">

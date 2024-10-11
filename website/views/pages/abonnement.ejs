@@ -1,6 +1,15 @@
 <%- include ("../partials/header.ejs") %>
 
   <style>
+    html,
+    body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      overflow-y: auto;
+      /* Ensures the page can scroll vertically */
+    }
+
     /*
         SCREEN
     */
@@ -214,11 +223,12 @@
         <div class="screen-content">
           <div class="screen-user">
             <h2 class="name" data-value="Basique">Basique</h2>
-            <p class="price" data-value="0€ / Mois">0$ / Mois</p>
+            <p class="price" data-value="0$/ Mois">0€ / Mois</p>
             <ul class="features" data-value="5 Swipes/J">
               <li>5 Swipes/J</li>
             </ul>
           </div>
+
           <% if (!userDetails) { %>
             <button onclick="window.location.href='/event/creationCompte'" class="custom_butt">
               Connectez-vous
@@ -228,10 +238,12 @@
                 Vous avez déjà cet abonnement
               </button>
               <% } else { %>
-                <button onclick="goToPayment(0, 'Basique')" class="custom_butt">Changer de plan</button>
+                <button onclick="confirmChangePlan(1)" class="custom_butt">Changer de plan</button>
+
                 <% } %>
         </div>
       </div>
+
 
       <div class="screen">
         <div class="screen-image"></div>
@@ -239,7 +251,7 @@
         <div class="screen-content">
           <div class="screen-user">
             <h2 class="name" data-value="Premium">Premium</h2>
-            <p class="price" data-value="19,47€ / Mois">19,47$ / Mois</p>
+            <p class="price" data-value="19,47$/ Mois">19,47$ / Mois</p>
             <ul class="features" data-value="100 Swipes/Semaine">
               <li>100 Swipes/Semaine</li>
             </ul>
@@ -264,7 +276,7 @@
         <div class="screen-content">
           <div class="screen-user">
             <h2 class="name" data-value="Diamant">Diamant</h2>
-            <p class="price" data-value="25,47€ / Mois">25,47$ / Mois</p>
+            <p class="price" data-value="25,47$/ Mois">25,47$ / Mois</p>
             <ul class="features" data-value="Swipes Illimités">
               <li>Swipes Illimités</li>
             </ul>
@@ -341,6 +353,37 @@
           });
         };
       });
+
+      function changePlan(subscriptionId) {
+        fetch('/event/change-plan', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ abonnement_id: subscriptionId }),
+        })
+          .then(response => response.json())
+          .then(data => {
+            if (data.success) {
+              window.location.reload(); // Refresh the page to update the button state
+            } else {
+              alert('Erreur lors du changement de plan');
+            }
+          })
+          .catch((error) => {
+            console.error('Erreur:', error);
+          });
+      }
+      function confirmChangePlan(subscriptionId) {
+        const confirmation = confirm('Êtes-vous sûr de vouloir changer de plan? Votre plan actuel se terminera maintenant.');
+
+        if (confirmation) {
+          // Proceed with the plan change
+          changePlan(subscriptionId);
+        }
+      }
+
+
     </script>
 
     <%- include ("../partials/footer.ejs") %>
