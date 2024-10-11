@@ -1,3 +1,4 @@
+import dotenv from 'dotenv';
 import express from "express";
 import session from "express-session";
 import path from "path";
@@ -7,9 +8,8 @@ import { body, validationResult } from "express-validator";
 import dateFormat from "dateformat";
 import bcrypt from 'bcrypt';
 import { Client, Environment } from 'square';
-import dotenv from 'dotenv';
-
-
+import nodemailer from 'nodemailer';
+import { google } from 'googleapis';
 dotenv.config();
 
 
@@ -32,17 +32,52 @@ app.use('/images', express.static(path.join(__dirname, '/website/images')));
 app.use(express.urlencoded({ extended: true })); // For parsing application/x-www-form-urlencoded
 app.use(express.json()); // For parsing application/json
 
+/*
+------------------------------------------
+PTSD NODE MAILER
+------------------------------------------
+*/
+
+const oauth2Client = new google.auth.OAuth2(
+    process.env.CLIENT_ID,
+    process.env.CLIENT_SECRET,
+    "http://localhost"  // Redirect URI from your OAuth2 credentials
+);
+
+// Set the credentials, using the refresh token from your .env file
+oauth2Client.setCredentials({
+    refresh_token: process.env.REFRESH_TOKEN
+});
+
+
+const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+        type: 'OAuth2',
+        user: process.env.GMAIL_USER,
+        clientId: process.env.CLIENT_ID,
+        clientSecret: process.env.CLIENT_SECRET,
+        refreshToken: process.env.REFRESH_TOKEN
+    }
+});
+
+
+
 
 
 /*
+------------------------------------------
     Connect to server
+------------------------------------------
 */
 const server = app.listen(4000, function () {
     console.log("serveur fonctionne sur 4000... ! ");
 });
 
 /*
+------------------------------------------
     Connect MySql
+------------------------------------------
 */
 const con = mysql.createConnection({
     host: "localhost",
@@ -72,14 +107,18 @@ con.connect(function (err) {
 
 
 /*
+------------------------------------------
     Configuration de EJS
+------------------------------------------
 */
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "ejs");
 app.use('/images', express.static(path.join(__dirname, 'images')));
 
 /*
+------------------------------------------
 Configuration API SQUARE FIOHSAIOGFHASIPFH
+------------------------------------------
 */
 
 const squareClient = new Client({
@@ -89,7 +128,9 @@ const squareClient = new Client({
 
 
 /*
+------------------------------------------
 Inititaliser la table d'abonnement
+------------------------------------------
 */
 const initializeSubscriptions = () => {
     const subscriptions = [
@@ -120,7 +161,9 @@ const initializeSubscriptions = () => {
 
 
 /*
-   PAGES DE GET
+------------------------------------------
+    Pages gets
+------------------------------------------
 */
 
 app.get("/", function (req, res) {
@@ -222,9 +265,15 @@ app.get("/event/profil", function (req, res) {
 
 
 /*
+------------------------------------------
     LES POSTS
+------------------------------------------
 */
 
+
+/*
+  Connectez a un compte
+*/
 
 app.post('/event/connect', (req, res) => {
     const { email, password } = req.body;
@@ -264,6 +313,10 @@ app.post('/event/connect', (req, res) => {
     });
 });
 
+/*
+  Déconnectez a un compte
+*/
+
 
 app.post('/event/logout', (req, res) => {
     req.session.destroy((err) => {
@@ -274,6 +327,11 @@ app.post('/event/logout', (req, res) => {
         res.redirect('/');
     });
 });
+
+/*
+  Payer un abonnement
+*/
+
 
 app.post('/event/payment', async (req, res) => {
     console.log('Received payment request:', req.body);
@@ -372,10 +430,32 @@ app.post('/event/payment', async (req, res) => {
                 req.session.paymentId = paymentResponse.result.payment.id; // Store payment ID
 
                 console.log("Payment successful! Payment ID:", paymentResponse.result.payment.id);
+                const subject = `Votre reçu pour l'abonnement ${subscriptionType}`;
+                const html = `
+                    <h1>Merci pour votre paiement !</h1>
+                    <p>Votre abonnement: ${subscriptionType}</p>
+                    <p>Montant payé: $${(amount / 100).toFixed(2)}</p>
+                    <p>Nous espérons que vous apprécierez votre abonnement.</p>
+                `;
+                const mailOptions = {
+                    from: 'heartscorps@gmail.com',
+                    to: confirmationEmail,
+                    subject: subject,
+                    html: html
+                };
 
-                // Send JSON response with redirect URL
-                res.json({ success: true, redirect: '/event/confirmation' });
+                transporter.sendMail(mailOptions, (error, info) => {
+                    if (error) {
+                        console.error('Error sending email:', error);
+                        return res.status(500).send('Error sending email receipt');
+                    } else {
+                        console.log('Email sent: ' + info.response);
+                        // Continue with the rest of your logic, like sending the JSON response
+                        res.json({ success: true, redirect: '/event/confirmation' });
+                    }
+                });
             });
+
         });
 
     } catch (error) {
@@ -384,11 +464,15 @@ app.post('/event/payment', async (req, res) => {
     }
 });
 
-app.post('/event/change-plan', (req, res) => {
-    const userId = req.session.user.e_id; // Retrieve user ID from session
-    const { abonnement_id } = req.body; // Get the subscription ID from the request body
+/*
+  Changer l'abonnement a gratuir
+*/
 
-    // Update the user's abonnement_id in the database
+
+app.post('/event/change-plan', (req, res) => {
+    const userId = req.session.user.e_id;
+    const { abonnement_id } = req.body;
+
     const updateQuery = 'UPDATE e_utilisateur SET abonnement_id = ? WHERE e_id = ?';
 
     con.query(updateQuery, [abonnement_id, userId], (err, result) => {
@@ -397,12 +481,15 @@ app.post('/event/change-plan', (req, res) => {
             return res.status(500).json({ success: false, message: 'Erreur lors du changement de plan' });
         }
 
-        // Update the session to reflect the new abonnement_id
         req.session.user.abonnement_id = abonnement_id;
 
         res.json({ success: true });
     });
 });
+
+/*
+  Changer le mot de passe
+*/
 
 
 app.post('/event/change-password', async (req, res) => {
@@ -489,7 +576,10 @@ app.post('/event/change-password', async (req, res) => {
     }
 });
 
-// Assuming this is part of your server.js
+/*
+  Delete un compte
+*/
+
 
 app.post('/event/delete-account', (req, res) => {
     const userId = req.session.user ? req.session.user.e_id : null; // Ensure session exists
@@ -516,6 +606,10 @@ app.post('/event/delete-account', (req, res) => {
     });
 });
 
+
+/*
+  Inscrire a un compte
+*/
 
 
 
