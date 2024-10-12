@@ -38,10 +38,12 @@ PTSD NODE MAILER
 ------------------------------------------
 */
 
+let transporter;
+
 const oauth2Client = new google.auth.OAuth2(
     process.env.CLIENT_ID,
     process.env.CLIENT_SECRET,
-    "http://localhost"  // Redirect URI from your OAuth2 credentials
+    process.env.REDIRECT_UR
 );
 
 // Set the credentials, using the refresh token from your .env file
@@ -51,21 +53,27 @@ oauth2Client.setCredentials({
 
 console.log(process.env.REFRESH_TOKEN);
 
+try {
+    const accessToken = await oauth2Client.getAccessToken();
+    transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+            type: 'OAuth2',
+            user: process.env.GMAIL_USER,
+            clientId: process.env.CLIENT_ID,
+            clientSecret: process.env.CLIENT_SECRET,
+            refreshToken: process.env.REFRESH_TOKEN,
+            accessToken: accessToken.token, // Use accessToken.token instead of accessToken
+        },
+    });
 
-const transporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth: {
-        type: 'OAuth2',
-        user: process.env.GMAIL_USER,
-        clientId: process.env.CLIENT_ID,
-        clientSecret: process.env.CLIENT_SECRET,
-        refreshToken: process.env.REFRESH_TOKEN
-    }
-});
+    // The transporter is now ready for use, and you can send emails later in your code
+    console.log('Nodemailer transporter is set up and ready to use.');
 
-
-
-
+} catch (error) {
+    console.error('Error setting up email transporter:', error);
+    // Handle the error appropriately, such as sending a response back to the client
+}
 
 /*
 ------------------------------------------
@@ -440,7 +448,7 @@ app.post('/event/payment', async (req, res) => {
                     <p>Nous espérons que vous apprécierez votre abonnement.</p>
                 `;
                 const mailOptions = {
-                    from: 'heartscorps@gmail.com',
+                    from: 'hearts.corps@gmail.com',
                     to: confirmationEmail,
                     subject: subject,
                     html: html
@@ -452,7 +460,6 @@ app.post('/event/payment', async (req, res) => {
                         return res.status(500).send('Error sending email receipt');
                     } else {
                         console.log('Email sent: ' + info.response);
-                        // Continue with the rest of your logic, like sending the JSON response
                         res.json({ success: true, redirect: '/event/confirmation' });
                     }
                 });
