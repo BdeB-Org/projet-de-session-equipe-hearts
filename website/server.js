@@ -286,33 +286,44 @@ app.get('/event/download-receipt', (req, res) => {
 
     const doc = new PDFDocument();
     const pdfStream = new PassThrough();
-    res.setHeader('Content-disposition', `attachment; filename=receipt-${paymentId}.pdf`);
-    res.setHeader('Content-type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename=receipt-${paymentId}.pdf`);
+    res.setHeader('Content-Type', 'application/pdf');
 
-    // Pipe PDF to the response
     doc.pipe(pdfStream);
     pdfStream.pipe(res);
 
-    // PDF content
-    doc.fontSize(25).text('Reçu de Paiement', { align: 'center' });
-    doc.moveDown();
+    doc.rect(0, 0, doc.page.width, doc.page.height).fill('#0d0d0d');
+    doc.fontSize(30)
+        .fillColor('#00ff00')
+        .text('Reçu de Paiement', { align: 'center', underline: true })
+        .moveDown();
 
-    doc.fontSize(15).text(`Merci, ${userDetails.e_prenom} ${userDetails.e_nom}!`);
-    doc.text(`Votre abonnement: ${subscriptionType}`);
-    doc.text(`ID de paiement: ${paymentId}`);
-    doc.text(`Email: ${userDetails.e_courriel}`);
-    doc.text(`Le reçu a été envoyé à: ${confirmationEmail}`);
-    doc.moveDown();
+    doc.fillColor('#ff007f');
+    doc.fontSize(18)
+        .text(`Merci, ${userDetails.e_prenom} ${userDetails.e_nom}!`, { align: 'center' })
+        .moveDown();
 
-    doc.text(`Prix d'abonnement: $${amount.toFixed(2)}`);
-    doc.text(`TVQ: $${tvqAmount.toFixed(2)}`);
-    doc.text(`TPS: $${tpsAmount.toFixed(2)}`);
-    doc.text(`Total: $${totalAmount.toFixed(2)}`);
+    doc.fillColor('#00ffff');
+    doc.text(`Votre abonnement: ${subscriptionType}`, { align: 'center' })
+        .text(`ID de paiement: ${paymentId}`, { align: 'center' })
+        .text(`Email: ${userDetails.e_courriel}`, { align: 'center' })
+        .text(`Le reçu a été envoyé à: ${confirmationEmail}`, { align: 'center' })
+        .moveDown();
 
-    // Finalize the PDF
+    doc.fillColor('#ffcc00');
+    doc.fontSize(16)
+        .text(`Prix d'abonnement: $${amount.toFixed(2)}`)
+        .text(`TVQ: $${tvqAmount.toFixed(2)}`)
+        .text(`TPS: $${tpsAmount.toFixed(2)}`)
+        .text(`Total: $${totalAmount.toFixed(2)}`)
+        .moveDown();
+
+    doc.fillColor('#ff007f')
+        .fontSize(14)
+        .text('Merci d\'avoir choisi notre service !', { align: 'center', italics: true })
+        .moveDown();
     doc.end();
 });
-
 
 
 /*
@@ -483,11 +494,21 @@ app.post('/event/payment', async (req, res) => {
                 console.log("Payment successful! Payment ID:", paymentResponse.result.payment.id);
                 const subject = `Votre reçu pour l'abonnement ${subscriptionType}`;
                 const html = `
-                    <h1>Merci pour votre paiement !</h1>
-                    <p>Votre abonnement: ${subscriptionType}</p>
-                    <p>Montant payé: $${(amount / 100).toFixed(2)}</p>
-                    <p>Nous espérons que vous apprécierez votre abonnement.</p>
-                `;
+                <div style="font-family: 'Arial', sans-serif; background-color: #0d0d0d; color: #ff007f; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(255, 0, 127, 0.5);">
+                    <h1 style="color: #00ff00; text-align: center;">Merci pour votre paiement !</h1>
+                    <hr style="border: 1px solid #00bfff;">
+                    <p style="font-size: 18px;">Votre abonnement: <strong style="color: #00ffff;">${subscriptionType}</strong></p>
+                    <p style="font-size: 18px;">Montant: <strong style="color: #ffcc00;">$${(originalAmount).toFixed(2)}</strong></p>
+                    <p style="font-size: 18px;">TVQ: <strong style="color: #ffcc00;">$${(tvqAmount).toFixed(2)}</strong></p>
+                    <p style="font-size: 18px;">TPS: <strong style="color: #ffcc00;">$${(tpsAmount).toFixed(2)}</strong></p>
+                    <p style="font-size: 20px; font-weight: bold;">Montant payé total: <strong style="color: #ff007f;">$${(totalAmount).toFixed(2)}</strong></p>
+                    <p style="font-size: 16px;">Nous espérons que vous apprécierez votre abonnement.</p>
+                    <footer style="margin-top: 20px; text-align: center;">
+                        <p style="font-size: 14px;">Si vous avez des questions, n'hésitez pas à nous contacter.</p>
+                        <p style="font-size: 14px;">Merci d'avoir choisi notre service !</p>
+                    </footer>
+                </div>
+            `;
                 const mailOptions = {
                     from: 'hearts.corps@gmail.com',
                     to: confirmationEmail,
