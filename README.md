@@ -12,11 +12,12 @@
 
 npm install
 npm install multer
-npm install
 npm install dotenv
 npm install square
 npm install nodemailer
 npm install googleApis
+
+try: npm install multer dotenv square nodemailer googleapis
 
 
 CREATE DATABASE myhearts;
