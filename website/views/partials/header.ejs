@@ -154,7 +154,6 @@
                                 <a class="navbar-item" href="/event/profil">profil</a>
                                 <% } %>
         </nav>
-        <div class="navbar-placeholder" id="navbarPlaceholder"></div>
         <div class="animation-square" id="animationSquare"></div>
     </header>
     <main>
@@ -170,11 +169,11 @@
         appMenu.addEventListener('click', () => {
             if (navbarVisible) {
                 animationSquare.classList.add('active');
-                navbar.style.opacity = '0'; 
+                navbar.style.opacity = '0';
                 navbarVisible = false;
 
                 setTimeout(() => {
-                    navbar.style.visibility = 'hidden'; 
+                    navbar.style.visibility = 'hidden';
                 }, 500);
             } else {
                 navbar.style.visibility = 'visible';

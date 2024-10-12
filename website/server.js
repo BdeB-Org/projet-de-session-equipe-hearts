@@ -326,6 +326,17 @@ app.get('/event/download-receipt', (req, res) => {
 });
 
 
+app.get('/api/users', (req, res) => {
+    const query = 'SELECT * FROM e_utilisateur';
+    con.query(query, (err, results) => {
+        if (err) {
+            return res.status(500).json({ error: 'Error fetching users' });
+        }
+        res.json(results); // Send user data as JSON
+    });
+});
+
+
 /*
 ------------------------------------------
     LES POSTS

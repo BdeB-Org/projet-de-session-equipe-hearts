@@ -1,0 +1,245 @@
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400..900&display=swap" rel="stylesheet">
+
+<style>
+    body {
+        background-color: #0d0d0d;
+        color: #ff007f;
+        font-family: 'Orbitron', sans-serif;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .header {
+        background-color: #ff007f;
+        width: 100%;
+        padding: 10px;
+        text-align: center;
+        color: white;
+        position: fixed;
+        top: 0;
+        z-index: 1000;
+    }
+
+    .card-container {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: center;
+        margin-top: 60px;
+    }
+
+    .card {
+        background: rgba(255, 255, 255, 0.1);
+        border: 2px solid #00bfff;
+        border-radius: 15px;
+        padding: 20px;
+        margin: 10px;
+        width: 300px;
+        box-shadow: 0 0 15px rgba(255, 0, 127, 0.5);
+        transition: transform 0.3s;
+    }
+
+    .card:hover {
+        transform: scale(1.05);
+    }
+
+    .card img {
+        width: 100%;
+        border-radius: 10px;
+    }
+
+    .button {
+        background-color: #00bfff;
+        color: white;
+        border: none;
+        padding: 10px;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+        margin-top: 10px;
+    }
+
+    .button:hover {
+        background-color: #007bbf;
+    }
+
+    .sidebar {
+        background-color: #ff7f7f;
+        width: 200px;
+        padding: 20px;
+        height: 100vh;
+        position: fixed;
+        left: 0;
+        top: 0;
+        z-index: 100;
+        box-shadow: 0 0 20px rgba(255, 127, 127, 0.7), 0 0 40px rgba(255, 127, 127, 0.5);
+        transition: box-shadow 0.3s;
+    }
+
+    .sidebar:hover {
+        box-shadow: 0 0 30px rgba(255, 127, 127, 1), 0 0 60px rgba(255, 127, 127, 0.7);
+    }
+
+
+    .matches-title {
+        font-size: 1.5em;
+        margin-bottom: 20px;
+    }
+
+    .matches {
+        list-style: none;
+        padding: 0;
+    }
+
+    .matches li {
+        margin: 10px 0;
+    }
+
+    .user-profile {
+        display: flex;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+
+    .profile-picture {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        margin-right: 10px;
+    }
+
+    .profile-info {
+        display: flex;
+        align-items: center;
+    }
+
+    .user-name {
+        color: #ff007f;
+        margin-right: 10px;
+    }
+
+    .user-icons {
+        display: flex;
+        gap: 10px;
+    }
+
+    .icon {
+        width: 24px;
+        height: 24px;
+        cursor: pointer;
+    }
+</style>
+</head>
+
+<body>
+
+    <div class="sidebar">
+        <div class="user-profile">
+            <img src="/images/Amy Habibti - Copy (2).png" alt="User Profile" class="profile-picture">
+            <div class="profile-info">
+                <h3 class="user-name">
+                    <%= userDetails.e_prenom %>
+                </h3>
+                <div class="user-icons">
+                    <a href="/event/profil">
+                        <i class="fas fa-user-circle icon-img"></i>
+                    </a>
+                    <i class="fas fa-comments icon-img"></i>
+                </div>
+            </div>
+        </div>
+        <h2 class="matches-title">Matches</h2>
+        <ul class="matches">
+        </ul>
+    </div>
+
+
+    <div class="card-container">
+    </div>
+</body>
+
+</html>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        let users = [];
+        let currentIndex = 0;
+
+        fetch('/api/users')
+            .then(response => response.json())
+            .then(data => {
+                users = data;
+                const cardContainer = document.querySelector('.card-container');
+                cardContainer.innerHTML = '';
+
+                users.forEach(user => {
+                    const card = document.createElement('div');
+                    card.classList.add('card');
+                    card.innerHTML = `
+                        <img src="${user.e_photo}" alt="${user.e_nom}">
+                        <h2>${user.e_nom}</h2>
+                        <p>À ${user.distance} kilomètres de distance</p>
+                        <button class="button like-button">Aimer</button>
+                        <button class="button pass-button">Passer</button>
+                    `;
+                    cardContainer.appendChild(card);
+                });
+
+                const likeButtons = document.querySelectorAll('.like-button');
+                const passButtons = document.querySelectorAll('.pass-button');
+
+                likeButtons.forEach((button, index) => {
+                    button.addEventListener('click', function () {
+                        console.log(`User ${users[index].e_nom} was liked.`);
+                        nextUser();
+                    });
+                });
+
+                passButtons.forEach((button, index) => {
+                    button.addEventListener('click', function () {
+                        console.log(`User ${users[index].e_nom} was passed.`);
+                        nextUser();
+                    });
+                });
+
+                updateUserCard();
+            })
+            .catch(error => console.error('Error fetching user data:', error));
+
+        function nextUser() {
+            currentIndex = (currentIndex + 1) % users.length;
+            updateUserCard();
+        }
+
+        function updateUserCard() {
+            const user = users[currentIndex];
+            if (user) {
+                document.querySelector('.card-container').innerHTML = `
+                    <div class="card">
+                        <img src="${user.e_photo}" alt="${user.e_nom}">
+                        <h2>${user.e_nom}</h2>
+                        <p>À ${user.distance} kilomètres de distance</p>
+                        <button class="button like-button">Aimer</button>
+                        <button class="button pass-button">Passer</button>
+                    </div>
+                `;
+                const likeButton = document.querySelector('.like-button');
+                const passButton = document.querySelector('.pass-button');
+
+                likeButton.addEventListener('click', function () {
+                    console.log(`User ${user.e_nom} was liked.`);
+                    nextUser();
+                });
+
+                passButton.addEventListener('click', function () {
+                    console.log(`User ${user.e_nom} was passed.`);
+                    nextUser();
+                });
+            }
+        }
+    });
+</script>
