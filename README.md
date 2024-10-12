@@ -16,6 +16,7 @@ npm install
 npm install dotenv
 npm install square
 npm install nodemailer
+npm install googleApis
 
 
 CREATE DATABASE myhearts;
