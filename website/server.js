@@ -10,6 +10,11 @@ import bcrypt from 'bcrypt';
 import { Client, Environment } from 'square';
 import nodemailer from 'nodemailer';
 import { google } from 'googleapis';
+import PDFDocument from 'pdfkit';
+import { PassThrough } from 'stream';
+
+import fs from 'fs';
+
 dotenv.config();
 
 
@@ -271,6 +276,42 @@ app.get("/event/profil", function (req, res) {
     });
 });
 
+app.get('/event/download-receipt', (req, res) => {
+    const { subscriptionType, amount, tvqAmount, tpsAmount, totalAmount, paymentId, confirmationEmail } = req.session;
+    const userDetails = req.session.user;
+
+    if (!userDetails) {
+        return res.status(400).send("User details not found in session.");
+    }
+
+    const doc = new PDFDocument();
+    const pdfStream = new PassThrough();
+    res.setHeader('Content-disposition', `attachment; filename=receipt-${paymentId}.pdf`);
+    res.setHeader('Content-type', 'application/pdf');
+
+    // Pipe PDF to the response
+    doc.pipe(pdfStream);
+    pdfStream.pipe(res);
+
+    // PDF content
+    doc.fontSize(25).text('Reçu de Paiement', { align: 'center' });
+    doc.moveDown();
+
+    doc.fontSize(15).text(`Merci, ${userDetails.e_prenom} ${userDetails.e_nom}!`);
+    doc.text(`Votre abonnement: ${subscriptionType}`);
+    doc.text(`ID de paiement: ${paymentId}`);
+    doc.text(`Email: ${userDetails.e_courriel}`);
+    doc.text(`Le reçu a été envoyé à: ${confirmationEmail}`);
+    doc.moveDown();
+
+    doc.text(`Prix d'abonnement: $${amount.toFixed(2)}`);
+    doc.text(`TVQ: $${tvqAmount.toFixed(2)}`);
+    doc.text(`TPS: $${tpsAmount.toFixed(2)}`);
+    doc.text(`Total: $${totalAmount.toFixed(2)}`);
+
+    // Finalize the PDF
+    doc.end();
+});
 
 
 
