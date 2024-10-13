@@ -11,7 +11,6 @@
         display: flex;
         flex-direction: column;
         align-items: center;
-        font-family: "Orbitron", sans-serif;
     }
 
     .header {
@@ -23,6 +22,32 @@
         position: fixed;
         top: 0;
         z-index: 1000;
+        font-size: 2em;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        animation: glitch 1.5s infinite;
+    }
+
+    @keyframes glitch {
+        0% {
+            text-shadow: 2px 2px 2px rgba(255, 0, 127, 0.7);
+        }
+
+        25% {
+            text-shadow: 5px 5px 2px rgba(255, 0, 127, 0.5);
+        }
+
+        50% {
+            text-shadow: -5px -5px 2px rgba(0, 255, 255, 0.7);
+        }
+
+        75% {
+            text-shadow: 10px 10px 2px rgba(255, 0, 127, 0.7);
+        }
+
+        100% {
+            text-shadow: 0px 0px 2px rgba(255, 0, 127, 0.5);
+        }
     }
 
     .card-container {
@@ -30,22 +55,23 @@
         flex-direction: row;
         flex-wrap: wrap;
         justify-content: center;
-        margin-top: 60px;
+        margin-top: 80px;
     }
 
     .card {
-        background: rgba(255, 255, 255, 0.1);
+        background: rgba(20, 20, 20, 0.8);
         border: 2px solid #00bfff;
         border-radius: 15px;
         padding: 20px;
         margin: 10px;
         width: 300px;
-        box-shadow: 0 0 15px rgba(255, 0, 127, 0.5);
-        transition: transform 0.3s;
+        box-shadow: 0 0 20px rgba(0, 255, 255, 0.7), 0 0 40px rgba(0, 255, 255, 0.5);
+        transition: transform 0.3s, box-shadow 0.3s;
     }
 
     .card:hover {
-        transform: scale(1.05);
+        transform: scale(1.1);
+        box-shadow: 0 0 40px rgba(0, 255, 255, 1), 0 0 80px rgba(0, 255, 255, 0.7);
     }
 
     .card img {
@@ -60,16 +86,21 @@
         padding: 10px;
         border-radius: 5px;
         cursor: pointer;
-        transition: background-color 0.3s;
+        transition: background-color 0.3s, transform 0.3s;
         margin-top: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 5px;
     }
 
     .button:hover {
         background-color: #007bbf;
+        transform: translateY(-3px);
     }
 
     .sidebar {
-        background-color: #ff7f7f;
+        background-color: #ff007f;
         width: 200px;
         padding: 20px;
         height: 100vh;
@@ -77,18 +108,19 @@
         left: 0;
         top: 0;
         z-index: 100;
-        box-shadow: 0 0 20px rgba(255, 127, 127, 0.7), 0 0 40px rgba(255, 127, 127, 0.5);
+        box-shadow: 0 0 20px rgba(255, 0, 127, 0.7), 0 0 40px rgba(255, 0, 127, 0.5);
         transition: box-shadow 0.3s;
     }
 
     .sidebar:hover {
-        box-shadow: 0 0 30px rgba(255, 127, 127, 1), 0 0 60px rgba(255, 127, 127, 0.7);
+        box-shadow: 0 0 30px rgba(255, 0, 127, 1), 0 0 60px rgba(255, 0, 127, 0.7);
     }
 
-
     .matches-title {
-        font-size: 1.5em;
+        font-size: 1.8em;
         margin-bottom: 20px;
+        color: #00bfff;
+        text-shadow: 0px 0px 5px #00bfff;
     }
 
     .matches {
@@ -111,6 +143,8 @@
         height: 60px;
         border-radius: 50%;
         margin-right: 10px;
+        border: 2px solid #00bfff;
+        box-shadow: 0 0 10px #00bfff;
     }
 
     .profile-info {
@@ -119,7 +153,7 @@
     }
 
     .user-name {
-        color: #ff007f;
+        color: black;
         margin-right: 10px;
     }
 
@@ -131,13 +165,53 @@
     .icon {
         width: 24px;
         height: 24px;
-        cursor: pointer;
+        color: #000000;
+        transition: transform 0.3s;
+    }
+
+    .icon:hover {
+        transform: scale(1.2);
+    }
+
+    .fa-heart {
+        color: #ff007f;
+    }
+
+    .fa-times {
+        color: #ff7f7f;
+    }
+
+    .glitch-background {
+        background-image: url(/images/cheng-feng-psdV2Rl-GvU-unsplash.jpg);
+        background-size: cover;
+        background-position: center;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: -1;
+        opacity: 0.3;
+    }
+
+
+    #background-video {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        z-index: -1;
     }
 </style>
-</head>
 
 <body>
-
+    <!-- <video autoplay muted loop id="background-video">
+        <source src="/images/vecteezy_future-cyber-city-ai-generative_31698895.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+    </video> -->
+    <div class="glitch-background"></div>
     <div class="sidebar">
         <div class="user-profile">
             <img src="/uploads/<%= userDetails.e_photo %>" alt="User Profile" class="profile-picture">
@@ -149,116 +223,93 @@
                     <a href="/event/profil">
                         <i class="fas fa-user-circle icon-img"></i>
                     </a>
-                    <i class="fas fa-comments icon-img"></i>
+                    <a href="/event/profil">
+                        <i class="fas fa-comments icon-img"></i>
+                    </a>
+
                 </div>
             </div>
         </div>
         <h2 class="matches-title">Matches</h2>
-        <ul class="matches">
-        </ul>
+        <ul class="matches"></ul>
     </div>
 
-
-
-    <div class="card-container">
-    </div>
+    <div class="card-container"></div>
 </body>
-
-
 
 <script>
     document.addEventListener("DOMContentLoaded", function () {
         let users = [];
         let currentIndex = 0;
 
+        const loggedInUserId = "<%= userDetails.e_id %>"; // Fetch the logged-in user's ID
+        console.log("Logged-in User ID: " + loggedInUserId);
+
         fetch('/api/users')
             .then(response => response.json())
             .then(data => {
-                users = data;
+                // Log the fetched data
+                console.log("Fetched Users: ", data);
+
+                // Filter out the logged-in user from the list of users
+                users = data.filter(user => user.e_id !== parseInt(loggedInUserId));
+
+                console.log("Filtered Users after excluding logged-in user: ", users);
+
                 const cardContainer = document.querySelector('.card-container');
-                cardContainer.innerHTML = '';
+                cardContainer.innerHTML = ''; // Clear previous cards
 
-                users.forEach(user => {
-                    const card = document.createElement('div');
-                    card.classList.add('card');
+                // Check if there are any users left to display after filtering
+                if (users.length === 0) {
+                    cardContainer.innerHTML = '<p>No other users found.</p>';
+                    return; // Exit if no users left to show
+                }
 
-                    // Create the image element
-                    const img = document.createElement('img');
-                    img.src = `/uploads/${user.e_photo}`; // Ensure this line is executing correctly
-
-                    console.log(img.src);
-                    img.alt = user.e_nom
-
-                    // Append the image to the card
-                    card.appendChild(img);
-
-                    // Then append the rest of the card content
-                    card.innerHTML += `
-                        <h2>${user.e_nom}</h2>
-                        S<p>À ${user.distance} kilomètres de distance</p>
-                        <button class="button like-button">Aimer</button>
-                        <button class="button pass-button">Passer</button>
-    `;
-                    console.log(card.innerHTML);
-                    console.log(img);
-
-
-                    // Finally, append the card to the container
-                    cardContainer.appendChild(card);
-                });
-
-
-                const likeButtons = document.querySelectorAll('.like-button');
-                const passButtons = document.querySelectorAll('.pass-button');
-
-                likeButtons.forEach((button, index) => {
-                    button.addEventListener('click', function () {
-                        console.log(`User ${users[index].e_nom} was liked.`);
-                        nextUser();
-                    });
-                });
-
-                passButtons.forEach((button, index) => {
-                    button.addEventListener('click', function () {
-                        console.log(`User ${users[index].e_nom} was passed.`);
-                        nextUser();
-                    });
-                });
-
+                // Render the first user
                 updateUserCard();
             })
             .catch(error => console.error('Error fetching user data:', error));
 
         function nextUser() {
-            currentIndex = (currentIndex + 1) % users.length;
-            updateUserCard();
+            currentIndex = (currentIndex + 1) % users.length; // Cycle through users
+            updateUserCard(); // Update the user card
         }
 
         function updateUserCard() {
-            const user = users[currentIndex];
+            const user = users[currentIndex]; // Get current user
             if (user) {
-                document.querySelector('.card-container').innerHTML = `
-                    <div class="card">
-                        <img src="${user.e_photo}" alt="${user.e_nom}">
-                        <h2>${user.e_nom}</h2>
-                        <p>À ${user.distance} kilomètres de distance</p>
-                        <button class="button like-button">Aimer</button>
-                        <button class="button pass-button">Passer</button>
-                    </div>
-                `;
-                const likeButton = document.querySelector('.like-button');
-                const passButton = document.querySelector('.pass-button');
+                const cardContainer = document.querySelector('.card-container');
+                cardContainer.innerHTML = `
+                <div class="card">
+                    <img src="/uploads/${user.e_photo}" alt="${user.e_nom}">
+                    <h2>${user.e_nom}</h2>
+                    <p>À ${user.distance || 'undefined'} kilomètres de distance</p>
+                    <button class="button like-button"><i class="fas fa-heart"></i>Aimer</button>
+                    <button class="button pass-button"><i class="fas fa-times"></i>Passer</button>
+                </div>
+            `;
+                setupButtonListeners(user);
+            }
+        }
 
+        function setupButtonListeners(user) {
+            const likeButton = document.querySelector('.like-button');
+            const passButton = document.querySelector('.pass-button');
+
+            if (likeButton) {
                 likeButton.addEventListener('click', function () {
                     console.log(`User ${user.e_nom} was liked.`);
-                    nextUser();
+                    nextUser(); // Show next user
                 });
+            }
 
+            if (passButton) {
                 passButton.addEventListener('click', function () {
                     console.log(`User ${user.e_nom} was passed.`);
-                    nextUser();
+                    nextUser(); // Show next user
                 });
             }
         }
     });
+
 </script>
