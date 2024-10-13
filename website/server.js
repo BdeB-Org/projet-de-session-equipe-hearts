@@ -12,6 +12,7 @@ import nodemailer from 'nodemailer';
 import { google } from 'googleapis';
 import PDFDocument from 'pdfkit';
 import { PassThrough } from 'stream';
+import cron from 'node-cron';
 
 import fs from 'fs';
 
@@ -139,6 +140,26 @@ Configuration API SQUARE FIOHSAIOGFHASIPFH
 const squareClient = new Client({
     environment: Environment.Sandbox,
     accessToken: process.env.SQUARE_ACCESS_TOKEN
+});
+
+/*
+    cron
+*/
+
+cron.schedule('0 0 * * *', () => {
+    const resetQuery = `
+        UPDATE e_utilisateur 
+        SET swipe_count = 0, last_swipe_time = CURRENT_TIMESTAMP
+        WHERE abonnement_id IS NOT NULL;
+    `;
+
+    con.query(resetQuery, (err, result) => {
+        if (err) {
+            console.error('Error resetting swipe count:', err);
+        } else {
+            console.log('Swipe counts have been reset for all users.');
+        }
+    });
 });
 
 
@@ -335,6 +356,49 @@ app.get('/api/users', (req, res) => {
         res.json(results); // Send user data as JSON
     });
 });
+
+app.get('/api/user/swipe-data/:userId', (req, res) => {
+    const userId = req.params.userId;
+    const currentTime = new Date(); // Get current time
+
+    // Query database to get swipe_count and last_swipe_time for the user
+    con.query('SELECT swipe_count, last_swipe_time FROM e_utilisateur WHERE e_id = ?', [userId], (error, results) => {
+        if (error) throw error;
+
+        const user = results[0];
+        const lastSwipeTime = new Date(user.last_swipe_time);
+
+        // Get today's date at 12am
+        const todayAtMidnight = new Date();
+        todayAtMidnight.setHours(0, 0, 0, 0); // Set time to 12 am
+
+        // Check if last swipe time is before today at 12 am
+        if (lastSwipeTime < todayAtMidnight) {
+            // Reset the swipe count and last swipe time for the new day
+            user.swipe_count = 0;
+            con.query('UPDATE e_utilisateur SET swipe_count = 0, last_swipe_time = CURRENT_TIMESTAMP WHERE e_id = ?', [userId], (err) => {
+                if (err) throw err;
+            });
+        }
+
+        // Return the updated swipe count and last swipe time
+        res.json({
+            swipe_count: user.swipe_count,
+            last_swipe_time: user.last_swipe_time
+        });
+    });
+});
+
+app.post('/api/user/update-swipe', (req, res) => {
+    const { userId, swipeCount, swipeTime } = req.body;
+
+    // Update the user's swipe_count and last_swipe_time
+    con.query('UPDATE e_utilisateur SET swipe_count = ?, last_swipe_time = ? WHERE e_id = ?', [swipeCount, swipeTime, userId], (error, results) => {
+        if (error) throw error;
+        res.json({ success: true });
+    });
+});
+
 
 
 /*
