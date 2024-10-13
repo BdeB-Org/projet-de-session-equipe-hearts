@@ -16,8 +16,10 @@ npm install dotenv
 npm install square
 npm install nodemailer
 npm install googleApis
+npm install node-cron
 
-try: npm install multer dotenv square nodemailer googleapis
+
+try: npm install multer dotenv square nodemailer googleapis node-cron
 
 
 CREATE DATABASE myhearts;
