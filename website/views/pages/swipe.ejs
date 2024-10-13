@@ -28,26 +28,45 @@
         animation: glitch 1.5s infinite;
     }
 
-    @keyframes glitch {
+    @keyframes glitch-background {
         0% {
-            text-shadow: 2px 2px 2px rgba(255, 0, 127, 0.7);
+            background-position: 0 0;
+            opacity: 0.3;
         }
 
         25% {
-            text-shadow: 5px 5px 2px rgba(255, 0, 127, 0.5);
+            background-position: 10px 5px;
+            opacity: 0.5;
         }
 
         50% {
-            text-shadow: -5px -5px 2px rgba(0, 255, 255, 0.7);
+            background-position: -10px -5px;
+            opacity: 0.6;
         }
 
         75% {
-            text-shadow: 10px 10px 2px rgba(255, 0, 127, 0.7);
+            background-position: 15px -10px;
+            opacity: 0.4;
         }
 
         100% {
-            text-shadow: 0px 0px 2px rgba(255, 0, 127, 0.5);
+            background-position: 0 0;
+            opacity: 0.3;
         }
+    }
+
+    .glitch-background {
+        background-image: url(/images/cheng-feng-psdV2Rl-GvU-unsplash.jpg);
+        background-size: cover;
+        background-position: center;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: -1;
+        opacity: 0.3;
+        animation: glitch-background 2s infinite;
     }
 
     .card-container {
@@ -181,20 +200,6 @@
         color: #ff7f7f;
     }
 
-    .glitch-background {
-        background-image: url(/images/cheng-feng-psdV2Rl-GvU-unsplash.jpg);
-        background-size: cover;
-        background-position: center;
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        z-index: -1;
-        opacity: 0.3;
-    }
-
-
     #background-video {
         position: fixed;
         top: 0;
@@ -203,6 +208,18 @@
         height: 100%;
         object-fit: cover;
         z-index: -1;
+    }
+
+    #swipe-counter {
+        margin-top: 20px;
+        font-size: 18px;
+        color: #00ff00;
+    }
+
+    #countdown {
+        margin-top: 20px;
+        font-size: 18px;
+        color: #ffcc00;
     }
 </style>
 
@@ -226,7 +243,6 @@
                     <a href="/event/profil">
                         <i class="fas fa-comments icon-img"></i>
                     </a>
-
                 </div>
             </div>
         </div>
@@ -234,16 +250,52 @@
         <ul class="matches"></ul>
     </div>
 
-    <div class="card-container"></div>
-</body>
+    <!-- Swipe Counter -->
+    <div id="swipe-counter">
+        <p>Swipes restants : <span id="swipes-left">0</span></p>
+    </div>
 
+    <!-- Countdown for reset -->
+    <div id="countdown" style="display: none;">
+        <p>Vous avez atteint votre limite ! Prochains swipes disponibles en :</p>
+        <p id="countdown-timer">00:00:00</p>
+    </div>
+
+    <div class="card-container"></div>
+
+</body>
 <script>
     document.addEventListener("DOMContentLoaded", function () {
         let users = [];
         let currentIndex = 0;
+        let swipeCount = 0;
+        let maxSwipes = 0;
+        const swipeLimitReached = false;
 
         const loggedInUserId = "<%= userDetails.e_id %>"; // Fetch the logged-in user's ID
-        console.log("Logged-in User ID: " + loggedInUserId);
+        const userSubscriptionId = "<%= userDetails.abonnement_id %>"; // Fetch the logged-in user's subscription ID
+
+        // Set the swipe limit based on subscription type
+        switch (parseInt(userSubscriptionId)) {
+            case 1: // Basique
+                maxSwipes = 5;
+                break;
+            case 2: // Premium
+                maxSwipes = 100;
+                break;
+            case 3: // Diamant
+                maxSwipes = Infinity; // Unlimited swipes
+                break;
+            default:
+                maxSwipes = 0;
+        }
+
+        const swipesLeftElement = document.getElementById("swipes-left");
+        const countdownElement = document.getElementById("countdown");
+        const countdownTimerElement = document.getElementById("countdown-timer");
+        const cardContainer = document.querySelector('.card-container');
+
+        swipesLeftElement.textContent = maxSwipes - swipeCount;
 
         fetch('/api/users')
             .then(response => response.json())
@@ -256,7 +308,6 @@
 
                 console.log("Filtered Users after excluding logged-in user: ", users);
 
-                const cardContainer = document.querySelector('.card-container');
                 cardContainer.innerHTML = ''; // Clear previous cards
 
                 // Check if there are any users left to display after filtering
@@ -271,23 +322,29 @@
             .catch(error => console.error('Error fetching user data:', error));
 
         function nextUser() {
+            if (swipeCount >= maxSwipes) {
+                alert('You have reached your daily swipe limit.');
+                showCountdown(); // Show countdown once limit is reached
+                return; // Stop swiping if the limit is reached
+            }
+
             currentIndex = (currentIndex + 1) % users.length; // Cycle through users
             updateUserCard(); // Update the user card
+            swipesLeftElement.textContent = maxSwipes - swipeCount; // Update swipe count on UI
         }
 
         function updateUserCard() {
             const user = users[currentIndex]; // Get current user
             if (user) {
-                const cardContainer = document.querySelector('.card-container');
                 cardContainer.innerHTML = `
-                <div class="card">
-                    <img src="/uploads/${user.e_photo}" alt="${user.e_nom}">
-                    <h2>${user.e_nom}</h2>
-                    <p>À ${user.distance || 'undefined'} kilomètres de distance</p>
-                    <button class="button like-button"><i class="fas fa-heart"></i>Aimer</button>
-                    <button class="button pass-button"><i class="fas fa-times"></i>Passer</button>
-                </div>
-            `;
+            <div class="card">
+                <img src="/uploads/${user.e_photo}" alt="${user.e_nom}">
+                <h2>${user.e_nom}</h2>
+                <p>À ${user.distance || 'undefined'} kilomètres de distance</p>
+                <button class="button like-button"><i class="fas fa-heart"></i>Aimer</button>
+                <button class="button pass-button"><i class="fas fa-times"></i>Passer</button>
+            </div>
+        `;
                 setupButtonListeners(user);
             }
         }
@@ -299,6 +356,7 @@
             if (likeButton) {
                 likeButton.addEventListener('click', function () {
                     console.log(`User ${user.e_nom} was liked.`);
+                    swipeCount++; // Increment swipe count
                     nextUser(); // Show next user
                 });
             }
@@ -306,9 +364,37 @@
             if (passButton) {
                 passButton.addEventListener('click', function () {
                     console.log(`User ${user.e_nom} was passed.`);
+                    swipeCount++; // Increment swipe count
                     nextUser(); // Show next user
                 });
             }
+        }
+
+        function showCountdown() {
+            // Hide user cards
+            cardContainer.innerHTML = '<p>Revenez demain pour continuer à swiper !</p>';
+            // Show countdown element
+            countdownElement.style.display = 'block';
+
+            const now = new Date();
+            const nextReset = new Date();
+            nextReset.setHours(24, 0, 0, 0); // Set to next 12 am (midnight)
+
+            const timeLeft = nextReset - now;
+
+            // Update countdown every second
+            const countdownInterval = setInterval(() => {
+                const hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
+
+                countdownTimerElement.textContent = `${hours}:${minutes}:${seconds}`;
+
+                if (timeLeft <= 0) {
+                    clearInterval(countdownInterval);
+                    location.reload(); // Reload the page at 12 am to refresh swipes
+                }
+            }, 1000);
         }
     });
 
