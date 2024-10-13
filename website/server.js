@@ -474,10 +474,6 @@ app.post('/event/payment', async (req, res) => {
     console.log('Received payment request:', req.body);
 
     const { sourceId, amount, subscriptionType, confirmationEmail } = req.body;
-
-
-    console.log(confirmationEmail)
-
     const totalAmountInCents = amount; // Amount received in cents
     const totalAmount = totalAmountInCents / 100; // Convert cents to dollars
 
@@ -494,7 +490,6 @@ app.post('/event/payment', async (req, res) => {
     req.session.tvqAmount = tvqAmount; // TVQ amount
     req.session.tpsAmount = tpsAmount; // TPS amount
     req.session.totalAmount = totalAmount; // Total amount with tax
-
     req.session.confirmationEmail = confirmationEmail;
 
     if (!subscriptionType) {
@@ -513,10 +508,9 @@ app.post('/event/payment', async (req, res) => {
     try {
         // Process the payment with Square API
         const paymentResponse = await squareClient.paymentsApi.createPayment(paymentRequest);
+        const paymentId = paymentResponse.result.payment.id;
 
-        // Make sure subscriptionType is correct
-        console.log("Subscription Type:", subscriptionType); // Add this line
-
+        // Fetch subscription ID
         const query = 'SELECT e_id FROM e_abonnement WHERE e_type = ?';
         con.query(query, [subscriptionType], (err, results) => {
             if (err) {
@@ -524,84 +518,34 @@ app.post('/event/payment', async (req, res) => {
                 return res.status(500).send('Error querying subscription details');
             }
 
-            if (results.length === 0) {
-                console.error('Subscription type not found:', subscriptionType);
-                return res.status(404).send('Subscription type not found');
-            }
-
             const subscriptionId = results[0].e_id;
-
             const { e_id } = req.session.user || {}; // Get logged-in user's e_id from session
 
             if (!e_id) {
                 return res.status(401).send('User not logged in');
             }
 
-            // Update the logged-in user's abonnement_id instead of inserting a new user
-            const updateQuery = `
-            UPDATE e_utilisateur
-            SET abonnement_id = ?
-            WHERE e_id = ?
-            `;
-
-            con.query(updateQuery, [subscriptionId, e_id], (err, result) => {
+            // Update the user's subscription
+            const updateQuery = `UPDATE e_utilisateur SET abonnement_id = ? WHERE e_id = ?`;
+            con.query(updateQuery, [subscriptionId, e_id], (err) => {
                 if (err) {
                     console.error('Error updating user subscription:', err);
                     return res.status(500).send('Error updating user subscription');
                 }
-                req.session.user.abonnement_id = subscriptionId; // Ensure session is updated
 
-                // Optional: Fetch the updated user details from the database
-                const fetchUpdatedUserQuery = "SELECT * FROM e_utilisateur WHERE e_id = ?";
-                con.query(fetchUpdatedUserQuery, [e_id], (err, updatedUserResult) => {
-                    if (err) {
-                        console.error('Error fetching updated user:', err);
-                        return;
-                    }
-                    // Update session with new user details
-                    req.session.user = updatedUserResult[0]; // Assuming updatedUserResult has user details
-                });
-
-                // Store payment details in the session
+                // Update session with new subscription details
+                req.session.user.abonnement_id = subscriptionId;
                 req.session.subscriptionType = subscriptionType; // Store subscription type
-                req.session.paymentId = paymentResponse.result.payment.id; // Store payment ID
+                req.session.paymentId = paymentId; // Store payment ID
 
-                console.log("Payment successful! Payment ID:", paymentResponse.result.payment.id);
-                const subject = `Votre reçu pour l'abonnement ${subscriptionType}`;
-                const html = `
-                <div style="font-family: 'Arial', sans-serif; background-color: #0d0d0d; color: #ff007f; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(255, 0, 127, 0.5);">
-                    <h1 style="color: #00ff00; text-align: center;">Merci pour votre paiement !</h1>
-                    <hr style="border: 1px solid #00bfff;">
-                    <p style="font-size: 18px;">Votre abonnement: <strong style="color: #00ffff;">${subscriptionType}</strong></p>
-                    <p style="font-size: 18px;">Montant: <strong style="color: #ffcc00;">$${(originalAmount).toFixed(2)}</strong></p>
-                    <p style="font-size: 18px;">TVQ: <strong style="color: #ffcc00;">$${(tvqAmount).toFixed(2)}</strong></p>
-                    <p style="font-size: 18px;">TPS: <strong style="color: #ffcc00;">$${(tpsAmount).toFixed(2)}</strong></p>
-                    <p style="font-size: 20px; font-weight: bold;">Montant payé total: <strong style="color: #ff007f;">$${(totalAmount).toFixed(2)}</strong></p>
-                    <p style="font-size: 16px;">Nous espérons que vous apprécierez votre abonnement.</p>
-                    <footer style="margin-top: 20px; text-align: center;">
-                        <p style="font-size: 14px;">Si vous avez des questions, n'hésitez pas à nous contacter.</p>
-                        <p style="font-size: 14px;">Merci d'avoir choisi notre service !</p>
-                    </footer>
-                </div>
-            `;
-                const mailOptions = {
-                    from: 'hearts.corps@gmail.com',
-                    to: confirmationEmail,
-                    subject: subject,
-                    html: html
-                };
+                // Send a quick response to the client
+                res.json({ success: true, redirect: '/event/confirmation' });
 
-                transporter.sendMail(mailOptions, (error, info) => {
-                    if (error) {
-                        console.error('Error sending email:', error);
-                        return res.status(500).send('Error sending email receipt');
-                    } else {
-                        console.log('Email sent: ' + info.response);
-                        res.json({ success: true, redirect: '/event/confirmation' });
-                    }
+                // Handle email sending asynchronously after response
+                setImmediate(() => {
+                    sendConfirmationEmail(confirmationEmail, subscriptionType, originalAmount, tvqAmount, tpsAmount, totalAmount, paymentId);
                 });
             });
-
         });
 
     } catch (error) {
@@ -609,6 +553,42 @@ app.post('/event/payment', async (req, res) => {
         return res.status(500).json({ success: false, message: error.message });
     }
 });
+
+const sendConfirmationEmail = (confirmationEmail, subscriptionType, originalAmount, tvqAmount, tpsAmount, totalAmount, paymentId) => {
+    const subject = `Votre reçu pour l'abonnement ${subscriptionType}`;
+    const html = `
+        <div style="font-family: 'Arial', sans-serif; background-color: #0d0d0d; color: #ff007f; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(255, 0, 127, 0.5);">
+            <h1 style="color: #00ff00; text-align: center;">Merci pour votre paiement !</h1>
+            <hr style="border: 1px solid #00bfff;">
+            <p style="font-size: 18px;">Votre abonnement: <strong style="color: #00ffff;">${subscriptionType}</strong></p>
+            <p style="font-size: 18px;">Montant: <strong style="color: #ffcc00;">$${originalAmount.toFixed(2)}</strong></p>
+            <p style="font-size: 18px;">TVQ: <strong style="color: #ffcc00;">$${tvqAmount.toFixed(2)}</strong></p>
+            <p style="font-size: 18px;">TPS: <strong style="color: #ffcc00;">$${tpsAmount.toFixed(2)}</strong></p>
+            <p style="font-size: 20px; font-weight: bold;">Montant payé total: <strong style="color: #ff007f;">$${totalAmount.toFixed(2)}</strong></p>
+            <p style="font-size: 16px;">Nous espérons que vous apprécierez votre abonnement.</p>
+            <footer style="margin-top: 20px; text-align: center;">
+                <p style="font-size: 14px;">Si vous avez des questions, n'hésitez pas à nous contacter.</p>
+                <p style="font-size: 14px;">Merci d'avoir choisi notre service !</p>
+            </footer>
+        </div>
+    `;
+
+    const mailOptions = {
+        from: 'hearts.corps@gmail.com',
+        to: confirmationEmail,
+        subject: subject,
+        html: html
+    };
+
+    transporter.sendMail(mailOptions, (error, info) => {
+        if (error) {
+            console.error('Error sending email:', error);
+        } else {
+            console.log('Email sent: ' + info.response);
+        }
+    });
+};
+
 
 /*
   Changer l'abonnement a gratuir
