@@ -11,6 +11,7 @@
         display: flex;
         flex-direction: column;
         align-items: center;
+        font-family: "Orbitron", sans-serif;
     }
 
     .header {
@@ -139,7 +140,7 @@
 
     <div class="sidebar">
         <div class="user-profile">
-            <img src="/images/Amy Habibti - Copy (2).png" alt="User Profile" class="profile-picture">
+            <img src="/uploads/<%= userDetails.e_photo %>" alt="User Profile" class="profile-picture">
             <div class="profile-info">
                 <h3 class="user-name">
                     <%= userDetails.e_prenom %>
@@ -158,11 +159,12 @@
     </div>
 
 
+
     <div class="card-container">
     </div>
 </body>
 
-</html>
+
 
 <script>
     document.addEventListener("DOMContentLoaded", function () {
@@ -179,15 +181,32 @@
                 users.forEach(user => {
                     const card = document.createElement('div');
                     card.classList.add('card');
-                    card.innerHTML = `
-                        <img src="${user.e_photo}" alt="${user.e_nom}">
+
+                    // Create the image element
+                    const img = document.createElement('img');
+                    img.src = `/uploads/${user.e_photo}`; // Ensure this line is executing correctly
+
+                    console.log(img.src);
+                    img.alt = user.e_nom
+
+                    // Append the image to the card
+                    card.appendChild(img);
+
+                    // Then append the rest of the card content
+                    card.innerHTML += `
                         <h2>${user.e_nom}</h2>
-                        <p>À ${user.distance} kilomètres de distance</p>
+                        S<p>À ${user.distance} kilomètres de distance</p>
                         <button class="button like-button">Aimer</button>
                         <button class="button pass-button">Passer</button>
-                    `;
+    `;
+                    console.log(card.innerHTML);
+                    console.log(img);
+
+
+                    // Finally, append the card to the container
                     cardContainer.appendChild(card);
                 });
+
 
                 const likeButtons = document.querySelectorAll('.like-button');
                 const passButtons = document.querySelectorAll('.pass-button');
