@@ -112,8 +112,9 @@
             <div class="right-wrapper" style="display: flex; align-items: center;">
                 <% if (userDetails) { %>
                     <div class="user-info" style="display: flex; align-items: center; margin-right: 20px;">
-                        <img id="user-photo" src="/images/default_user.png" alt="User Icon"
+                        <img src="/uploads/<%= userDetails.e_photo %>" alt="User Photo"
                             style="border-radius: 50%; height: 40px; width: 40px; background: white; margin-right: 10px;" />
+
                         <span id="user-name" class="user-name">
                             <%= userDetails.e_prenom %>
                                 <%= userDetails.e_nom %>
