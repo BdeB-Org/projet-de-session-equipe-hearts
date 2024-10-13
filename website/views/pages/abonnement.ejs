@@ -37,7 +37,6 @@
       width: 350px;
       display: flex;
       flex-direction: column;
-      /* Stack content vertically */
       border: 3px solid rgba(255, 20, 147, 0.8);
       aspect-ratio: 10 / 16;
       border-radius: 1rem;
@@ -45,12 +44,14 @@
       overflow: hidden;
       position: relative;
       z-index: 10;
-      margin: 0 20px;
+      margin: 10px 5px;
+      /* Reduce margin for closer cards */
+      top: 50px;
+      /* Move cards lower */
       transition: box-shadow 0.3s ease;
-      /* Smooth shadow transition */
       backdrop-filter: blur(8px);
-      /* Adding blur for background */
     }
+
 
     /* Shadow border effect on hover */
     .screen:hover {
@@ -173,7 +174,6 @@
       padding: 1em 2em;
     }
 
-    /* Lines Animation */
     @keyframes pan-overlay {
       from {
         background-position: 0% 0%;
@@ -207,6 +207,11 @@
       height: 100%;
       object-fit: cover;
       z-index: -1;
+    }
+
+    .abonnement-actuel {
+      box-shadow: 0 0 30px #1E90FF !important;
+      border-color: #1E90FF;
     }
   </style>
 
@@ -252,8 +257,8 @@
           <div class="screen-user">
             <h2 class="name" data-value="Premium">Premium</h2>
             <p class="price" data-value="19,47$/ Mois">19,47$ / Mois</p>
-            <ul class="features" data-value="100 Swipes/Semaine">
-              <li>100 Swipes/Semaine</li>
+            <ul class="features" data-value="100 Swipes/j">
+              <li>100 Swipes/j</li>
             </ul>
           </div>
           <% if (!userDetails) { %>

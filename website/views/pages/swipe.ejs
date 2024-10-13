@@ -8,9 +8,9 @@
         font-family: 'Orbitron', sans-serif;
         margin: 0;
         padding: 0;
-        display: flex;
         flex-direction: column;
         align-items: center;
+        display: flex;
     }
 
     .header {
@@ -221,6 +221,55 @@
         font-size: 18px;
         color: #ffcc00;
     }
+
+    /* Add tilt animations */
+    .card.swipe-right {
+        transform: translateX(100%) rotate(15deg);
+        opacity: 0;
+        transition: transform 0.5s ease, opacity 0.5s ease;
+    }
+
+    .card.swipe-left {
+        transform: translateX(-100%) rotate(-15deg);
+        opacity: 0;
+        transition: transform 0.5s ease, opacity 0.5s ease;
+    }
+
+    /* Heart bounce animation */
+    .heart-bounce {
+        position: absolute;
+        font-size: 40px;
+        color: #ff007f;
+        animation: bounce 0.5s ease forwards;
+        opacity: 0;
+        z-index: 1000;
+    }
+
+    @keyframes bounce {
+        0% {
+            opacity: 1;
+            transform: scale(0);
+        }
+
+        50% {
+            transform: scale(1.2);
+        }
+
+        100% {
+            transform: scale(1);
+            opacity: 0;
+        }
+    }
+
+    /* X bounce animation */
+    .x-bounce {
+        position: absolute;
+        font-size: 40px;
+        color: #ff7f7f;
+        animation: bounce 0.5s ease forwards;
+        opacity: 0;
+        z-index: 1000;
+    }
 </style>
 
 <body>
@@ -270,7 +319,7 @@
         let currentIndex = 0;
         let swipeCount = 0;
         let maxSwipes = 0;
-        const swipeLimitReached = false;
+        let swipeLimitReached = false;
 
         const loggedInUserId = "<%= userDetails.e_id %>"; // Fetch the logged-in user's ID
         const userSubscriptionId = "<%= userDetails.abonnement_id %>"; // Fetch the logged-in user's subscription ID
@@ -300,13 +349,8 @@
         fetch('/api/users')
             .then(response => response.json())
             .then(data => {
-                // Log the fetched data
-                console.log("Fetched Users: ", data);
-
                 // Filter out the logged-in user from the list of users
                 users = data.filter(user => user.e_id !== parseInt(loggedInUserId));
-
-                console.log("Filtered Users after excluding logged-in user: ", users);
 
                 cardContainer.innerHTML = ''; // Clear previous cards
 
@@ -321,69 +365,93 @@
             })
             .catch(error => console.error('Error fetching user data:', error));
 
+        function setupButtonListeners(user) {
+            const likeButton = document.querySelector('.like-button');
+            const passButton = document.querySelector('.pass-button');
+            const cardElement = document.querySelector('.card');
+
+            if (likeButton) {
+                likeButton.addEventListener('click', function () {
+                    swipeCount++; // Increment swipe count
+                    showBounceIcon('heart', cardElement);
+                    cardElement.classList.add('swipe-right'); // Add the swipe-right animation
+                    setTimeout(() => nextUser(), 500); // Delay switching to the next user
+                });
+            }
+
+            if (passButton) {
+                passButton.addEventListener('click', function () {
+                    swipeCount++; // Increment swipe count
+                    showBounceIcon('x', cardElement);
+                    cardElement.classList.add('swipe-left'); // Add the swipe-left animation
+                    setTimeout(() => nextUser(), 500); // Delay switching to the next user
+                });
+            }
+        }
+
+        function showBounceIcon(type, cardElement) {
+            const iconElement = document.createElement('i');
+
+            if (type === 'heart') {
+                iconElement.classList.add('fas', 'fa-heart', 'heart-bounce');
+            } else if (type === 'x') {
+                iconElement.classList.add('fas', 'fa-times', 'x-bounce');
+            }
+
+            cardElement.appendChild(iconElement);
+
+            setTimeout(() => {
+                iconElement.remove(); // Remove the icon after animation completes
+            }, 500); // Match with the bounce animation duration
+        }
+
         function nextUser() {
+            const cardElement = document.querySelector('.card');
+
             if (swipeCount >= maxSwipes) {
                 alert('You have reached your daily swipe limit.');
                 showCountdown(); // Show countdown once limit is reached
+                swipesLeftElement.textContent = 0;
                 return; // Stop swiping if the limit is reached
             }
 
             currentIndex = (currentIndex + 1) % users.length; // Cycle through users
             updateUserCard(); // Update the user card
             swipesLeftElement.textContent = maxSwipes - swipeCount; // Update swipe count on UI
+
+            // Remove the swipe classes after the animation ends
+            cardElement.classList.remove('swipe-right', 'swipe-left');
         }
 
         function updateUserCard() {
             const user = users[currentIndex]; // Get current user
             if (user) {
                 cardContainer.innerHTML = `
-            <div class="card">
-                <img src="/uploads/${user.e_photo}" alt="${user.e_nom}">
-                <h2>${user.e_nom}</h2>
-                <p>À ${user.distance || 'undefined'} kilomètres de distance</p>
-                <button class="button like-button"><i class="fas fa-heart"></i>Aimer</button>
-                <button class="button pass-button"><i class="fas fa-times"></i>Passer</button>
-            </div>
-        `;
+                <div class="card">
+                    <img src="/uploads/${user.e_photo}" alt="${user.e_nom}">
+                    <h2>${user.e_nom}</h2>
+                    <p>À ${user.distance || 'undefined'} kilomètres de distance</p>
+                    <button class="button like-button"><i class="fas fa-heart"></i>Aimer</button>
+                    <button class="button pass-button"><i class="fas fa-times"></i>Passer</button>
+                </div>
+            `;
                 setupButtonListeners(user);
             }
         }
 
-        function setupButtonListeners(user) {
-            const likeButton = document.querySelector('.like-button');
-            const passButton = document.querySelector('.pass-button');
-
-            if (likeButton) {
-                likeButton.addEventListener('click', function () {
-                    console.log(`User ${user.e_nom} was liked.`);
-                    swipeCount++; // Increment swipe count
-                    nextUser(); // Show next user
-                });
-            }
-
-            if (passButton) {
-                passButton.addEventListener('click', function () {
-                    console.log(`User ${user.e_nom} was passed.`);
-                    swipeCount++; // Increment swipe count
-                    nextUser(); // Show next user
-                });
-            }
-        }
-
         function showCountdown() {
-            // Hide user cards
             cardContainer.innerHTML = '<p>Revenez demain pour continuer à swiper !</p>';
-            // Show countdown element
             countdownElement.style.display = 'block';
 
             const now = new Date();
             const nextReset = new Date();
             nextReset.setHours(24, 0, 0, 0); // Set to next 12 am (midnight)
 
-            const timeLeft = nextReset - now;
-
             // Update countdown every second
             const countdownInterval = setInterval(() => {
+                const now = new Date(); // Recalculate 'now' each second
+                const timeLeft = nextReset - now;
+
                 const hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
                 const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
                 const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
@@ -396,6 +464,8 @@
                 }
             }, 1000);
         }
+
     });
+
 
 </script>
