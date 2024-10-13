@@ -41,6 +41,8 @@ CREATE TABLE e_utilisateur (
     e_number TEXT NOT NULL,
     e_password VARCHAR(255),
     abonnement_id VARCHAR(255),
+    swipe_count INT DEFAULT 0,
+    last_swipe_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP.
     PRIMARY KEY (e_id)
 );
 
