@@ -1,247 +1,353 @@
 <%- include ("../partials/header.ejs") %>
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Profil Utilisateur</title>
-    <link rel="stylesheet" href="styles.css">
-</head>
-<style>
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
+    <style>
+        html,
+        body {
+            height: 100%;
+            margin: 0;
+            margin: 0;
+            padding: 0;
+            padding: 0;
+            overflow-y: auto;
+            box-sizing: border-box;
+            justify-content: center;
+            align-items: center;
+        }
 
-body {
-    font-family: 'Arial', sans-serif;
-    background-color: #000000;
-    margin: 0;
-    padding: 0;
-}
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-.main-content {
-    justify-content: center;
-    align-items: center; /* Centrer verticalement */
-    height: 100vh; /* Utiliser toute la hauteur de la fenêtre */
-    padding-top: 0;
-}
+        body {
+            background-color: #000000;
+            color: #ffffff;
+            /* Keep text color consistent */
+            font-family: "Orbitron", sans-serif;
 
-.profile-container {
-    background-color: #f093fb; /* Couleur de départ */
-    padding: 1.5rem; /* Réduction du padding pour diminuer la hauteur */
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    width: 600px; /* Garde la largeur */
-    height: 600px;
-    text-align: center;
-    margin: 0 auto; /* Centrer horizontalement */
-    z-index: 1;
-    background: linear-gradient(45deg, #d44fdc, #e38be3, #f0b7f5, #d44fdc);
+        }
+
+        .main-content {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            /* Align items to the start */
+            padding-top: 20px;
+        }
+
+        .profile-container {
+            background-color: #f093fb;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 600px;
+            height: auto;
+            text-align: center;
+            margin: 20px auto;
+            background: linear-gradient(45deg, #d44fdc, #e38be3, #f0b7f5, #d44fdc);
             box-shadow: 0 0 10px #d44fdc, 0 0 15px #e38be3, 0 0 20px #d44fdc;
             transition: transform 0.5s ease, opacity 0.5s ease;
-    /* Animation */
-    top: 200px;
-    left: 50%;
-    transform: translateX(-50%) scale(0); /* Démarre à scale 0 */
-    opacity: 0; /* Démarre avec opacité 0 */
-    transition: transform 0.5s ease, opacity 0.5s ease, background-color 1s ease;
+            transform: scale(0.8);
+            opacity: 0;
+        }
 
-    position: fixed;
+        .profile-container.active {
+            opacity: 1;
+            transform: scale(1);
+        }
 
-}
 
-.profile-container.active {
-    transform: translateX(-50%) scale(1); /* Apparaît à taille normale */
-    opacity: 1; /* Pleine opacité */
-    background-color: #f093fb;
-}
+        .profile-header {
+            margin-bottom: 1rem;
+        }
 
-.profile-header {
-    margin-bottom: 1rem; /* Réduction de l'espacement pour diminuer la hauteur */
-}
+        .profile-picture {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            margin-bottom: 1rem;
+            object-fit: cover;
+            border: 2px solid #f093fb;
+        }
 
-.profile-picture {
-    width: 100px;
-    height: 100px;
-    border-radius: 50%;
-    margin-bottom: 1rem;
-    object-fit: cover;
-    border: 2px solid #f093fb;
-}
+        h1 {
+            font-size: 1.2rem;
+            /* Réduction de la taille de la police */
+            color: #333;
+        }
 
-h1 {
-    font-size: 1.2rem; /* Réduction de la taille de la police */
-    color: #333;
-}
+        .profile-details p {
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+            /* Réduction de la marge inférieure */
+            color: #666;
+        }
 
-.profile-details p {
-    font-size: 1rem;
-    margin-bottom: 0.5rem; /* Réduction de la marge inférieure */
-    color: #666;
-}
+        .profile-details strong {
+            color: #000000;
+        }
 
-.profile-details strong {
-    color: #000000;
-}
+        .profile-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            /* Réduction de l'écart entre les boutons */
+        }
 
-.profile-actions {
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem; /* Réduction de l'écart entre les boutons */
-}
+        .profile-actions button {
+            padding: 0.5rem;
+            /* Réduction du padding pour diminuer la hauteur des boutons */
+            border: none;
+            background-color: white;
+            color: black;
+            font-size: 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
 
-.profile-actions button {
-    padding: 0.5rem; /* Réduction du padding pour diminuer la hauteur des boutons */
-    border: none;
-    background-color: white;
-    color: black;
-    font-size: 1rem;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
+        .profile-actions button:hover {
+            background-color: #e04e2e;
+        }
 
-.profile-actions button:hover {
-    background-color: #e04e2e;
-}
+        .change-password h3 {
+            color: #333;
+            margin-bottom: 1rem;
+        }
 
-.change-password h3 {
-    color: #333;
-    margin-bottom: 1rem;
-}
+        .change-password form div {
+            margin-bottom: 0.75rem;
+            /* Réduction des marges */
+        }
 
-.change-password form div {
-    margin-bottom: 0.75rem; /* Réduction des marges */
-}
+        .change-password form label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            color: #f093fb;
+        }
 
-.change-password form label {
-    display: block;
-    font-weight: bold;
-    margin-bottom: 0.5rem;
-    color: #f093fb;
-}
+        .change-password form input {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
 
-.change-password form input {
-    width: 100%;
-    padding: 0.5rem;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    font-size: 1rem;
-}
+        .change-password button {
+            padding: 0.5rem;
+            /* Réduction du padding pour diminuer la hauteur */
+            border: none;
+            background-color: #f093fb;
+            color: black;
+            font-size: 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
 
-.change-password button {
-    padding: 0.5rem; /* Réduction du padding pour diminuer la hauteur */
-    border: none;
-    background-color: #f093fb;
-    color: black;
-    font-size: 1rem;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
+        .change-password button:hover {
+            background-color: #e04e2e;
+        }
 
-.change-password button:hover {
-    background-color: #e04e2e;
-}
+        /* Message Styles */
+        .message-container {
+            margin-top: 1rem;
+            text-align: center;
+        }
 
-/* Message Styles */
-.message-container {
-    margin-top: 1rem;
-    text-align: center;
-}
+        .message {
+            padding: 0.75rem 1rem;
+            border-radius: 5px;
+            font-size: 1rem;
+            width: 100%;
+            max-width: 350px;
+            margin: 0 auto;
+        }
 
-.message {
-    padding: 0.75rem 1rem;
-    border-radius: 5px;
-    font-size: 1rem;
-    width: 100%;
-    max-width: 350px;
-    margin: 0 auto;
-}
+        .message.success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
 
-.message.success {
-    background-color: #d4edda;
-    color: #155724;
-    border: 1px solid #c3e6cb;
-}
+        .message.error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
 
-.message.error {
-    background-color: #f8d7da;
-    color: #721c24;
-    border: 1px solid #f5c6cb;
-}
-#background-video {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      z-index: -1;
-    }
-</style>
-<body>
-    <video autoplay muted loop id="background-video">
-        <source src="/images/vecteezy_abstract-digital-neon-color-animation-background_19427853.mov" type="video/mp4">
-        Your browser does not support the video tag.
-    </video>
-    <div class="main-content">
-        <div class="profile-container">
-            <div class="profile-header">
-                <h1>Profil <span id="user-prenom"></span> <span id="user-nom"></span></h1>
+
+
+        .subscription-block {
+            margin-top: 1rem;
+            padding: 1.5rem;
+            background: linear-gradient(135deg, #6c63ff, #d44fdc);
+            border-radius: 15px;
+            /* Increase border radius for a smoother look */
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+            /* Deeper shadow for depth */
+            transition: transform 0.3s ease;
+            /* Add transition for hover effect */
+        }
+
+        .subscription-block:hover {
+            transform: scale(1.05);
+            /* Slightly scale up on hover */
+        }
+
+        .subscription-block h3 {
+            color: #ffffff;
+            /* Keep heading color white */
+            font-size: 1.5rem;
+            /* Increase font size for the heading */
+            margin-bottom: 0.5rem;
+            /* Space below the heading */
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7);
+            /* Add shadow for depth */
+        }
+
+        .subscription-block p {
+            font-size: 1.1rem;
+            /* Slightly increase font size for better readability */
+            color: #ffffff;
+            /* White text for better contrast */
+            margin: 0.5rem 0;
+            /* Space between paragraphs */
+        }
+
+        .subscription-block button {
+            padding: 0.75rem;
+            /* Increase padding for buttons */
+            border: none;
+            background-color: #e04e2e;
+            /* Vibrant button color */
+            color: white;
+            /* Change text color to white */
+            font-size: 1.1rem;
+            /* Increase font size for the button */
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+            /* Smooth transitions */
+        }
+
+        .subscription-block button:hover {
+            background-color: #ff5c33;
+            /* Change button color on hover */
+            transform: translateY(-2px);
+            /* Slightly lift button on hover */
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+            /* Add shadow on hover */
+        }
+
+        #background-video {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: -1;
+        }
+    </style>
+
+    <body>
+        <video autoplay muted loop id="background-video">
+            <source src="/images/vecteezy_polygon-cyberpunk-sci-fi-background_1807028.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
+        <div class="main-content">
+            <div class="profile-container">
+                <div class="profile-header">
+                    <h1>Profil <span id="user-prenom"></span> <span id="user-nom"></span></h1>
+                </div>
+
+                <!-- Profile Picture Section -->
+                <div class="profile-picture-container">
+                    <img src="/uploads/<%= userDetails.e_photo %>" alt="Photo de Profil" class="profile-picture">
+                </div>
+
+                <!-- Message Display Section -->
+                <div class="message-container">
+                    <% if (message) { %>
+                        <div class="message <%= messageType %>">
+                            <p>
+                                <%= message %>
+                            </p>
+                        </div>
+                        <% } %>
+                </div>
+
+                <div class="profile-details">
+                    <p><strong>
+                            <%= userDetails.e_nom %>
+                        </strong></p>
+                    <p><strong>
+                            <%= userDetails.e_prenom %>
+                        </strong></p>
+                    <p><strong>
+                            <%= userDetails.e_courriel %>
+                        </strong></p>
+                    <p><strong>Mot de passe : ••••••••</strong></p> <!-- Masked password -->
+                </div>
+
+                <!-- Change Password Section -->
+                <div class="change-password">
+                    <h3>Changer le Mot de Passe</h3>
+                    <form action="/event/change-password" method="POST">
+                        <div>
+                            <input type="password" id="old-password" name="old_password"
+                                placeholder="Ancien mot de passe" required>
+                        </div>
+                        <div>
+                            <input type="password" id="new-password" name="new_password"
+                                placeholder="Nouveau mot de passe" required>
+                        </div>
+                        <div>
+                            <input type="password" id="confirm-password" name="confirm_password"
+                                placeholder="Confirmer le nouveau mot de passe" required>
+                        </div>
+                        <button type="submit">Changer le Mot de Passe</button>
+                    </form>
+                </div>
+
+
+
+                <!-- Profile actions -->
+                <div class="profile-actions">
+                    <form action="/event/delete-account" method="POST"
+                        onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer votre compte? Cette action est irréversible.');">
+                        <button type="submit">Supprimer le Compte</button>
+                    </form>
+                </div>
+
+                <div class="subscription-block">
+                    <h3>Votre abonnement actuel :</h3>
+                    <p>
+                        <%= subscriptionName %>
+                    </p>
+
+                    <p>Souhaitez-vous obtenir un autre abonnement ?</p>
+                    <a href="/event/abonnement">
+                        <button>Changer d'abonnement</button>
+                    </a>
+                </div>
             </div>
-            
-            <!-- Message Display Section -->
-            <div class="message-container">
-                <% if (message) { %>
-                    <div class="message <%= messageType %>">
-                        <p><%= message %></p>
-                    </div>
-                <% } %>
-            </div>
 
-            <div class="profile-details">
-                <p><strong><%= userDetails.e_nom %></strong></p>
-                <p><strong><%= userDetails.e_prenom %></strong></p>
-                <p><strong><%= userDetails.e_courriel %></strong></p>
-                <p><strong>Mot de passe : ••••••••</strong></p> <!-- Masked password -->
-            </div>
-            
-            <!-- Change Password Section -->
-            <div class="change-password">  
-                <h3>Changer le Mot de Passe</h3>
-                <form action="/event/change-password" method="POST">
-                    <div>
-                        
-                        <input type="password" id="old-password" name="old_password" placeholder="Ancien mot de passe" required>
-                    </div>
-                    <div>
-                        
-                        <input type="password" id="new-password" name="new_password" placeholder="Nouveau mot de passe" required>
-                    </div>
-                    <div>
-                        
-                        <input type="password" id="confirm-password" name="confirm_password" placeholder="Confirmer le nouveau mot de passe" required>
-                    </div>
-                    <button type="submit">Changer le Mot de Passe</button>
-                </form>
-            <!-- Profile actions -->
-<div class="profile-actions">
-    <form action="/event/delete-account" method="POST" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer votre compte? Cette action est irréversible.');">
-        <button type="submit">Supprimer le Compte</button>
-    </form>
-</div>
 
-    </div>
+        </div>
+    </body>
 
     <script>
         // Activer l'animation lors du chargement de la page
-        window.addEventListener('load', function() {
+        window.addEventListener('load', function () {
             const profileContainer = document.querySelector('.profile-container');
-            profileContainer.classList.add('active');
+            setTimeout(() => {
+                profileContainer.classList.add('active');
+            }, 100);
         });
+
+
     </script>
-</body>
-</html>
