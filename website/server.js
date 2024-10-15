@@ -288,20 +288,26 @@ app.get("/event/swipe", function (req, res) {
 
 app.get("/event/profil", function (req, res) {
     if (!req.session.user) {
-        // Redirect to login page if not logged in
         return res.redirect("/event/inscription");
     }
 
-    // Render profile page with default message and messageType
+    const subscriptionNames = {
+        1: "Basique",
+        2: "Premium",
+        3: "Diamant"
+    };
+
+    const userSubscriptionName = subscriptionNames[req.session.user.abonnement_id] || 'Aucun abonnement actif';
+
     res.render("pages/profil", {
         siteTitle: "Profil",
         pageTitle: "Votre Profil",
         userDetails: req.session.user,
-        message: null, // No message by default
-        messageType: '' // No message type by default
+        subscriptionName: userSubscriptionName,
+        message: null, 
+        messageType: '' 
     });
 });
-
 app.get('/event/download-receipt', (req, res) => {
     const { subscriptionType, amount, tvqAmount, tpsAmount, totalAmount, paymentId, confirmationEmail } = req.session;
     const userDetails = req.session.user;
