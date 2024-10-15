@@ -13,6 +13,7 @@ import { google } from 'googleapis';
 import PDFDocument from 'pdfkit';
 import { PassThrough } from 'stream';
 import cron from 'node-cron';
+import crypto from 'crypto';
 
 import fs from 'fs';
 
@@ -124,6 +125,23 @@ con.connect(function (err) {
     console.log("connected!");
     initializeSubscriptions();
 });
+/*
+------------------------------------------
+    Crypting
+------------------------------------------
+*/
+
+// Route to hash a URL dynamically based on query parameters
+app.get("/hash-url", (req, res) => {
+    const { amount, subscriptionType } = req.query;
+    const baseUrl = `localhost:4000/event/payment?amount=${amount}&subscriptionType=${subscriptionType}`;
+    const hashedUrl = hashString(baseUrl);
+    res.redirect(`localhost:4000/event/payment?hash=${hashedUrl}`);
+});
+
+function hashString(str) {
+    return crypto.createHash('sha256').update(str).digest('hex');
+}
 
 
 
@@ -257,15 +275,39 @@ app.get("/event/confirmation", function (req, res) {
     });
 });
 
-app.get("/event/payment", function (req, res) {
-    const subscriptionName = req.query.subscriptionType || "Your Subscription"; // Retrieve the subscription name dynamically
+app.get("/event/payment", (req, res) => {
+    const { amount, subscriptionType, hash } = req.query;
+
+    // Rebuild the base URL to match what was hashed on the client
+    const baseUrl = `/event/payment?amount=${amount}&subscriptionType=${subscriptionType}`;
+    const generatedHash = hashString(baseUrl);
+
+
+    // Compare the client-provided hash with the server-generated one
+    if (hash !== generatedHash) {
+        return res.status(400).send("Invalid payment link.");
+    }
+
+    // Log for debugging
+    console.log("Generated hash:", generatedHash);
+    console.log("Received hash:", hash);
+
+    // Validate the hash
+    if (hash !== generatedHash) {
+        return res.status(400).send("Invalid payment link.");
+    }
+
+    // Continue processing if hash is valid
     res.render("pages/payment", {
         siteTitle: "Payment",
         pageTitle: "Payment",
         userDetails: req.session.user,
-        subscriptionName: subscriptionName // Pass subscription name
+        amount,
+        subscriptionName: subscriptionType,
+        hashedUrl: hash // Pass the hash if needed for display purposes
     });
 });
+
 
 
 app.get("/event/apropos", function (req, res) {
@@ -304,8 +346,8 @@ app.get("/event/profil", function (req, res) {
         pageTitle: "Votre Profil",
         userDetails: req.session.user,
         subscriptionName: userSubscriptionName,
-        message: null, 
-        messageType: '' 
+        message: null,
+        messageType: ''
     });
 });
 app.get('/event/download-receipt', (req, res) => {

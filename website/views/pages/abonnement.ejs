@@ -7,7 +7,6 @@
       margin: 0;
       padding: 0;
       overflow-y: auto;
-      /* Ensures the page can scroll vertically */
     }
 
     /*
@@ -18,7 +17,6 @@
       justify-content: center;
       align-items: center;
       background-color: #000000;
-      /* Dark background */
       margin: 0;
       padding: 0;
       font-family: "Orbitron", sans-serif;
@@ -45,18 +43,14 @@
       position: relative;
       z-index: 10;
       margin: 10px 5px;
-      /* Reduce margin for closer cards */
       top: 50px;
-      /* Move cards lower */
       transition: box-shadow 0.3s ease;
       backdrop-filter: blur(8px);
     }
 
 
-    /* Shadow border effect on hover */
     .screen:hover {
       box-shadow: 0 0 20px #1E90FF;
-      /* Fixed complementary shadow color */
     }
 
     .screen-image {
@@ -75,46 +69,36 @@
       flex-direction: column;
       align-items: center;
       justify-content: space-between;
-      /* Space elements evenly */
       flex-grow: 1;
       gap: 1.5rem;
-      /* Increased spacing between elements */
       position: relative;
       z-index: 3;
       margin: 1rem;
       padding: 2rem 1rem;
-      /* Added padding for top space */
+
       text-align: center;
-      /* Centering text */
+
     }
 
     .screen-content h2 {
       font-size: 2.5rem;
-      /* Adjust font size */
       margin: 0;
       text-shadow: 0 0 10px rgba(255, 20, 147, 0.9);
-      /* Glow effect */
     }
 
     .screen-content p {
       font-size: 2rem;
-      /* Font size for price */
       margin: 0;
       text-shadow: 0 0 5px rgba(255, 20, 147, 0.7);
-      /* Glow effect */
     }
 
     .screen-content ul {
       font-size: 1.5rem;
-      /* Font size for features */
       margin: 0;
       padding: 0;
       text-shadow: 0 0 5px rgba(255, 20, 147, 0.7);
-      /* Glow effect */
       list-style-type: disc;
-      /* Ensure list has bullets */
       padding-left: 20px;
-      /* Indent the list */
     }
 
     .screen-content .custom_butt {
@@ -209,9 +193,10 @@
       z-index: -1;
     }
 
-    .abonnement-actuel {
-      box-shadow: 0 0 30px #1E90FF !important;
-      border-color: #1E90FF;
+    /* Add a flashy border effect */
+    .screen.flashy-border {
+      box-shadow: 0 0 30px #1E90FF, 0 0 60px #FF1493, 0 0 90px #1E90FF !important;
+      border-color: #FF1493;
     }
   </style>
 
@@ -222,35 +207,32 @@
       Your browser does not support the video tag.
     </video>
     <div id="screens-container">
-      <div class="screen">
+      <div class="screen <%= userDetails && Number(userDetails.abonnement_id) === 1 ? 'flashy-border' : '' %>">
         <div class="screen-image"></div>
         <div class="screen-overlay"></div>
         <div class="screen-content">
-          <div class="screen-user">
+          <div class="screen-user-abonnementActuel">
             <h2 class="name" data-value="Basique">Basique</h2>
-            <p class="price" data-value="0$/ Mois">0€ / Mois</p>
+            <p class="price" data-value="0€/ Mois">0€ / Mois</p>
             <ul class="features" data-value="5 Swipes/J">
               <li>5 Swipes/J</li>
             </ul>
           </div>
-
           <% if (!userDetails) { %>
             <button onclick="window.location.href='/event/creationCompte'" class="custom_butt">
               Connectez-vous
             </button>
             <% } else if (Number(userDetails.abonnement_id)===1) { %>
               <button class="custom_butt" disabled>
-                Vous avez déjà cet abonnement
+                Abonnement actuel
               </button>
               <% } else { %>
                 <button onclick="confirmChangePlan(1)" class="custom_butt">Changer de plan</button>
-
                 <% } %>
         </div>
       </div>
 
-
-      <div class="screen">
+      <div class="screen <%= userDetails && Number(userDetails.abonnement_id) === 2 ? 'flashy-border' : '' %>">
         <div class="screen-image"></div>
         <div class="screen-overlay"></div>
         <div class="screen-content">
@@ -267,7 +249,7 @@
             </button>
             <% } else if (Number(userDetails.abonnement_id)===2) { %>
               <button class="custom_butt" disabled>
-                Vous avez déjà cet abonnement
+                Abonnement actuel
               </button>
               <% } else { %>
                 <button onclick="goToPayment(19.47, 'Premium')" class="custom_butt">Changer de plan</button>
@@ -275,7 +257,7 @@
         </div>
       </div>
 
-      <div class="screen">
+      <div class="screen <%= userDetails && Number(userDetails.abonnement_id) === 3 ? 'flashy-border' : '' %>">
         <div class="screen-image"></div>
         <div class="screen-overlay"></div>
         <div class="screen-content">
@@ -291,20 +273,25 @@
               Connectez-vous
             </button>
             <% } else if (Number(userDetails.abonnement_id)===3) { %>
-              <button class="custom_butt" disabled>
-                Vous avez déjà cet abonnement
+              Abonnement actuel
               </button>
               <% } else { %>
                 <button onclick="goToPayment(25.47, 'Diamant')" class="custom_butt">Changer de plan</button>
                 <% } %>
         </div>
       </div>
+
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/crypto-js@4.0.0/crypto-js.min.js"></script>
 
     <script>
+
       function goToPayment(price, subscriptionType) {
-        window.location.href = `/event/payment?amount=${price}&subscriptionType=${subscriptionType}`;
+        const baseUrl = `/event/payment?amount=${price}&subscriptionType=${subscriptionType}`;
+        const hashedUrl = CryptoJS.SHA256(baseUrl).toString();
+        window.location.href = `${baseUrl}&hash=${hashedUrl}`;
       }
+
 
       const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789€";
       let intervals = [];
@@ -370,7 +357,7 @@
           .then(response => response.json())
           .then(data => {
             if (data.success) {
-              window.location.reload(); // Refresh the page to update the button state
+              window.location.reload();
             } else {
               alert('Erreur lors du changement de plan');
             }
@@ -383,7 +370,6 @@
         const confirmation = confirm('Êtes-vous sûr de vouloir changer de plan? Votre plan actuel se terminera maintenant.');
 
         if (confirmation) {
-          // Proceed with the plan change
           changePlan(subscriptionId);
         }
       }
