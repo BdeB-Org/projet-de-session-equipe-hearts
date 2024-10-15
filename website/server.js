@@ -35,8 +35,13 @@ app.use(express.static(path.join(__dirname, 'css')));
 app.use('/js', express.static(path.join(__dirname, 'js')));
 app.use('/images', express.static(path.join(__dirname, '/website/images')));
 
+app.use('/uploads', express.static(path.join(__dirname, '/website/uploads')));
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
 app.use(express.urlencoded({ extended: true })); // For parsing application/x-www-form-urlencoded
 app.use(express.json()); // For parsing application/json
+
+
 
 /*
 ------------------------------------------
@@ -734,23 +739,42 @@ app.post('/event/delete-account', (req, res) => {
 
 
 /*
-  Inscrire a un compte
+/*
+  Inscrire à un compte
 */
-
-
 
 import multer from 'multer';
 
-// Set up multer for file uploads
-const upload = multer({ dest: 'uploads/' }); // or configure as needed for file storage
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, path.join(__dirname, '/uploads')); // Specify uploads folder
+    },
+    filename: (req, file, cb) => {
+        const ext = path.extname(file.originalname); // Get the file extension
+        cb(null, `${file.fieldname}-${Date.now()}${ext}`); // Use the original file extension
+    }
+});
 
-// Use multer in the POST route
+// Set up multer for file uploads
+const upload = multer({
+    storage: storage,
+    fileFilter: (req, file, cb) => {
+        const filetypes = /jpeg|jpg|png|gif/; // Acceptable file types
+        const mimetype = filetypes.test(file.mimetype);
+        const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
+
+        if (mimetype && extname) {
+            return cb(null, true);
+        } else {
+            cb('Error: Images Only!'); // Reject non-image files
+        }
+    }
+});
+
 app.post('/event/inscription', upload.single('photo'), (req, res) => {
     const { email, password, phone, firstName, lastName, birthdate } = req.body;
 
-    // Debug: print the request body and file
-    console.log(req.body);  // Should now show form values
-    console.log(req.file);  // Shows file details if a photo was uploaded
+    const uploadedPhoto = req.file ? req.file.filename : null; // Get the filename
 
     // Check if email already exists
     const checkEmailQuery = "SELECT * FROM e_utilisateur WHERE e_courriel = ?";
@@ -766,23 +790,42 @@ app.post('/event/inscription', upload.single('photo'), (req, res) => {
 
         // If email does not exist, insert new user
         const insertUserQuery = `
-            INSERT INTO e_utilisateur (e_nom, e_prenom, date_naissance, e_courriel, e_photo, e_location, e_number, e_password)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            INSERT INTO e_utilisateur (e_nom, e_prenom, date_naissance, e_courriel, e_photo, e_location, e_number, e_password, abonnement_id)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
         `;
 
-        const defaultLocation = 'Unknown';  // Replace with location handling if needed
-        const uploadedPhoto = req.file ? req.file.filename : null; // Save the file path if photo was uploaded
+        const defaultLocation = 'Unknown'; // Default location
 
-        con.query(insertUserQuery, [lastName, firstName, birthdate, email, uploadedPhoto, defaultLocation, phone, password], (err, result) => {
+        con.query(insertUserQuery, [lastName, firstName, birthdate, email, uploadedPhoto, defaultLocation, phone, password, 1], (err, result) => {
             if (err) {
                 console.error("Error inserting user:", err);
                 return res.status(500).send("Internal Server Error");
             }
 
-            console.log("New user inserted:", result);
-            req.session.user = { email, firstName, lastName }; // Set session for the new user
-            res.redirect('/');
+            // Set session user correctly with the uploaded photo filename
+            req.session.user = {
+                email,
+                firstName,
+                lastName,
+                e_photo: uploadedPhoto // Store the filename here
+            };
+
+            res.redirect('/'); // Redirect after successful registration
         });
     });
 });
 
+app.get('/uploads/:filename', (req, res) => {
+    const options = {
+        root: path.join(__dirname, 'website/uploads'),
+        headers: {
+            'Content-Type': 'image/png', // Change this based on the file type if needed
+        }
+    };
+
+    res.sendFile(req.params.filename, options, (err) => {
+        if (err) {
+            res.status(err.status).end();
+        }
+    });
+});
