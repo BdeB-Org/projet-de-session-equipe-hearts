@@ -19,7 +19,7 @@ npm install googleApis
 npm install node-cron
 
 
-try: npm install multer dotenv square nodemailer googleapis node-cron
+try: npm install multer dotenv square nodemailer googleapis node-cron crypto-js
 
 
 CREATE DATABASE myhearts;
