@@ -32,3 +32,77 @@ function redirectAccueil(event) {
     window.location.href = "/";
     console.log("Rediriction finie");
 }
+
+particlesJS("particles-js", {
+    "particles": {
+        "number": {
+            "value": 120,
+            "density": {
+                "enable": true,
+                "value_area": 800
+            }
+        },
+        "color": {
+            "value": "#ff00ff" // Neon yellow for particles
+        },
+        "shape": {
+            "type": "circle",
+        },
+        "opacity": {
+            "value": 0.7,
+            "random": true,
+            "anim": {
+                "enable": false
+            }
+        },
+        "size": {
+            "value": 4,
+            "random": true,
+            "anim": {
+                "enable": false
+            }
+        },
+        "line_linked": {
+            "enable": true,
+            "distance": 200,
+            "color": "#ffcc00", // Neon pink for the connecting lines
+            "opacity": 0.5,
+            "width": 1.5
+        },
+        "move": {
+            "bounce": true,
+            "enable": true,
+            "speed": 1,
+            "out_mode": "out"
+        }
+    },
+    "interactivity": {
+        "detect_on": "window",
+        "events": {
+            "onhover": {
+                "enable": true,
+                "mode": "repulse"
+            },
+            "resize": {
+                "enable": true,
+                "density_auto": true,
+                "density_area": 800
+            }
+        },
+        "modes": {
+            "repulse": {
+                "distance": 100,
+                "duration": 0.4
+            }
+        }
+    },
+    "retina_detect": true
+});
+
+
+window.addEventListener("focus", () => {
+    if (pJSDom && pJSDom[0] && pJSDom[0].pJS) {
+        pJSDom[0].pJS.fn.particlesRefresh();
+    }
+});
+

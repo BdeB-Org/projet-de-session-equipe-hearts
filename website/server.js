@@ -42,6 +42,25 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use(express.urlencoded({ extended: true })); // For parsing application/x-www-form-urlencoded
 app.use(express.json()); // For parsing application/json
 
+app.use('/cyberpunk-css-main', express.static(path.join(__dirname, 'cyberpunk-css-main')));
+console.log('Serving static files from:', path.join(__dirname, 'cyberpunk-css-main'));
+
+// Serve the cyberpunk CSS with the correct MIME type
+app.get('/cyberpunk-css-main/cyberpunk.css', (req, res) => {
+    const options = {
+        root: path.join(__dirname, 'cyberpunk-css-main'),
+        headers: {
+            'Content-Type': 'text/css', // Explicitly set the correct MIME type
+        }
+    };
+
+    res.sendFile('cyberpunk.css', options, (err) => {
+        if (err) {
+            console.error('Error serving CSS file:', err);
+            res.status(err.status).end();
+        }
+    });
+});
 
 
 /*

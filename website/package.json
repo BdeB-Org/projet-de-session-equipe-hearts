@@ -26,6 +26,6 @@
     "node-cron": "^3.0.3",
     "nodemailer": "^6.9.15",
     "pdfkit": "^0.15.0",
-    "square": "^38.1.0"
+    "square": "^38.2.0"
   }
 }

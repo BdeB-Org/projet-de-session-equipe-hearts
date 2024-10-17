@@ -14,6 +14,7 @@ body {
     height: 100vh;
 }
 
+
 .container {
     background: linear-gradient(135deg, #fff 50%, #FF66FF 50%);
     /* Smooth blend from white to pink */
@@ -43,20 +44,22 @@ body {
 }
 
 .container span {
-    font-size: 11.5px;
-    color: #fff;
+    font-size: 12px;
+    color: #ffcc00;
 }
 
 .container a {
-    color: #fff;
+    color: #FF66FF;
     font-size: 13px;
     text-decoration: none;
     margin: 15px 0 10px;
 }
 
-.mdp_button {
+.container .mdp_button {
     position: relative;
+    color: #ffcc00 !important;
     transition: color 0.3s ease;
+    text-decoration: none;
 }
 
 .mdp_button:before {
@@ -66,16 +69,20 @@ body {
     height: 2px;
     bottom: -2px;
     left: 0;
-    background-color: #FFA3AC;
+    background-color: #ffcc00;
+    /* Neon pink underline */
     transition: width 0.3s ease;
 }
 
 .mdp_button:hover {
-    color: #FFA3AC;
+    color: #ffcc00;
+    /* Slightly lighter pink on hover for a soft effect */
 }
 
 .mdp_button:hover:before {
     width: 100%;
+    background-color: #ffcc00;
+    /* Lighter pink underline on hover */
 }
 
 .container button {
@@ -110,7 +117,7 @@ body {
 }
 
 .container form {
-    background-color: #fff;
+    background-color: #000000;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -123,8 +130,7 @@ body {
 }
 
 .container input {
-    background: linear-gradient(90deg, #FA68AC 15%, #2E0249 75%);
-    /* Light to dark gradient */
+    /* background: linear-gradient(90deg, #FF9BD6 15%, #B25EFF 75%); */
     border: none;
     margin: 8px 0;
     padding: 10px 15px;
@@ -132,25 +138,28 @@ body {
     border-radius: 8px;
     width: 100%;
     outline: none;
-    color: #fff;
+
     transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
     box-shadow: 0px 4px 10px rgba(255, 102, 255, 0.5);
     /* Added shadow box */
 }
 
 .container input:focus {
-    border: 2px solid #FF66FF;
+    /* border: 2px solid #FF66FF;
     box-shadow: 0px 0px 8px rgba(255, 102, 255, 0.75);
     transform: scale(1.02);
-    color: #FF66FF;
+    color: #FF66FF; */
+    color: black;
 }
 
 .container input::placeholder {
-    color: #888;
+    /* color: #888; */
+    color: #000000; 
 }
 
 .container input:focus::placeholder {
-    color: #FFB3BB;
+    /* color: #FFB3BB; */
+    color: #000000;
 }
 
 .form-container {
@@ -205,7 +214,7 @@ body {
 
 .social-icons a {
     border: 1px solid #FF66FF;
-    color: #FF66FF;
+    color: #ffcc00;
     /* Neon pink */
     border-radius: 50%;
     display: inline-flex;
@@ -222,7 +231,8 @@ body {
 
 .social-icons a:hover {
     color: #fff;
-    background-color: #FF66FF;
+    background-color: #ffcc00;
+    border: 0px;
     /* Pink background on hover */
     transform: translateY(-3px);
     opacity: 0.8;
@@ -295,4 +305,32 @@ body {
     font-size: 0.9em;
     display: none;
     margin-top: 5px;
+}
+
+#particles-js {
+    position: absolute;
+    /* Change to absolute for easier layering */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    z-index: 0;
+    /* Lower z-index to place it under everything */
+}
+
+.container-wrapper {
+    position: relative;
+    z-index: 2;
+    /* Keep container above particles */
+}
+
+nav,
+.navbar {
+    position: relative;
+    z-index: 3;
+    /* Ensure navbar is always on top */
+}
+
+.container h1 {
+    color: #ffcc00;
 }
