@@ -19,7 +19,7 @@ npm install googleApis
 npm install node-cron
 
 
-try: npm install multer dotenv square nodemailer googleapis node-cron
+try: npm install multer dotenv square nodemailer googleapis node-cron crypto-js
 
 
 CREATE DATABASE myhearts;
@@ -44,7 +44,7 @@ CREATE TABLE e_utilisateur (
     e_password VARCHAR(255),
     abonnement_id VARCHAR(255),
     swipe_count INT DEFAULT 0,
-    last_swipe_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP.
+    last_swipe_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (e_id)
 );
 
