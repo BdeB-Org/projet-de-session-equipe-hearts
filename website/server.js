@@ -84,9 +84,8 @@ oauth2Client.setCredentials({
 // Retrieve the access token
 try {
     const accessToken = await oauth2Client.getAccessToken();
-    console.log('Access Token:', accessToken.token); // Log the access token
+    console.log('Access Token:', accessToken.token);
 
-    // Create the Nodemailer transporter
     transporter = nodemailer.createTransport({
         service: 'gmail',
         auth: {
@@ -95,7 +94,7 @@ try {
             clientId: process.env.CLIENT_ID,
             clientSecret: process.env.CLIENT_SECRET,
             refreshToken: process.env.REFRESH_TOKEN,
-            accessToken: accessToken.token, // Use accessToken.token
+            accessToken: accessToken.token,
         },
     });
 
