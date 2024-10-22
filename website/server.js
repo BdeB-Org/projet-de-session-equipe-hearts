@@ -250,6 +250,14 @@ app.get("/", function (req, res) {
     });
 });
 
+app.get("/event/error", function (req, res) {
+    res.render("pages/error", {
+        siteTitle: "Index",
+        pageTitle: "index",
+        userDetails: req.session.user,
+    });
+});
+
 app.get("/event/inscription", function (req, res) {
     res.render("pages/inscription", {
         siteTitle: "Connexion",
@@ -302,7 +310,7 @@ app.get("/event/payment", (req, res) => {
 
     // Compare the client-provided hash with the server-generated one
     if (hash !== generatedHash) {
-        return res.status(400).send("Invalid payment link.");
+        return res.redirect("/event/error");
     }
 
     // Log for debugging
@@ -311,7 +319,7 @@ app.get("/event/payment", (req, res) => {
 
     // Validate the hash
     if (hash !== generatedHash) {
-        return res.status(400).send("Invalid payment link.");
+        return res.redirect("/event/error");
     }
 
     // Continue processing if hash is valid

@@ -1,0 +1,70 @@
+<%- include ("../partials/header.ejs") %>
+    <style>
+        body {
+            height: 100vh;
+            margin: 0;
+            padding: 0;
+            font-family: "Orbitron", sans-serif;
+            color: white;
+            background-color: #000000;
+            overflow: hidden;
+            text-align: center;
+            /* Center text */
+            line-height: 1.5;
+            /* Improve readability */
+        }
+
+        .container {
+            background: rgba(255, 20, 147, 0.9);
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(10px);
+            transition: transform 0.3s ease-in-out;
+            max-width: 80%;
+            margin: auto;
+            /* Center the container */
+            margin-top: calc(50vh - 200px);
+            /* Center vertically */
+            position: relative;
+            /* Ensure the container can be positioned correctly */
+        }
+
+        h1 {
+            font-size: 36px;
+            /* Slightly larger font size */
+            margin-bottom: 20px;
+            text-shadow: 3px 3px 8px rgba(0, 0, 0, 0.6);
+        }
+
+        p {
+            font-size: 20px;
+            margin-bottom: 30px;
+            text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.5);
+        }
+
+        a {
+            color: #fff;
+            /* White link color */
+            text-decoration: underline;
+            /* Underline for emphasis */
+        }
+
+        a:hover {
+            color: #ff1493;
+            /* Highlight color on hover */
+            transition: color 0.3s;
+            /* Smooth transition */
+        }
+    </style>
+
+    <body>
+        <div class="container">
+            <h1>La page que vous cherchez ne peut pas être trouvée.</h1>
+            <p>Il semble que la page que vous recherchez n'existe pas. Peut-être que vous pouvez retourner à la
+                <a href="/">page d'accueil</a> ?
+            </p>
+        </div>
+    </body>
+
+    <%- include("../partials/footer.ejs") %>
