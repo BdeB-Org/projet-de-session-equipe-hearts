@@ -839,7 +839,6 @@ const upload = multer({
 
 app.post('/event/inscription', upload.single('photo'), (req, res) => {
     const { email, password, phone, firstName, lastName, birthdate } = req.body;
-
     const uploadedPhoto = req.file ? req.file.filename : null; // Get the filename
 
     // Check if email already exists
@@ -847,11 +846,11 @@ app.post('/event/inscription', upload.single('photo'), (req, res) => {
     con.query(checkEmailQuery, [email], (err, result) => {
         if (err) {
             console.error("Error checking email:", err);
-            return res.status(500).send("Internal Server Error");
+            return res.status(500).send("Erreur interne du serveur");
         }
 
         if (result.length > 0) {
-            return res.status(409).send("Email already in use");
+            return res.status(409).send("Email déjà utilisé");
         }
 
         // If email does not exist, insert new user
@@ -860,12 +859,12 @@ app.post('/event/inscription', upload.single('photo'), (req, res) => {
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
         `;
 
-        const defaultLocation = 'Unknown'; // Default location
+        const defaultLocation = 'Inconnu'; // Default location
 
         con.query(insertUserQuery, [lastName, firstName, birthdate, email, uploadedPhoto, defaultLocation, phone, password, 1], (err, result) => {
             if (err) {
                 console.error("Error inserting user:", err);
-                return res.status(500).send("Internal Server Error");
+                return res.status(500).send("Erreur interne du serveur");
             }
 
             // Set session user correctly with the uploaded photo filename
@@ -881,6 +880,7 @@ app.post('/event/inscription', upload.single('photo'), (req, res) => {
     });
 });
 
+
 app.get('/uploads/:filename', (req, res) => {
     const options = {
         root: path.join(__dirname, 'website/uploads'),
@@ -893,5 +893,60 @@ app.get('/uploads/:filename', (req, res) => {
         if (err) {
             res.status(err.status).end();
         }
+    });
+});
+
+app.post('/event/update-profile', (req, res) => {
+    const { new_firstName, new_lastName, new_email } = req.body;
+    const userId = req.session.user.e_id;
+
+    if (!userId) {
+        return res.json({ success: false, message: "Utilisateur non connecté" });
+    }
+
+    const updateProfileQuery = `
+        UPDATE e_utilisateur 
+        SET e_prenom = ?, e_nom = ?, e_courriel = ? 
+        WHERE e_id = ?;
+    `;
+
+    con.query(updateProfileQuery, [new_firstName, new_lastName, new_email, userId], (err, result) => {
+        if (err) {
+            console.error("Error updating profile:", err);
+            return res.json({ success: false, message: "Erreur lors de la mise à jour du profil dans la base de données." });
+        }
+
+        // Mettez à jour les informations de la session pour refléter les nouvelles données
+        req.session.user.e_prenom = new_firstName;
+        req.session.user.e_nom = new_lastName;
+        req.session.user.e_courriel = new_email;
+
+        res.json({ success: true, message: "Profil mis à jour avec succès." });
+    });
+});
+
+
+
+
+app.get("/event/profil", function (req, res) {
+    if (!req.session.user) {
+        return res.redirect("/event/inscription");
+    }
+
+    const subscriptionNames = {
+        1: "Basique",
+        2: "Premium",
+        3: "Diamant"
+    };
+
+    const userSubscriptionName = subscriptionNames[req.session.user.abonnement_id] || 'Aucun abonnement actif';
+
+    res.render("pages/profil", {
+        siteTitle: "Profil",
+        pageTitle: "Votre Profil",
+        userDetails: req.session.user,
+        subscriptionName: userSubscriptionName,
+        message: null,
+        messageType: ''
     });
 });

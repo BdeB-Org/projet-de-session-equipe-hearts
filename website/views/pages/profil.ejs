@@ -251,6 +251,45 @@
             object-fit: cover;
             z-index: -1;
         }
+
+        .edit-profile {
+    margin-top: 1.5rem;
+    padding: 1.5rem;
+    background: #333;
+    border-radius: 10px;
+    text-align: center;
+    color: #ffffff;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+}
+
+.edit-profile form div {
+    margin-bottom: 0.75rem;
+}
+
+.edit-profile input {
+    width: 90%;
+    padding: 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 1rem;
+    background-color: #222;
+    color: #ffffff;
+}
+
+.edit-profile button {
+    padding: 0.75rem;
+    background-color: #e04e2e;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.edit-profile button:hover {
+    background-color: #ff5c33;
+}
+
     </style>
 
     <body>
@@ -280,18 +319,23 @@
                         <% } %>
                 </div>
 
-                <div class="profile-details">
-                    <p><strong>
-                            <%= userDetails.e_nom %>
-                        </strong></p>
-                    <p><strong>
-                            <%= userDetails.e_prenom %>
-                        </strong></p>
-                    <p><strong>
-                            <%= userDetails.e_courriel %>
-                        </strong></p>
-                    <p><strong>Mot de passe : ••••••••</strong></p> <!-- Masked password -->
+                <div class="edit-profile">
+                    <h3>Modifier les informations du profil</h3>
+                    <form id="update-profile-form">
+                        <div>
+                            <input type="text" name="new_firstName" value="<%= userDetails.e_prenom %>" placeholder="Prénom" required>
+                        </div>
+                        <div>
+                            <input type="text" name="new_lastName" value="<%= userDetails.e_nom %>" placeholder="Nom" required>
+                        </div>
+                        <div>
+                            <input type="email" name="new_email" value="<%= userDetails.e_courriel %>" placeholder="Email" required>
+                        </div>
+                        <button type="submit">Mettre à jour le profil</button>
+                    </form>
                 </div>
+                
+                
 
                 <!-- Change Password Section -->
                 <div class="change-password">
@@ -348,6 +392,39 @@
                 profileContainer.classList.add('active');
             }, 100);
         });
+        document.getElementById("update-profile-form").addEventListener("submit", function (event) {
+    event.preventDefault(); // Empêche la soumission par défaut du formulaire
 
+    const formData = new FormData(this);
+
+    fetch("/event/update-profile", {
+        method: "POST",
+        body: new URLSearchParams(formData), // Formate les données pour un POST
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded"
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Mettre à jour les informations affichées sur la page
+            document.querySelector("#user-prenom").textContent = formData.get("new_firstName");
+            document.querySelector("#user-nom").textContent = formData.get("new_lastName");
+            document.querySelector(".profile-details strong:nth-child(1)").textContent = formData.get("new_lastName");
+            document.querySelector(".profile-details strong:nth-child(2)").textContent = formData.get("new_firstName");
+            document.querySelector(".profile-details strong:nth-child(3)").textContent = formData.get("new_email");
+
+            // Ajouter un délai pour montrer un message, puis actualiser la page
+            setTimeout(() => {
+                location.reload(); // Actualise la page pour afficher les nouvelles données
+            }, 500);
+
+            alert(data.message);
+        } else {
+            alert(data.message); // Afficher le message d'erreur renvoyé par le serveur
+        }
+    })
+    
+});
 
     </script>
