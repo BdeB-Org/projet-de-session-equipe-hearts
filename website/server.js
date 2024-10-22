@@ -70,22 +70,23 @@ PTSD NODE MAILER
 */
 
 let transporter;
-
 const oauth2Client = new google.auth.OAuth2(
     process.env.CLIENT_ID,
     process.env.CLIENT_SECRET,
-    process.env.REDIRECT_UR
+    process.env.REDIRECT_URI
 );
 
-// Set the credentials, using the refresh token from your .env file
+// Set the credentials
 oauth2Client.setCredentials({
     refresh_token: process.env.REFRESH_TOKEN
 });
 
-console.log(process.env.REFRESH_TOKEN);
-
+// Retrieve the access token
 try {
     const accessToken = await oauth2Client.getAccessToken();
+    console.log('Access Token:', accessToken.token); // Log the access token
+
+    // Create the Nodemailer transporter
     transporter = nodemailer.createTransport({
         service: 'gmail',
         auth: {
@@ -94,16 +95,14 @@ try {
             clientId: process.env.CLIENT_ID,
             clientSecret: process.env.CLIENT_SECRET,
             refreshToken: process.env.REFRESH_TOKEN,
-            accessToken: accessToken.token, // Use accessToken.token instead of accessToken
+            accessToken: accessToken.token, // Use accessToken.token
         },
     });
 
-    // The transporter is now ready for use, and you can send emails later in your code
     console.log('Nodemailer transporter is set up and ready to use.');
 
 } catch (error) {
     console.error('Error setting up email transporter:', error);
-    // Handle the error appropriately, such as sending a response back to the client
 }
 
 /*
