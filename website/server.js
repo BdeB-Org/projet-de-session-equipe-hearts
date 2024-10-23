@@ -16,6 +16,9 @@ import cron from 'node-cron';
 import crypto from 'crypto';
 import passport from 'passport';
 import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
+import FacebookStrategy from 'passport-facebook';
+import TwitterStrategy from 'passport-twitter';
+import AppleStrategy from 'passport-apple';
 
 import fs from 'fs';
 
@@ -276,15 +279,15 @@ app.get('/auth/google', (req, res, next) => {
 
 passport.serializeUser((user, done) => {
     console.log('Serializing user:', user);
-    done(null, user.googleId); // Serialize using googleId
+    done(null, user.googleId);
 });
 
 passport.deserializeUser((id, done) => {
     console.log('Deserializing user with ID:', id);
-    const query = 'SELECT * FROM e_utilisateur WHERE googleId = ?'; // Query using googleId
+    const query = 'SELECT * FROM e_utilisateur WHERE googleId = ?';
     con.query(query, [id], (err, results) => {
         if (err) return done(err);
-        done(null, results[0]); // Pass the user object to the next middleware
+        done(null, results[0]);
     });
 });
 
@@ -295,12 +298,115 @@ app.get('/auth/google/callback', passport.authenticate('google', {
     res.redirect('/');
 });
 
+/*
+------------------------------------------
+    Connect to FACEBOOK
+------------------------------------------
+*/
+
+passport.use(new FacebookStrategy({
+    clientID: process.env.FACEBOOK_APP_ID,
+    clientSecret: process.env.FACEBOOK_APP_SECRET,
+    callbackURL: '/auth/facebook/callback',
+    profileFields: ['id', 'displayName', 'emails', 'photos']
+}, (accessToken, refreshToken, profile, done) => {
+    const user = {
+        facebookId: profile.id,
+        name: profile.displayName,
+        email: profile.emails[0].value,
+        photo: profile.photos[0].value
+    };
+
+    const query = `
+        INSERT INTO e_utilisateur (facebookId, e_nom, e_prenom, e_courriel, e_photo) 
+        VALUES (?, ?, ?, ?, ?) 
+        ON DUPLICATE KEY UPDATE e_nom = ?, e_prenom = ?, e_photo = ?
+    `;
+    con.query(query, [user.facebookId, user.name.split(' ')[0], user.name.split(' ')[1], user.email, user.photo, user.name.split(' ')[0], user.name.split(' ')[1], user.photo], (err) => {
+        if (err) return done(err);
+        return done(null, user);
+    });
+}));
+
+app.get('/auth/facebook', passport.authenticate('facebook', { scope: ['email'] }));
+app.get('/auth/facebook/callback', passport.authenticate('facebook', { failureRedirect: '/event/inscription' }), (req, res) => {
+    res.redirect('/');
+});
 
 /*
 ------------------------------------------
-    Pages gets
+    Connect to Twitter
 ------------------------------------------
 */
+
+passport.use(new TwitterStrategy({
+    consumerKey: process.env.TWITTER_CONSUMER_KEY,
+    consumerSecret: process.env.TWITTER_CONSUMER_SECRET,
+    callbackURL: '/auth/twitter/callback'
+}, (token, tokenSecret, profile, done) => {
+    const user = {
+        twitterId: profile.id,
+        name: profile.displayName,
+        photo: profile.photos[0].value
+    };
+
+    const query = `
+        INSERT INTO e_utilisateur (twitterId, e_nom, e_courriel, e_photo) 
+        VALUES (?, ?, ?, ?) 
+        ON DUPLICATE KEY UPDATE e_nom = ?, e_photo = ?
+    `;
+    con.query(query, [user.twitterId, user.name.split(' ')[0], user.email, user.photo, user.name.split(' ')[0], user.photo], (err) => {
+        if (err) return done(err);
+        return done(null, user);
+    });
+}));
+
+app.get('/auth/twitter', passport.authenticate('twitter'));
+app.get('/auth/twitter/callback', passport.authenticate('twitter', { failureRedirect: '/event/inscription' }), (req, res) => {
+    res.redirect('/');
+});
+
+/*
+------------------------------------------
+    Connect to Apple
+------------------------------------------
+*/
+
+passport.use(new AppleStrategy({
+    clientID: process.env.APPLE_CLIENT_ID,
+    teamID: process.env.APPLE_TEAM_ID,
+    keyID: process.env.APPLE_KEY_ID,
+    privateKey: process.env.APPLE_PRIVATE_KEY,
+    callbackURL: '/auth/apple/callback'
+}, (accessToken, refreshToken, idToken, profile, done) => {
+    const user = {
+        appleId: profile.id,
+        email: profile.email
+    };
+
+    const query = `
+        INSERT INTO e_utilisateur (appleId, e_courriel) 
+        VALUES (?, ?) 
+        ON DUPLICATE KEY UPDATE e_courriel = ?
+    `;
+    con.query(query, [user.appleId, user.email, user.email], (err) => {
+        if (err) return done(err);
+        return done(null, user);
+    });
+}));
+
+app.get('/auth/apple', passport.authenticate('apple'));
+app.get('/auth/apple/callback', passport.authenticate('apple', { failureRedirect: '/event/inscription' }), (req, res) => {
+    res.redirect('/');
+});
+
+/*
+------------------------------------------
+    APP GETS
+------------------------------------------
+*/
+
+
 
 app.get("/", function (req, res) {
     res.render("pages/accueil", {
