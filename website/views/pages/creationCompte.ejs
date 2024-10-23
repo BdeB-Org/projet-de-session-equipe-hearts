@@ -26,7 +26,7 @@
                     <form onsubmit="redirectInscription(event)">
                         <h1>Créer un compte</h1>
                         <div class="social-icons">
-                            <a href="#" class="icons"><i class="fa-brands fa-google"></i></a>
+                            <a href="/auth/google" class="icons"><i class="fa-brands fa-google"></i></a>
                             <a href="#" class="icons"><i class="fa-brands fa-facebook"></i></a>
                             <a href="#" class="icons"><i class="fa-brands fa-apple"></i></a>
                             <a href="#" class="icons"><i class="fa-brands fa-twitter"></i></a>
@@ -55,7 +55,9 @@
                     <form method="post" action="/event/connect">
                         <h1>Se Connecter</h1>
                         <div class="social-icons">
-                            <a href="#" class="icons"><i class="fa-brands fa-google"></i></a>
+                            <a href="javascript:void(0)" class="icons" onclick="loginWithGoogle()">
+                                <i class="fa-brands fa-google"></i>
+                            </a>
                             <a href="#" class="icons"><i class="fa-brands fa-facebook"></i></a>
                             <a href="#" class="icons"><i class="fa-brands fa-apple"></i></a>
                             <a href="#" class="icons"><i class="fa-brands fa-twitter"></i></a>

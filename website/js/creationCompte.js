@@ -106,3 +106,14 @@ window.addEventListener("focus", () => {
     }
 });
 
+function loginWithGoogle() {
+    const width = 600; // Width of the popup
+    const height = 600; // Height of the popup
+    const left = (window.innerWidth / 2) - (width / 2);
+    const top = (window.innerHeight / 2) - (height / 2);
+    const options = `width=${width},height=${height},top=${top},left=${left}`;
+    const googleAuthUrl = '/auth/google';
+
+    window.open(googleAuthUrl, 'Google Login', options);
+}
+

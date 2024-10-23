@@ -14,6 +14,8 @@ import PDFDocument from 'pdfkit';
 import { PassThrough } from 'stream';
 import cron from 'node-cron';
 import crypto from 'crypto';
+import passport from 'passport';
+import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
 
 import fs from 'fs';
 
@@ -43,7 +45,8 @@ app.use(express.urlencoded({ extended: true })); // For parsing application/x-ww
 app.use(express.json()); // For parsing application/json
 
 app.use('/cyberpunk-css-main', express.static(path.join(__dirname, 'cyberpunk-css-main')));
-console.log('Serving static files from:', path.join(__dirname, 'cyberpunk-css-main'));
+
+
 
 // Serve the cyberpunk CSS with the correct MIME type
 app.get('/cyberpunk-css-main/cyberpunk.css', (req, res) => {
@@ -104,6 +107,8 @@ try {
     console.error('Error setting up email transporter:', error);
 }
 
+
+
 /*
 ------------------------------------------
     Connect to server
@@ -136,12 +141,15 @@ app.use(session({
     cookie: { secure: false }
 }));
 
+app.use(passport.initialize());
+app.use(passport.session());
 
 con.connect(function (err) {
     if (err) throw err;
     console.log("connected!");
     initializeSubscriptions();
 });
+
 /*
 ------------------------------------------
     Crypting
@@ -234,6 +242,58 @@ const initializeSubscriptions = () => {
         });
     });
 };
+
+/*
+------------------------------------------
+    Connect to GOOGLE FEUGH
+------------------------------------------
+*/
+
+passport.use(new GoogleStrategy({
+    clientID: process.env.GOOGLE_CLIENT_ID,
+    clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+    callbackURL: '/auth/google/callback'
+}, (accessToken, refreshToken, profile, done) => {
+    const user = {
+        googleId: profile.id,
+        name: profile.displayName,
+        email: profile.emails[0].value,
+    };
+    const query = 'INSERT INTO e_utilisateur (googleId, e_nom, e_prenom, e_courriel) VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE e_nom = ?, e_prenom = ?';
+    con.query(query, [user.googleId, user.name.split(' ')[0], user.name.split(' ')[1], user.email, user.name.split(' ')[0], user.name.split(' ')[1]], (err) => {
+        if (err) return done(err);
+        return done(null, user);
+    });
+}));
+
+
+app.get('/auth/google', (req, res, next) => {
+    console.log("Google Auth Route Hit");
+    passport.authenticate('google', {
+        scope: ['profile', 'email']
+    })(req, res, next);
+});
+
+passport.serializeUser((user, done) => {
+    console.log('Serializing user:', user);
+    done(null, user.googleId); // Serialize using googleId
+});
+
+passport.deserializeUser((id, done) => {
+    console.log('Deserializing user with ID:', id);
+    const query = 'SELECT * FROM e_utilisateur WHERE googleId = ?'; // Query using googleId
+    con.query(query, [id], (err, results) => {
+        if (err) return done(err);
+        done(null, results[0]); // Pass the user object to the next middleware
+    });
+});
+
+
+app.get('/auth/google/callback', passport.authenticate('google', {
+    failureRedirect: '/event/inscription'
+}), (req, res) => {
+    res.redirect('/');
+});
 
 
 /*
@@ -694,28 +754,18 @@ app.post('/event/change-plan', (req, res) => {
 /*
   Changer le mot de passe
 */
-
-
 app.post('/event/change-password', async (req, res) => {
     const { old_password, new_password, confirm_password } = req.body;
     const userId = req.session.user.e_id; // Assuming user ID is stored in session
 
     // Ensure all fields are provided
     if (!old_password || !new_password || !confirm_password) {
-        return res.render('pages/profil', {
-            userDetails: req.session.user,
-            message: 'Tous les champs sont requis',
-            messageType: 'error'
-        });
+        return res.json({ success: false, message: 'Tous les champs sont requis' });
     }
 
     // Check if new password and confirmation match
     if (new_password !== confirm_password) {
-        return res.render('pages/profil', {
-            userDetails: req.session.user,
-            message: 'Les mots de passe ne correspondent pas',
-            messageType: 'error'
-        });
+        return res.json({ success: false, message: 'Les mots de passe ne correspondent pas' });
     }
 
     try {
@@ -724,30 +774,18 @@ app.post('/event/change-password', async (req, res) => {
         con.query(query, [userId], async (err, result) => {
             if (err) {
                 console.error('Error fetching user:', err);
-                return res.render('pages/profil', {
-                    userDetails: req.session.user,
-                    message: 'Erreur serveur. Veuillez réessayer.',
-                    messageType: 'error'
-                });
+                return res.json({ success: false, message: 'Erreur serveur. Veuillez réessayer.' });
             }
 
             if (result.length === 0) {
-                return res.render('pages/profil', {
-                    userDetails: req.session.user,
-                    message: 'Utilisateur non trouvé',
-                    messageType: 'error'
-                });
+                return res.json({ success: false, message: 'Utilisateur non trouvé' });
             }
 
             const user = result[0];
 
-            // Compare the current password directly (for plain-text passwords)
+            // Compare the current password with the provided old password
             if (old_password !== user.e_password) {
-                return res.render('pages/profil', {
-                    userDetails: req.session.user,
-                    message: 'Le mot de passe actuel est incorrect',
-                    messageType: 'error'
-                });
+                return res.json({ success: false, message: 'Le mot de passe actuel est incorrect' });
             }
 
             // Update the password in the database
@@ -755,30 +793,19 @@ app.post('/event/change-password', async (req, res) => {
             con.query(updateQuery, [new_password, userId], (err, result) => {
                 if (err) {
                     console.error('Error updating password:', err);
-                    return res.render('pages/profil', {
-                        userDetails: req.session.user,
-                        message: 'Erreur lors de la mise à jour du mot de passe',
-                        messageType: 'error'
-                    });
+                    return res.json({ success: false, message: 'Erreur lors de la mise à jour du mot de passe' });
                 }
 
-                // Update successful
-                return res.render('pages/profil', {
-                    userDetails: req.session.user,
-                    message: 'Le mot de passe a bien été changé',
-                    messageType: 'success'
-                });
+                return res.json({ success: true, message: 'Le mot de passe a bien été changé' });
             });
         });
     } catch (error) {
         console.error('Error processing password change:', error);
-        return res.render('pages/profil', {
-            userDetails: req.session.user,
-            message: 'Erreur interne. Veuillez réessayer plus tard.',
-            messageType: 'error'
-        });
+        return res.json({ success: false, message: 'Erreur interne. Veuillez réessayer plus tard.' });
     }
 });
+
+
 
 /*
   Delete un compte
