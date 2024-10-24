@@ -10,17 +10,11 @@
 9. Ouvrez http://localhost:4000/ dans votre navigateur web.
 10. Ajoutez les modules nodes suivants :
 
-npm install
-npm install multer
-npm install dotenv
-npm install square
-npm install nodemailer
-npm install googleApis
-npm install node-cron
+# Installez ces packages dans le terminal :
 
+npm install multer dotenv square nodemailer googleapis node-cron crypto-js passport-facebook passport-twitter passport-apple passport passport-google-oauth20 express-session
 
-try: npm install multer dotenv square nodemailer googleapis node-cron crypto-js
-
+# Base de données
 
 CREATE DATABASE myhearts;
 
