@@ -4,47 +4,44 @@
         body {
             height: 100%;
             margin: 0;
-            margin: 0;
-            padding: 0;
             padding: 0;
             overflow-y: auto;
             box-sizing: border-box;
-            justify-content: center;
-            align-items: center;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+            font-family: "Orbitron", sans-serif;
         }
 
         body {
             background-color: #000000;
             color: #ffffff;
-            /* Keep text color consistent */
-            font-family: "Orbitron", sans-serif;
-
         }
 
         .main-content {
             display: flex;
             justify-content: center;
             align-items: flex-start;
-            /* Align items to the start */
-            padding-top: 20px;
+            padding: 20px;
+            gap: 10px;
         }
 
+        .profile-container,
+        .modify-profile-container {
+            width: 100%;
+            /* or max-width: 400px; */
+        }
+
+        .profile-container,
+        .preview-container {
+            width: 100%;
+            /* or max-width: 400px; */
+        }
+
+
         .profile-container {
-            background-color: #f093fb;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            width: 600px;
-            height: auto;
-            text-align: center;
-            margin: 20px auto;
-            background: linear-gradient(45deg, #d44fdc, #e38be3, #f0b7f5, #d44fdc);
-            box-shadow: 0 0 10px #d44fdc, 0 0 15px #e38be3, 0 0 20px #d44fdc;
+            background: linear-gradient(45deg, #d44fdc, #e38be3, #f0b7f5);
+            border-radius: 15px;
+            padding: 20px;
+            width: 400px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
             transition: transform 0.5s ease, opacity 0.5s ease;
             transform: scale(0.8);
             opacity: 0;
@@ -55,191 +52,78 @@
             transform: scale(1);
         }
 
+        .profile-arrow {
+            font-size: 24px;
+            cursor: pointer;
+            color: #ffffff;
+            position: relative;
+            top: 40px;
+            margin: 0 20px;
+            transition: color 0.3s ease;
+            display: block;
+            z-index: 10;
+
+
+        }
+
+        .profile-arrow:hover {
+            color: #e04e2e;
+        }
+
+        .profile-container {
+            transition: transform 0.5s ease;
+        }
 
         .profile-header {
-            margin-bottom: 1rem;
+            text-align: center;
+            margin-bottom: 15px;
         }
 
         .profile-picture {
             width: 100px;
             height: 100px;
             border-radius: 50%;
-            margin-bottom: 1rem;
-            object-fit: cover;
+            margin-bottom: 10px;
             border: 2px solid #f093fb;
         }
 
         h1 {
-            font-size: 1.2rem;
-            /* Réduction de la taille de la police */
-            color: #333;
+            font-size: 1.5rem;
         }
 
-        .profile-details p {
-            font-size: 1rem;
-            margin-bottom: 0.5rem;
-            /* Réduction de la marge inférieure */
-            color: #666;
+        .profile-details {
+            margin: 15px 0;
+            text-align: left;
         }
 
-        .profile-details strong {
-            color: #000000;
+        .edit-profile,
+        .change-password,
+        .subscription-block {
+            background: #333;
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 15px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
         }
 
-        .profile-actions {
-            display: flex;
-            flex-direction: column;
-            gap: 0.75rem;
-            /* Réduction de l'écart entre les boutons */
-        }
-
-        .profile-actions button {
-            padding: 0.5rem;
-            /* Réduction du padding pour diminuer la hauteur des boutons */
+        button {
+            padding: 0.75rem;
+            background-color: #e04e2e;
+            color: white;
             border: none;
-            background-color: white;
-            color: black;
-            font-size: 1rem;
             border-radius: 5px;
             cursor: pointer;
-            transition: background-color 0.3s ease;
+            margin-top: 10px;
+            transition: background-color 0.3s ease, transform 0.3s ease;
         }
 
-        .profile-actions button:hover {
-            background-color: #e04e2e;
+        button:hover {
+            background-color: #ff5c33;
+            transform: translateY(-2px);
         }
-
-        .change-password h3 {
-            color: #333;
-            margin-bottom: 1rem;
-        }
-
-        .change-password form div {
-            margin-bottom: 0.75rem;
-            /* Réduction des marges */
-        }
-
-        .change-password form label {
-            display: block;
-            font-weight: bold;
-            margin-bottom: 0.5rem;
-            color: #f093fb;
-        }
-
-        .change-password form input {
-            width: 100%;
-            padding: 0.5rem;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            font-size: 1rem;
-        }
-
-        .change-password button {
-            padding: 0.5rem;
-            /* Réduction du padding pour diminuer la hauteur */
-            border: none;
-            background-color: #f093fb;
-            color: black;
-            font-size: 1rem;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-
-        .change-password button:hover {
-            background-color: #e04e2e;
-        }
-
-        /* Message Styles */
-        .message-container {
-            margin-top: 1rem;
-            text-align: center;
-        }
-
-        .message {
-            padding: 0.75rem 1rem;
-            border-radius: 5px;
-            font-size: 1rem;
-            width: 100%;
-            max-width: 350px;
-            margin: 0 auto;
-        }
-
-        .message.success {
-            background-color: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-
-        .message.error {
-            background-color: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-
-
 
         .subscription-block {
-            margin-top: 1rem;
-            padding: 1.5rem;
             background: linear-gradient(135deg, #6c63ff, #d44fdc);
-            border-radius: 15px;
-            /* Increase border radius for a smoother look */
-            text-align: center;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
-            /* Deeper shadow for depth */
-            transition: transform 0.3s ease;
-            /* Add transition for hover effect */
-        }
-
-        .subscription-block:hover {
-            transform: scale(1.05);
-            /* Slightly scale up on hover */
-        }
-
-        .subscription-block h3 {
-            color: #ffffff;
-            /* Keep heading color white */
-            font-size: 1.5rem;
-            /* Increase font size for the heading */
-            margin-bottom: 0.5rem;
-            /* Space below the heading */
-            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7);
-            /* Add shadow for depth */
-        }
-
-        .subscription-block p {
-            font-size: 1.1rem;
-            /* Slightly increase font size for better readability */
-            color: #ffffff;
-            /* White text for better contrast */
-            margin: 0.5rem 0;
-            /* Space between paragraphs */
-        }
-
-        .subscription-block button {
-            padding: 0.75rem;
-            /* Increase padding for buttons */
-            border: none;
-            background-color: #e04e2e;
-            /* Vibrant button color */
-            color: white;
-            /* Change text color to white */
-            font-size: 1.1rem;
-            /* Increase font size for the button */
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s ease, transform 0.3s ease;
-            /* Smooth transitions */
-        }
-
-        .subscription-block button:hover {
-            background-color: #ff5c33;
-            /* Change button color on hover */
-            transform: translateY(-2px);
-            /* Slightly lift button on hover */
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
-            /* Add shadow on hover */
         }
 
         #background-video {
@@ -252,44 +136,90 @@
             z-index: -1;
         }
 
-        .edit-profile {
-    margin-top: 1.5rem;
-    padding: 1.5rem;
-    background: #333;
-    border-radius: 10px;
-    text-align: center;
-    color: #ffffff;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
-}
+        .modify-profile-container {
+            background: linear-gradient(45deg, #d44fdc, #e38be3, #f0b7f5);
+            border-radius: 15px;
+            padding: 20px;
+            width: 400px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+            transition: opacity 0.5s ease;
+            opacity: 0;
+            margin-left: 20px;
+            display: none;
+        }
 
-.edit-profile form div {
-    margin-bottom: 0.75rem;
-}
+        .modify-profile-container.active {
+            display: block;
+            opacity: 1;
+        }
 
-.edit-profile input {
-    width: 90%;
-    padding: 0.5rem;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    font-size: 1rem;
-    background-color: #222;
-    color: #ffffff;
-}
+        .preview-container {
+            background: rgba(20, 20, 20, 0.8);
+            /* Similar to the card background */
+            border: 2px solid #00bfff;
+            /* Same border color as card */
+            border-radius: 15px;
+            padding: 20px;
+            width: 400px;
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.7), 0 0 40px rgba(0, 255, 255, 0.5);
+            transition: opacity 0.5s ease;
+            opacity: 0;
+            margin-right: 20px;
+            display: none;
+        }
 
-.edit-profile button {
-    padding: 0.75rem;
-    background-color: #e04e2e;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
+        .preview-container.active {
+            display: block;
+            opacity: 1;
+        }
 
-.edit-profile button:hover {
-    background-color: #ff5c33;
-}
+        .add-photo-container {
+            position: relative;
+            display: inline-block;
+        }
 
+        .add-photo {
+            width: 100px;
+            height: auto;
+            border-radius: 10px;
+            /* Same as the card img */
+            margin-bottom: 10px;
+            opacity: 0.5;
+            /* Adjust this if needed */
+            border: 2px solid #00bfff;
+            /* To match the card */
+        }
+
+        .upload-label {
+            position: absolute;
+            top: 35px;
+            /* Adjust position as needed */
+            left: 0;
+            /* Center it under the image */
+            right: 0;
+            text-align: center;
+            font-size: 24px;
+            color: #ffffff;
+            text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+            background-color: rgba(0, 0, 0, 0.5);
+            /* Semi-transparent background */
+            border-radius: 5px;
+            padding: 5px;
+            transition: background-color 0.3s ease;
+        }
+
+        .upload-label:hover {
+            background-color: rgba(0, 0, 0, 0.7);
+        }
+
+
+        .add-photo {
+            width: 100px;
+            height: auto;
+            border-radius: 0;
+            margin-bottom: 10px;
+            opacity: 0.5;
+        }
     </style>
 
     <body>
@@ -298,68 +228,48 @@
             Your browser does not support the video tag.
         </video>
         <div class="main-content">
+            <div class="profile-arrow left-arrow" title="Preview">&#9664;</div>
+            <div class="preview" style="display: none;">
+                <div class="preview-container active">
+                    <h3>Preview</h3>
+                    <div class="profile-header">
+                        <h1>Profil</h1>
+                        <div class="add-photo-container">
+                            <img src="/uploads/<%= userDetails.e_photo %>" alt="Photo de Profil" class="add-photo">
+                            <label for="file-upload" class="upload-label">+</label>
+                            <input type="file" id="file-upload" style="display:none;" accept="image/*">
+                        </div>
+                    </div>
+                    <div class="profile-details">
+                        <p><strong>Nom:</strong> <span id="user-nom">
+                                <%= userDetails.e_nom %>
+                            </span></p>
+                    </div>
+                </div>
+            </div>
+
+
+
             <div class="profile-container">
                 <div class="profile-header">
-                    <h1>Profil <span id="user-prenom"></span> <span id="user-nom"></span></h1>
-                </div>
-
-                <!-- Profile Picture Section -->
-                <div class="profile-picture-container">
+                    <h1>Profil</h1>
                     <img src="/uploads/<%= userDetails.e_photo %>" alt="Photo de Profil" class="profile-picture">
                 </div>
-
-                <!-- Message Display Section -->
-                <div class="message-container">
-                    <% if (message) { %>
-                        <div class="message <%= messageType %>">
-                            <p>
-                                <%= message %>
-                            </p>
-                        </div>
-                        <% } %>
+                <div class="profile-details">
+                    <p><strong>Prénom:</strong> <span id="user-prenom">
+                            <%= userDetails.e_prenom %>
+                        </span></p>
+                    <p><strong>Nom:</strong> <span id="user-nom">
+                            <%= userDetails.e_nom %>
+                        </span></p>
+                    <p><strong>Email:</strong> <span id="user-email">
+                            <%= userDetails.e_courriel %>
+                        </span></p>
+                    <p><strong>Votre abonnement actuel:</strong> <span>
+                            <%= subscriptionName %>
+                        </span></p>
                 </div>
 
-                <div class="edit-profile">
-                    <h3>Modifier les informations du profil</h3>
-                    <form id="update-profile-form">
-                        <div>
-                            <input type="text" name="new_firstName" value="<%= userDetails.e_prenom %>" placeholder="Prénom" required>
-                        </div>
-                        <div>
-                            <input type="text" name="new_lastName" value="<%= userDetails.e_nom %>" placeholder="Nom" required>
-                        </div>
-                        <div>
-                            <input type="email" name="new_email" value="<%= userDetails.e_courriel %>" placeholder="Email" required>
-                        </div>
-                        <button type="submit">Mettre à jour le profil</button>
-                    </form>
-                </div>
-                
-                
-
-                <!-- Change Password Section -->
-                <div class="change-password">
-                    <h3>Changer le Mot de Passe</h3>
-                    <form action="/event/change-password" method="POST">
-                        <div>
-                            <input type="password" id="old-password" name="old_password"
-                                placeholder="Ancien mot de passe" required>
-                        </div>
-                        <div>
-                            <input type="password" id="new-password" name="new_password"
-                                placeholder="Nouveau mot de passe" required>
-                        </div>
-                        <div>
-                            <input type="password" id="confirm-password" name="confirm_password"
-                                placeholder="Confirmer le nouveau mot de passe" required>
-                        </div>
-                        <button type="submit">Changer le Mot de Passe</button>
-                    </form>
-                </div>
-
-
-
-                <!-- Profile actions -->
                 <div class="profile-actions">
                     <form action="/event/delete-account" method="POST"
                         onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer votre compte? Cette action est irréversible.');">
@@ -372,59 +282,182 @@
                     <p>
                         <%= subscriptionName %>
                     </p>
-
                     <p>Souhaitez-vous obtenir un autre abonnement ?</p>
                     <a href="/event/abonnement">
                         <button>Changer d'abonnement</button>
                     </a>
                 </div>
             </div>
+            <div class="modify-profile-container" style="display: none;">
+                <h3>Modifier le Profil</h3>
+                <div class="edit-profile">
+                    <h3>Modifier les informations du profil</h3>
+                    <button id="edit-profile-btn">Modifier le Profil</button>
+                    <form id="update-profile-form" style="display: none;">
+                        <input type="text" name="new_firstName" placeholder="Prénom" required>
+                        <input type="text" name="new_lastName" placeholder="Nom" required>
+                        <input type="email" name="new_email" placeholder="Email" required>
+                        <button type="submit">Mettre à jour le profil</button>
+                    </form>
+                </div>
+
+                <div class="change-password">
+                    <h3>Changer le Mot de Passe</h3>
+                    <button id="change-password-btn">Changer le Mot de Passe</button>
+                    <form id="change-password-form" style="display: none;" method="POST"
+                        action="/event/change-password">
+                        <input type="password" name="old_password" placeholder="Ancien mot de passe" required>
+                        <input type="password" name="new_password" placeholder="Nouveau mot de passe" required>
+                        <input type="password" name="confirm_password" placeholder="Confirmer le nouveau mot de passe"
+                            required>
+                        <button type="submit">Changer le Mot de Passe</button>
+                    </form>
+
+                </div>
+            </div>
+            <div class="profile-arrow right-arrow" title="Modifier profil">&#9654;</div>
 
 
         </div>
-    </body>
 
-    <script>
-        // Activer l'animation lors du chargement de la page
-        window.addEventListener('load', function () {
+
+        <script>
+            window.addEventListener('load', function () {
+                const profileContainer = document.querySelector('.profile-container');
+                setTimeout(() => {
+                    profileContainer.classList.add('active');
+                }, 100);
+            });
+
+            const leftArrow = document.querySelector('.left-arrow');
+            const rightArrow = document.querySelector('.right-arrow');
             const profileContainer = document.querySelector('.profile-container');
-            setTimeout(() => {
-                profileContainer.classList.add('active');
-            }, 100);
-        });
-        document.getElementById("update-profile-form").addEventListener("submit", function (event) {
-    event.preventDefault(); // Empêche la soumission par défaut du formulaire
+            const modifyProfileContainer = document.querySelector('.modify-profile-container');
+            const preview = document.querySelector('.preview');
 
-    const formData = new FormData(this);
+            let isProfileVisible = true;
 
-    fetch("/event/update-profile", {
-        method: "POST",
-        body: new URLSearchParams(formData), // Formate les données pour un POST
-        headers: {
-            "Content-Type": "application/x-www-form-urlencoded"
-        }
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            // Mettre à jour les informations affichées sur la page
-            document.querySelector("#user-prenom").textContent = formData.get("new_firstName");
-            document.querySelector("#user-nom").textContent = formData.get("new_lastName");
-            document.querySelector(".profile-details strong:nth-child(1)").textContent = formData.get("new_lastName");
-            document.querySelector(".profile-details strong:nth-child(2)").textContent = formData.get("new_firstName");
-            document.querySelector(".profile-details strong:nth-child(3)").textContent = formData.get("new_email");
+            leftArrow.addEventListener('click', function () {
+                console.log(isProfileVisible);
+                if (!isProfileVisible) {
+                    modifyProfileContainer.style.opacity = '0';
+                    setTimeout(() => {
+                        profileContainer.style.transition = 'transform 0.5s ease';
+                        profileContainer.style.transform = 'translateX(0)';
+                        modifyProfileContainer.classList.remove('active');
+                        modifyProfileContainer.style.display = 'none';
+                        rightArrow.style.display = 'block';
+                        isProfileVisible = true;
+                    }, 500);
+                } else {
+                    profileContainer.style.transition = 'transform 0.5s ease';
+                    profileContainer.style.transform = 'translateX(100%)';
+                    setTimeout(() => {
+                        preview.classList.add('active');
+                        preview.style.display = 'block';
+                        preview.style.opacity = '1';
+                        leftArrow.style.display = 'none';
+                        rightArrow.style.display = 'block';
+                        isProfileVisible = false;
+                    }, 500);
+                }
+            });
 
-            // Ajouter un délai pour montrer un message, puis actualiser la page
-            setTimeout(() => {
-                location.reload(); // Actualise la page pour afficher les nouvelles données
-            }, 500);
+            rightArrow.addEventListener('click', function () {
+                console.log(isProfileVisible);
+                if (!isProfileVisible) {
+                    preview.style.opacity = '0';
+                    setTimeout(() => {
+                        profileContainer.style.transition = 'transform 0.5s ease';
+                        profileContainer.style.transform = 'translateX(0)';
+                        preview.classList.remove('active');
+                        preview.style.display = 'none';
+                        leftArrow.style.display = 'block';
+                        isProfileVisible = true;
+                    }, 500);
+                } else {
 
-            alert(data.message);
-        } else {
-            alert(data.message); // Afficher le message d'erreur renvoyé par le serveur
-        }
-    })
-    
-});
+                    profileContainer.style.transition = 'transform 0.5s ease';
+                    profileContainer.style.transform = 'translateX(-100%)';
+                    setTimeout(() => {
+                        modifyProfileContainer.classList.add('active');
+                        modifyProfileContainer.style.display = 'block';
+                        modifyProfileContainer.style.opacity = '1';
+                        leftArrow.style.display = 'block';
+                        rightArrow.style.display = 'none';
+                        isProfileVisible = false;
+                    }, 500);
+                }
+            });
 
-    </script>
+
+
+
+
+
+            document.getElementById("edit-profile-btn").addEventListener("click", function () {
+                const form = document.getElementById("update-profile-form");
+                form.style.display = form.style.display === "none" ? "block" : "none";
+            });
+
+            document.getElementById("change-password-btn").addEventListener("click", function () {
+                const form = document.getElementById("change-password-form");
+                form.style.display = form.style.display === "none" ? "block" : "none";
+            });
+
+
+            document.getElementById("change-password-form").addEventListener("submit", function (event) {
+                event.preventDefault();
+
+                const formData = new FormData(this);
+
+                fetch("/event/change-password", {
+                    method: "POST",
+                    body: new URLSearchParams(formData),
+                    headers: {
+                        "Content-Type": "application/x-www-form-urlencoded"
+                    }
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            alert(data.message); // Show success message
+                            // Optionally, refresh the page or update the UI
+                        } else {
+                            alert(data.message); // Show error message from server
+                        }
+                    });
+            });
+
+            document.getElementById("update-profile-form").addEventListener("submit", function (event) {
+                event.preventDefault(); // Prevent default form submission
+
+                const formData = new FormData(this);
+
+                fetch("/event/update-profile", {
+                    method: "POST",
+                    body: new URLSearchParams(formData), // Format data for POST
+                    headers: {
+                        "Content-Type": "application/x-www-form-urlencoded"
+                    }
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            // Update displayed user info
+                            document.querySelector("#user-prenom").textContent = formData.get("new_firstName");
+                            document.querySelector("#user-nom").textContent = formData.get("new_lastName");
+
+                            // Add delay to show message, then refresh
+                            setTimeout(() => {
+                                location.reload(); // Refresh page to show new data
+                            }, 500);
+
+                            alert(data.message);
+                        } else {
+                            alert(data.message); // Show error message from server
+                        }
+                    });
+            });
+        </script>
+    </body>
