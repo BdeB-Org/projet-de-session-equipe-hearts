@@ -65,13 +65,14 @@
                         <!-- Password -->
                         <div class="step" id="step-1">
                             <input type="password" id="password" name="password" placeholder="Mot de passe"
-                                minlength="6" required>
+                                 required>
+                                <!-- minlength -->
                         </div>
 
                         <!-- Verify Password -->
                         <div class="step" id="step-2">
                             <input type="password" id="verify-password" placeholder="Vérifiez le mot de passe"
-                                minlength="6" required>
+                                 required>
                         </div>
 
                         <!-- Phone Number -->
@@ -120,7 +121,37 @@
 
                         <!-- Likes -->
                         <div class="step" id="step-10">
-                            <input type="text" id="likes" name="likes" placeholder="Qu'est-ce que vous aimez?" required>
+                            <p>Qu'est-ce que vous aimez?</p>
+                            <button type="button" id="pick-options-btn">Choisir options</button>
+                            <div id="selected-options"></div>
+                        </div>
+                        <div id="options-modal" class="modal">
+                            <div class="modal-content">
+                                <span class="close-btn">&times;</span>
+                                <h3>Choose Your Interests</h3>
+                                <div class="scrollable-options">
+                                    <label>
+                                        <input type="checkbox" name="interests" value="musique"> Musique
+                                    </label>
+                                    <label>
+                                        <input type="checkbox" name="interests" value="cinema"> Cinéma
+                                    </label>
+                                    <label>
+                                        <input type="checkbox" name="interests" value="voyages"> Voyages
+                                    </label>
+                                    <label>
+                                        <input type="checkbox" name="interests" value="sport"> Sport
+                                    </label>
+                                    <label>
+                                        <input type="checkbox" name="interests" value="lecture"> Lecture
+                                    </label>
+                                    <label>
+                                        <input type="checkbox" name="interests" value="cuisine"> Cuisine
+                                    </label>
+                                    <!-- Add more options as needed -->
+                                </div>
+                                <button type="button" id="save-options-btn">Save</button>
+                            </div>
                         </div>
 
                         <!-- Photos -->

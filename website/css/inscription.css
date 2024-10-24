@@ -14,10 +14,13 @@ body {
 
 .grid-container {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr 1fr; /* Four equal columns */
-  grid-gap: 40px; /* Spacing between columns */
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  /* Four equal columns */
+  grid-gap: 40px;
+  /* Spacing between columns */
   width: 95%;
-  max-width: 1600px; /* Maximum width for large screens */
+  max-width: 1600px;
+  /* Maximum width for large screens */
   align-items: start;
   margin: 0 auto;
   margin-top: -100px;
@@ -40,8 +43,10 @@ body {
 
 .form-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;  /* Two equal columns for form */
-  grid-column: 3 / span 2; /* Form spans the last two columns */
+  grid-template-columns: 1fr 1fr;
+  /* Two equal columns for form */
+  grid-column: 3 / span 2;
+  /* Form spans the last two columns */
   gap: 60px;
 }
 
@@ -99,38 +104,46 @@ body {
 
 .icon-container {
   display: flex;
-  justify-content: space-around; /* Adjust to space out the icons */
+  justify-content: space-around;
+  /* Adjust to space out the icons */
   align-items: center;
   margin-top: -15px;
   padding: 10px;
   background: linear-gradient(90deg, #FF7991 0%, #F4F4F4 100%);
   border-radius: 15px;
   box-shadow: 0 4px 8px rgba(255, 163, 172, 0.5);
-  z-index: 1; /* Ensure the icons are above any overlapping elements */
+  z-index: 1;
+  /* Ensure the icons are above any overlapping elements */
 }
 
 .icon-container img {
-  width: 60px;  /* Adjust icon size */
+  width: 60px;
+  /* Adjust icon size */
   height: auto;
   padding: 10px;
-  cursor: pointer; /* Make icons clickable */
-  z-index: 2; /* Ensure the icons themselves are clickable */
+  cursor: pointer;
+  /* Make icons clickable */
+  z-index: 2;
+  /* Ensure the icons themselves are clickable */
   transition: transform 0.3s ease, filter 0.3s ease;
 }
 
 .icon-container img:hover {
-  transform: scale(1.2);  /* Slight scale on hover */
+  transform: scale(1.2);
+  /* Slight scale on hover */
 }
 
 .icon-container img.selected {
-  filter: url(#glow-effect); /* Apply white glow by default */
+  filter: url(#glow-effect);
+  /* Apply white glow by default */
   transform: scale(1.1);
   transition: filter 0.3s ease, transform 0.3s ease;
 }
 
 
 .icon-container img:active {
-  filter: brightness(1.5);  /* Apply the glow effect on active/click */
+  filter: brightness(1.5);
+  /* Apply the glow effect on active/click */
 }
 
 p {
@@ -142,13 +155,104 @@ p {
   font-weight: bold;
 }
 
-#queen.selected, #king.selected {
-  filter: url(#pink-glow-effect); /* Apply pink glow for Queen and King */
+#queen.selected,
+#king.selected {
+  filter: url(#pink-glow-effect);
+  /* Apply pink glow for Queen and King */
 }
 
-#joker{
+#joker {
   width: 70px;
 }
-#king{
+
+#king {
   width: 55px;
+}
+
+
+
+/* General Styles */
+.txt {
+  font-size: 20px;
+  color: white;
+}
+
+
+#pick-options-btn {
+  background-color: #FF7991;
+  color: #fff;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+
+}
+
+#selected-options {
+  margin-top: 10px;
+  color: #ffcc00;
+  font-size: 14px;
+}
+
+/* Modal Styles */
+.modal {
+  display: none;
+  /* Hidden by default */
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+  /* Semi-transparent background */
+}
+
+.modal-content {
+  background-color: #24043a;
+  padding: 20px;
+  margin: 10% auto;
+  border-radius: 10px;
+  width: 80%;
+  max-width: 500px;
+  color: #ffcc00;
+}
+
+.scrollable-options {
+  max-height: 200px;
+  /* Height limit for scrolling */
+  overflow-y: auto;
+  margin-top: 10px;
+  padding: 10px;
+  background-color: #000;
+  border-radius: 5px;
+  color: #fff;
+}
+
+.scrollable-options label {
+  display: block;
+  padding: 5px 0;
+  cursor: pointer;
+}
+
+.scrollable-options input[type="checkbox"] {
+  margin-right: 10px;
+}
+
+.close-btn {
+  color: #ffcc00;
+  float: right;
+  font-size: 24px;
+  cursor: pointer;
+}
+
+/* Button for saving selected options */
+#save-options-btn {
+  background-color: #ffcc00;
+  color: #24043a;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-top: 10px;
 }

@@ -6,7 +6,7 @@
 
 body {
     background-image: radial-gradient(circle at 50% 50%, #24043a, #000000);
-    /* Smooth background */
+
     align-items: center;
     font-family: "Orbitron", sans-serif;
     justify-content: center;
@@ -16,10 +16,9 @@ body {
 
 
 .container {
-    background: linear-gradient(135deg, #fff 50%, #FF66FF 50%);
-    /* Smooth blend from white to pink */
+
     border-radius: 30px;
-    box-shadow: 0 10px 15px rgba(255, 255, 255, 0.718);
+    box-shadow: 0 0 40px rgba(211, 197, 9, 0.4);
     position: relative;
     overflow: hidden;
     width: 1000px;
@@ -46,10 +45,10 @@ body {
 .container span {
     font-size: 12px;
     color: #ffcc00;
+    padding: 0 0 10px 0;
 }
 
 .container a {
-    color: #FF66FF;
     font-size: 13px;
     text-decoration: none;
     margin: 15px 0 10px;
@@ -69,55 +68,32 @@ body {
     height: 2px;
     bottom: -2px;
     left: 0;
-    background-color: #ffcc00;
-    /* Neon pink underline */
     transition: width 0.3s ease;
 }
 
 .mdp_button:hover {
     color: #ffcc00;
-    /* Slightly lighter pink on hover for a soft effect */
+
 }
 
 .mdp_button:hover:before {
     width: 100%;
     background-color: #ffcc00;
-    /* Lighter pink underline on hover */
 }
 
 .container button {
-    background-color: #fff;
-    /* Initially white */
-    color: #FF66FF;
-    /* Neon pink text */
+    
     font-size: 12px;
     padding: 10px 45px;
-    border: 2px solid #FF66FF;
-    /* Neon pink border */
-    border-radius: 8px;
-    font-weight: 600;
     letter-spacing: 0.5px;
     text-transform: uppercase;
     margin-top: 10px;
-    cursor: pointer;
-    transition: background-color 0.5s ease, color 0.5s ease, border-color 0.5s ease;
-    box-shadow: 0px 4px 15px rgba(255, 102, 255, 0.5);
-    /* Subtle shadow */
-}
+}       
 
-.container button:hover {
-    background-color: #FF66FF;
-    /* Neon pink on hover */
-    color: #fff;
-    /* White text on hover */
-    border: 2px solid #fff;
-    /* White border on hover */
-    box-shadow: 0px 4px 20px rgba(255, 102, 255, 0.75);
-    /* Stronger glow on hover */
-}
+
 
 .container form {
-    background-color: #000000;
+    background-color: black;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -126,41 +102,15 @@ body {
     height: 100%;
     border-radius: 10px;
     box-shadow: 0px 4px 15px rgba(255, 102, 255, 0.5);
-    /* Shadow around form */
 }
 
-.container input {
-    /* background: linear-gradient(90deg, #FF9BD6 15%, #B25EFF 75%); */
-    border: none;
-    margin: 8px 0;
-    padding: 10px 15px;
-    font-size: 13px;
-    border-radius: 8px;
-    width: 100%;
-    outline: none;
+.container form input {
+    width: 100%; 
+    padding: 0px 0px 30px 5px;
+    max-width: 260px;
 
-    transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
-    box-shadow: 0px 4px 10px rgba(255, 102, 255, 0.5);
-    /* Added shadow box */
 }
 
-.container input:focus {
-    /* border: 2px solid #FF66FF;
-    box-shadow: 0px 0px 8px rgba(255, 102, 255, 0.75);
-    transform: scale(1.02);
-    color: #FF66FF; */
-    color: black;
-}
-
-.container input::placeholder {
-    /* color: #888; */
-    color: #000000; 
-}
-
-.container input:focus::placeholder {
-    /* color: #FFB3BB; */
-    color: #000000;
-}
 
 .form-container {
     position: absolute;
@@ -215,7 +165,6 @@ body {
 .social-icons a {
     border: 1px solid #FF66FF;
     color: #ffcc00;
-    /* Neon pink */
     border-radius: 50%;
     display: inline-flex;
     justify-content: center;
@@ -226,14 +175,12 @@ body {
     font-size: 22px;
     transition: color 0.3s ease, transform 0.3s ease, opacity 0.3s ease;
     box-shadow: 0px 4px 15px rgba(255, 102, 255, 0.5);
-    /* Shadow for social icons */
 }
 
 .social-icons a:hover {
     color: #fff;
     background-color: #ffcc00;
     border: 0px;
-    /* Pink background on hover */
     transform: translateY(-3px);
     opacity: 0.8;
 }
@@ -256,8 +203,8 @@ body {
 }
 
 .toggle {
-    background-color: #FF66FF;
-    /* Neon pink */
+    background-color: rgba(109, 29, 109, 0.4);
+
     height: 100%;
     color: #fff;
     position: relative;
@@ -309,28 +256,35 @@ body {
 
 #particles-js {
     position: absolute;
-    /* Change to absolute for easier layering */
     top: 0;
     left: 0;
     width: 100%;
     height: 100vh;
     z-index: 0;
-    /* Lower z-index to place it under everything */
 }
 
 .container-wrapper {
     position: relative;
     z-index: 2;
-    /* Keep container above particles */
 }
 
 nav,
 .navbar {
     position: relative;
     z-index: 3;
-    /* Ensure navbar is always on top */
 }
 
 .container h1 {
     color: #ffcc00;
 }
+
+.cyber-button.bg-yellow.fg-white:hover {
+    color: black !important;
+}
+
+
+.logo {
+    z-index: 1001; /* Make sure this is higher than the particles-js */
+    position: relative; /* Ensures z-index takes effect */
+}
+

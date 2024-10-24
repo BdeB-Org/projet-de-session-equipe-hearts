@@ -36,3 +36,30 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 });
+
+
+document.getElementById("pick-options-btn").addEventListener("click", function() {
+    document.getElementById("options-modal").style.display = "block";
+});
+
+document.querySelector(".close-btn").addEventListener("click", function() {
+    document.getElementById("options-modal").style.display = "none";
+});
+
+document.getElementById("save-options-btn").addEventListener("click", function() {
+    const checkboxes = document.querySelectorAll('.scrollable-options input[type="checkbox"]');
+    const selected = Array.from(checkboxes)
+        .filter(checkbox => checkbox.checked)
+        .map(checkbox => checkbox.value);
+
+    document.getElementById("selected-options").textContent = selected.join(", ");
+    document.getElementById("options-modal").style.display = "none";
+});
+
+// Close the modal when clicking outside of it
+window.addEventListener("click", function(event) {
+    const modal = document.getElementById("options-modal");
+    if (event.target === modal) {
+        modal.style.display = "none";
+    }
+});
