@@ -174,38 +174,32 @@
         }
 
         .add-photo-container {
-            position: relative;
-            display: inline-block;
+            display: flex;
+            justify-content: center;
+            margin-top: 10px;
         }
 
         .add-photo {
             width: 100px;
             height: auto;
             border-radius: 10px;
-            /* Same as the card img */
             margin-bottom: 10px;
             opacity: 0.5;
-            /* Adjust this if needed */
             border: 2px solid #00bfff;
-            /* To match the card */
         }
 
+
         .upload-label {
-            position: absolute;
-            top: 35px;
-            /* Adjust position as needed */
-            left: 0;
-            /* Center it under the image */
-            right: 0;
-            text-align: center;
-            font-size: 24px;
-            color: #ffffff;
-            text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
-            background-color: rgba(0, 0, 0, 0.5);
-            /* Semi-transparent background */
-            border-radius: 5px;
-            padding: 5px;
-            transition: background-color 0.3s ease;
+            width: 30px;
+            height: 30px;
+            background: green;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            font-size: 20px;
         }
 
         .upload-label:hover {
@@ -219,6 +213,33 @@
             border-radius: 0;
             margin-bottom: 10px;
             opacity: 0.5;
+        }
+
+        .photo-container {
+            position: relative;
+            display: inline-block;
+            margin: 5px;
+        }
+
+        .delete-photo {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: rgba(255, 0, 0, 0.8);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            /* Center icon */
+        }
+
+        .delete-photo:hover {
+            background: darkred;
         }
     </style>
 
@@ -235,18 +256,35 @@
                     <div class="profile-header">
                         <h1>Profil</h1>
                         <div class="add-photo-container">
-                            <img src="/uploads/<%= userDetails.e_photo %>" alt="Photo de Profil" class="add-photo">
-                            <label for="file-upload" class="upload-label">+</label>
-                            <input type="file" id="file-upload" style="display:none;" accept="image/*">
+                            <button class="upload-label" id="upload-button"></button>
+                            <input type="file" id="file-upload" name="photos" style="display: none;" accept="image/*"
+                                multiple>
                         </div>
+
                     </div>
                     <div class="profile-details">
                         <p><strong>Nom:</strong> <span id="user-nom">
                                 <%= userDetails.e_nom %>
                             </span></p>
                     </div>
+                    <div class="uploaded-photos" style="display: flex; flex-wrap: wrap; gap: 10px;">
+                        <% if (userPhotos.length) { %>
+                            <% userPhotos.forEach(photo=> { %>
+                                <div class="photo-container">
+                                    <img src="/uploads/<%= photo %>" alt="Uploaded Photo" class="add-photo"
+                                        style="width: 100px; height: 100px; object-fit: cover;">
+                                    <button class="delete-photo" data-photo="<%= photo %>">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                                <% }); %>
+                                    <% } else { %>
+                                        <p>Aucune photo téléchargée.</p>
+                                        <% } %>
+                    </div>
                 </div>
             </div>
+
 
 
 
@@ -421,22 +459,21 @@
                     .then(response => response.json())
                     .then(data => {
                         if (data.success) {
-                            alert(data.message); // Show success message
-                            // Optionally, refresh the page or update the UI
+                            alert(data.message);
                         } else {
-                            alert(data.message); // Show error message from server
+                            alert(data.message);
                         }
                     });
             });
 
             document.getElementById("update-profile-form").addEventListener("submit", function (event) {
-                event.preventDefault(); // Prevent default form submission
+                event.preventDefault();
 
                 const formData = new FormData(this);
 
                 fetch("/event/update-profile", {
                     method: "POST",
-                    body: new URLSearchParams(formData), // Format data for POST
+                    body: new URLSearchParams(formData),
                     headers: {
                         "Content-Type": "application/x-www-form-urlencoded"
                     }
@@ -444,20 +481,72 @@
                     .then(response => response.json())
                     .then(data => {
                         if (data.success) {
-                            // Update displayed user info
                             document.querySelector("#user-prenom").textContent = formData.get("new_firstName");
                             document.querySelector("#user-nom").textContent = formData.get("new_lastName");
 
-                            // Add delay to show message, then refresh
                             setTimeout(() => {
-                                location.reload(); // Refresh page to show new data
+                                location.reload();
                             }, 500);
 
                             alert(data.message);
                         } else {
-                            alert(data.message); // Show error message from server
+                            alert(data.message);
                         }
                     });
             });
+
+            document.querySelector('.upload-label').addEventListener('click', function () {
+                document.getElementById('file-upload').click();
+            });
+
+            document.getElementById('file-upload').addEventListener('change', function (event) {
+                console.log("File input changed");
+                const files = event.target.files;
+                const formData = new FormData();
+
+                for (let i = 0; i < files.length; i++) {
+                    formData.append('photos', files[i]);
+                }
+                fetch('/event/update-photos', {
+                    method: 'POST',
+                    body: formData
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            alert('Photos uploaded successfully!');
+                            location.reload();
+                        } else {
+                            alert('Failed to upload photos: ' + data.message);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error uploading photos:', error);
+                    });
+            });
+
+
+
+            document.querySelectorAll('.delete-photo').forEach(button => {
+                button.addEventListener('click', function () {
+                    const photoUrl = this.getAttribute('data-photo');
+
+                    fetch(`/event/delete-photo/${photoUrl}`, {
+                        method: 'DELETE'
+                    })
+                        .then(response => {
+                            if (response.ok) {
+                                alert('Photo deleted successfully!');
+                                location.reload();
+                            } else {
+                                alert('Failed to delete photo: ' + response.statusText);
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error deleting photo:', error);
+                        });
+                });
+            });
+
         </script>
     </body>

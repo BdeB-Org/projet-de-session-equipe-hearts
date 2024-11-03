@@ -532,15 +532,27 @@ app.get("/event/profil", function (req, res) {
 
     const userSubscriptionName = subscriptionNames[req.session.user.abonnement_id] || 'Aucun abonnement actif';
 
-    res.render("pages/profil", {
-        siteTitle: "Profil",
-        pageTitle: "Votre Profil",
-        userDetails: req.session.user,
-        subscriptionName: userSubscriptionName,
-        message: null,
-        messageType: ''
+    // Fetch user's photos from the database
+    const userId = req.session.user.e_id;
+    const getPhotosQuery = 'SELECT photo_url FROM e_photo WHERE utilisateur_id = ?';
+    con.query(getPhotosQuery, [userId], (err, results) => {
+        if (err) {
+            console.error('Error fetching user photos:', err);
+            return res.status(500).send('Error fetching user photos');
+        }
+
+        const userPhotos = results.map(row => row.photo_url);
+
+        res.render("pages/profil", {
+            siteTitle: "Profil",
+            pageTitle: "Votre Profil",
+            userDetails: req.session.user,
+            subscriptionName: userSubscriptionName,
+            userPhotos: userPhotos // Pass photos to the view
+        });
     });
 });
+
 app.get('/event/download-receipt', (req, res) => {
     const { subscriptionType, amount, tvqAmount, tpsAmount, totalAmount, paymentId, confirmationEmail } = req.session;
     const userDetails = req.session.user;
@@ -1036,6 +1048,11 @@ app.get('/uploads/:filename', (req, res) => {
     });
 });
 
+/*
+--------------------------------
+        PROFILES
+--------------------------------
+*/
 app.post('/event/update-profile', (req, res) => {
     const { new_firstName, new_lastName, new_email } = req.body;
     const userId = req.session.user.e_id;
@@ -1056,7 +1073,6 @@ app.post('/event/update-profile', (req, res) => {
             return res.json({ success: false, message: "Erreur lors de la mise à jour du profil dans la base de données." });
         }
 
-        // Mettez à jour les informations de la session pour refléter les nouvelles données
         req.session.user.e_prenom = new_firstName;
         req.session.user.e_nom = new_lastName;
         req.session.user.e_courriel = new_email;
@@ -1065,28 +1081,58 @@ app.post('/event/update-profile', (req, res) => {
     });
 });
 
+app.post('/event/update-photos', upload.array('photos', 20), (req, res) => {
+    const userId = req.session.user.e_id;
+    const photoUrls = req.files.map(file => file.filename);
+
+    const existingPhotosQuery = 'SELECT photo_url FROM e_photo WHERE utilisateur_id = ?';
+    con.query(existingPhotosQuery, [userId], (err, results) => {
+        if (err) return res.status(500).send('Error fetching existing photos');
+
+        const existingPhotos = results.map(row => row.photo_url);
+        const newPhotos = photoUrls.filter(url => !existingPhotos.includes(url));
+
+        if (newPhotos.length === 0) {
+            return res.json({ success: true, message: 'No new photos to upload.' });
+        }
+        const insertPromises = newPhotos.map(photoUrl => {
+            const insertPhotoQuery = 'INSERT INTO e_photo (utilisateur_id, photo_url) VALUES (?, ?)';
+            return new Promise((resolve, reject) => {
+                con.query(insertPhotoQuery, [userId, photoUrl], (err) => {
+                    if (err) {
+                        console.error('Error inserting photo:', err);
+                        reject(err);
+                    } else {
+                        resolve();
+                    }
+                });
+            });
+        });
+
+        Promise.all(insertPromises)
+            .then(() => res.json({ success: true, message: 'Photos uploaded successfully.' }))
+            .catch(err => res.status(500).send('Error saving photos'));
+    });
+});
 
 
 
-app.get("/event/profil", function (req, res) {
-    if (!req.session.user) {
-        return res.redirect("/event/inscription");
-    }
+app.delete('/event/delete-photo/:photoUrl', (req, res) => {
+    const photoUrl = req.params.photoUrl;
+    const userId = req.session.user.e_id;
 
-    const subscriptionNames = {
-        1: "Basique",
-        2: "Premium",
-        3: "Diamant"
-    };
+    const deletePhotoQuery = 'DELETE FROM e_photo WHERE photo_url = ? AND utilisateur_id = ?';
+    con.query(deletePhotoQuery, [photoUrl, userId], (err) => {
+        if (err) {
+            console.error('Error deleting photo from database:', err);
+            return res.status(500).send('Error deleting photo');
+        }
 
-    const userSubscriptionName = subscriptionNames[req.session.user.abonnement_id] || 'Aucun abonnement actif';
+        const filePath = path.join(__dirname, '/uploads', photoUrl);
+        fs.unlink(filePath, (err) => {
+            if (err) console.error('Error deleting photo file:', err);
+        });
 
-    res.render("pages/profil", {
-        siteTitle: "Profil",
-        pageTitle: "Votre Profil",
-        userDetails: req.session.user,
-        subscriptionName: userSubscriptionName,
-        message: null,
-        messageType: ''
+        res.json({ success: true, message: 'Photo deleted successfully.' });
     });
 });
