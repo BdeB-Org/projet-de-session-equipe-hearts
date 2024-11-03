@@ -28,7 +28,10 @@
                 position: absolute;
                 transition: filter 0.5s ease-in-out;
                 cursor: pointer;
+                width: 280px;
+                height: 480px;
             }
+
 
             .card-inner {
                 width: 100%;
@@ -44,21 +47,24 @@
 
             .card.dimming {
                 filter: brightness(0.2);
-                
+
             }
 
             .card:hover {
                 z-index: 10;
-                
+
                 filter: brightness(1);
-                
+
             }
+
             .card-front,
             .card-back {
                 position: absolute;
                 width: 100%;
                 height: 100%;
                 backface-visibility: hidden;
+                object-fit: cover;
+                object-fit: contain;
                 border-radius: 15px;
             }
 
@@ -66,14 +72,16 @@
                 width: 100%;
                 height: 100%;
                 object-fit: cover;
+                object-fit: contain;
                 border-radius: 15px;
             }
 
             .card-back {
                 transform: rotateY(180deg);
-                background: url('/images/background_.png') no-repeat center center;
+                background: url('/images/image.png') no-repeat center center;
+                width: 280px;
+                height: 480px;
                 background-size: cover;
-                display: flex;
                 justify-content: center;
                 align-items: center;
                 font-size: 24px;
@@ -106,29 +114,21 @@
             .card-1 {
                 top: 100px;
                 left: 200px;
-                width: 280px;
-                height: 480px;
             }
 
             .card-2 {
-                top: 110px;
+                top: 100px;
                 left: 600px;
-                width: 285px;
-                height: 460px;
             }
 
             .card-3 {
-                top: 85px;
+                top: 100px;
                 left: 1000px;
-                width: 290px;
-                height: 520px;
             }
 
             .card-4 {
-                top: 120px;
+                top: 100px;
                 left: 1400px;
-                width: 320px;
-                height: 430px;
             }
 
             .modal {
@@ -170,21 +170,23 @@
             .modal-close:hover {
                 text-decoration: underline;
             }
+
             #background-video {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      z-index: -1;
-    }
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                z-index: -1;
+            }
         </style>
     </head>
 
     <body>
         <video autoplay muted loop id="background-video">
-            <source src="/images/vecteezy_a-nostalgic-90s-animation-captures-city-lights-and-traffic_49883292.mp4" type="video/mp4">
+            <source src="/images/vecteezy_a-nostalgic-90s-animation-captures-city-lights-and-traffic_49883292.mp4"
+                type="video/mp4">
             Your browser does not support the video tag.
         </video>
         <div class="cards">
@@ -192,7 +194,7 @@
                 data-description="Pour ceux qui cherchent un 'ami... avec un petit plus', sans trop de complications !">
                 <div class="card-inner">
                     <div class="card-front">
-                        <img src="/images/joker_neon_converted-removebg-preview.png" alt="Joker">
+                        <img src="/images/CARD5-JOKER.png" alt="Joker">
                     </div>
                     <div class="card-back">
                         <!-- Arrière-plan par défaut -->
@@ -204,7 +206,7 @@
                 data-description="Pour ceux qui veulent juste apprendre à se connaître, sans se prendre la tête... et sans passer par la case lit !">
                 <div class="card-inner">
                     <div class="card-front">
-                        <img src="/images/file-removebg-preview.png" alt="Card 2">
+                        <img src="/images/CARD4-QUEEN.png" alt="Card 2">
                     </div>
                     <div class="card-back">
                         <!-- Arrière-plan par défaut -->
@@ -216,7 +218,7 @@
                 data-description="Quand tu veux passer une bonne soirée... sans les discussions du lendemain.">
                 <div class="card-inner">
                     <div class="card-front">
-                        <img src="/images/file__1_-removebg-preview.png" alt="Card 3">
+                        <img src="/images/CARD1-ACE.png" alt="Card 3">
                     </div>
                     <div class="card-back">
                         <!-- Arrière-plan avec taille personnalisée pour la carte 3 -->
@@ -228,7 +230,7 @@
                 data-description="Pour les rois et reines du cœur, en quête d'une histoire qui dure et qui compte.">
                 <div class="card-inner">
                     <div class="card-front">
-                        <img src="/images/file__2_-removebg-preview.png" alt="Card 4">
+                        <img src="/images/CARDS3-KING-2.png" alt="Card 4">
                     </div>
                     <div class="card-back">
                         <!-- Arrière-plan avec taille personnalisée pour la carte 4 -->
