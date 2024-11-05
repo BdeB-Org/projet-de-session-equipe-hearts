@@ -20,11 +20,20 @@ CREATE DATABASE myhearts;
 
 USE myhearts;
 
-DROP TABLE e_utilisateur;
-DROP TABLE e_abonnement;
-DROP TABLE lieu;
-DROP TABLE preference;
-DROP TABLE relation_5;
+ALTER TABLE preference DROP FOREIGN KEY preference_ibfk_1; -- Utilisateur_id
+ALTER TABLE preference DROP FOREIGN KEY preference_ibfk_2; -- Card_id
+ALTER TABLE preference DROP FOREIGN KEY preference_ibfk_3; -- Like_id
+
+ALTER TABLE relation_5 DROP FOREIGN KEY relation_5_ibfk_1; -- Utilisateur_id_utilisateur
+ALTER TABLE relation_5 DROP FOREIGN KEY relation_5_ibfk_2; -- Lieu_id_lieu
+
+DROP TABLE IF EXISTS e_utilisateur;
+DROP TABLE IF EXISTS e_abonnement;
+DROP TABLE IF EXISTS lieu;
+DROP TABLE IF EXISTS preference;
+DROP TABLE IF EXISTS relation_5;
+DROP TABLE IF EXISTS e_card;
+DROP TABLE IF EXISTS e_likes;
 
 CREATE TABLE e_utilisateur (
     e_id INT AUTO_INCREMENT NOT NULL,
@@ -39,6 +48,7 @@ CREATE TABLE e_utilisateur (
     abonnement_id VARCHAR(255),
     swipe_count INT DEFAULT 0,
     last_swipe_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    genre VARCHAR(10) NOT NULL,
     PRIMARY KEY (e_id)
 );
 ALTER TABLE e_utilisateur 
@@ -63,13 +73,31 @@ CREATE TABLE lieu (
     PRIMARY KEY (id_lieu)
 );
 
-CREATE TABLE preference (
-    id_preference INT NOT NULL,
-    utilisateur_id_utilisateur INT,
-    type_pref VARCHAR(100) NOT NULL,
-    PRIMARY KEY (id_preference),
-    FOREIGN KEY (utilisateur_id_utilisateur) REFERENCES utilisateur(id_utilisateur)
+CREATE TABLE e_card (
+    id_card INT AUTO_INCREMENT NOT NULL,
+    type_card VARCHAR(50) NOT NULL,
+    PRIMARY KEY (id_card)
 );
+
+CREATE TABLE e_likes (
+    id_like INT AUTO_INCREMENT NOT NULL,
+    type_like VARCHAR(50) NOT NULL,
+    PRIMARY KEY (id_like)
+);
+
+
+CREATE TABLE preference (
+    id_preference INT AUTO_INCREMENT NOT NULL,
+    utilisateur_id INT,
+    card_id INT,
+    like_id INT,
+    PRIMARY KEY (id_preference),
+    FOREIGN KEY (utilisateur_id) REFERENCES e_utilisateur(e_id),
+    FOREIGN KEY (card_id) REFERENCES e_card(id_card),
+    FOREIGN KEY (like_id) REFERENCES e_likes(id_like)
+);
+
+
 
 CREATE TABLE relation_5 (
     utilisateur_id_utilisateur INT NOT NULL,
