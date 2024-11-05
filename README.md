@@ -57,6 +57,14 @@ ADD COLUMN twitterId VARCHAR(255) UNIQUE,
 ADD COLUMN appleId VARCHAR(255) UNIQUE;
 ADD COMLUM googleId VARCHAR(255) UNIQUE; 
 
+CREATE TABLE e_photo (
+    id_photo INT AUTO_INCREMENT NOT NULL,
+    utilisateur_id INT NOT NULL,
+    photo_url VARCHAR(255) NOT NULL,
+    PRIMARY KEY (id_photo),
+    FOREIGN KEY (utilisateur_id) REFERENCES e_utilisateur(e_id) ON DELETE CASCADE
+);
+
 CREATE TABLE e_abonnement (
     e_id INT NOT NULL,
     e_type VARCHAR(100) NOT NULL,
