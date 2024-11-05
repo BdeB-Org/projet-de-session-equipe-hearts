@@ -578,13 +578,54 @@ app.get("/event/apropos", function (req, res) {
 });
 
 app.get("/event/swipe", function (req, res) {
-    res.render("pages/swipe", {
-        siteTitle: "Aprpoos",
-        pageTitle: "A Propos",
-        userDetails: req.session.user,
+    const userId = req.session.user.e_id;
+    const cardNames = {
+        1: 'Ace',
+        2: 'Joker',
+        3: 'Reine',
+        4: 'Roi'
+    };
 
+    const likeNames = {
+        1: 'Musique',
+        2: 'Cinéma',
+        3: 'Voyages',
+        4: 'Sport',
+        5: 'Lecture',
+        6: 'Cuisine'
+    };
+
+    const getPreferencesQuery = `
+        SELECT card_id, like_id 
+        FROM preference 
+        WHERE utilisateur_id = ?`;
+
+    con.query(getPreferencesQuery, [userId], (err, preferenceResults) => {
+        if (err) {
+            console.error('Error fetching user preferences:', err);
+            return res.status(500).send('Error fetching user preferences');
+        }
+
+        const cardPreferences = preferenceResults
+            .filter(pref => pref.card_id)
+            .map(pref => cardNames[pref.card_id]);
+
+        const likePreferences = preferenceResults
+            .filter(pref => pref.like_id)
+            .map(pref => likeNames[pref.like_id]);
+
+        // Ensure you're passing the user session data correctly
+        res.render("pages/swipe", {
+            siteTitle: "Swipe",
+            pageTitle: "Swipe",
+            userDetails: req.session.user, // Make sure this is populated correctly
+            cardPreferences: cardPreferences,
+            likePreferences: likePreferences // This should be an array
+        });
     });
+
 });
+
 app.get("/event/profil", function (req, res) {
     if (!req.session.user) {
         return res.redirect("/event/inscription");
@@ -706,42 +747,75 @@ app.get('/event/download-receipt', (req, res) => {
     doc.end();
 });
 
-
+/*
+-----------------------------
+    Pages swipes
+-----------------------------
+*/
 app.get('/api/users', (req, res) => {
     const query = 'SELECT * FROM e_utilisateur';
     con.query(query, (err, results) => {
         if (err) {
             return res.status(500).json({ error: 'Error fetching users' });
         }
-        res.json(results); // Send user data as JSON
+
+        // Prepare users with their likes
+        const usersWithLikesPromises = results.map(async (user) => {
+            const likes = await getUserLikes(user.e_id); // Ensure this returns an array
+            return {
+                ...user,
+                likes: likes // Add the likes array here
+            };
+        });
+
+        Promise.all(usersWithLikesPromises).then(usersWithLikes => {
+            res.json(usersWithLikes);
+        });
     });
 });
 
+
+function getUserLikes(userId) {
+    const likeNames = {
+        1: 'Musique',
+        2: 'Cinéma',
+        3: 'Voyages',
+        4: 'Sport',
+        5: 'Lecture',
+        6: 'Cuisine'
+    };
+
+    const likesQuery = 'SELECT like_id FROM preference WHERE utilisateur_id = ?';
+    return new Promise((resolve, reject) => {
+        con.query(likesQuery, [userId], (err, results) => {
+            if (err) return reject(err);
+            const likeNamesList = results.map(row => likeNames[row.like_id]); // Ensure this returns a string array
+            resolve(likeNamesList);
+        });
+    });
+}
+
+
 app.get('/api/user/swipe-data/:userId', (req, res) => {
     const userId = req.params.userId;
-    const currentTime = new Date(); // Get current time
+    const currentTime = new Date();
 
-    // Query database to get swipe_count and last_swipe_time for the user
     con.query('SELECT swipe_count, last_swipe_time FROM e_utilisateur WHERE e_id = ?', [userId], (error, results) => {
         if (error) throw error;
 
         const user = results[0];
         const lastSwipeTime = new Date(user.last_swipe_time);
 
-        // Get today's date at 12am
         const todayAtMidnight = new Date();
-        todayAtMidnight.setHours(0, 0, 0, 0); // Set time to 12 am
+        todayAtMidnight.setHours(0, 0, 0, 0);
 
-        // Check if last swipe time is before today at 12 am
         if (lastSwipeTime < todayAtMidnight) {
-            // Reset the swipe count and last swipe time for the new day
             user.swipe_count = 0;
             con.query('UPDATE e_utilisateur SET swipe_count = 0, last_swipe_time = CURRENT_TIMESTAMP WHERE e_id = ?', [userId], (err) => {
                 if (err) throw err;
             });
         }
 
-        // Return the updated swipe count and last swipe time
         res.json({
             swipe_count: user.swipe_count,
             last_swipe_time: user.last_swipe_time
@@ -752,7 +826,6 @@ app.get('/api/user/swipe-data/:userId', (req, res) => {
 app.post('/api/user/update-swipe', (req, res) => {
     const { userId, swipeCount, swipeTime } = req.body;
 
-    // Update the user's swipe_count and last_swipe_time
     con.query('UPDATE e_utilisateur SET swipe_count = ?, last_swipe_time = ? WHERE e_id = ?', [swipeCount, swipeTime, userId], (error, results) => {
         if (error) throw error;
         res.json({ success: true });
@@ -769,7 +842,9 @@ app.post('/api/user/update-swipe', (req, res) => {
 
 
 /*
+-----------------------------
   Connectez a un compte
+-----------------------------
 */
 
 app.post('/event/connect', (req, res) => {
@@ -811,7 +886,9 @@ app.post('/event/connect', (req, res) => {
 });
 
 /*
+-----------------------------
   Déconnectez a un compte
+-----------------------------
 */
 
 
@@ -826,7 +903,9 @@ app.post('/event/logout', (req, res) => {
 });
 
 /*
+-----------------------------
   Payer un abonnement
+-----------------------------
 */
 
 
@@ -951,7 +1030,9 @@ const sendConfirmationEmail = (confirmationEmail, subscriptionType, originalAmou
 
 
 /*
-  Changer l'abonnement a gratuir
+-----------------------------
+  Changer l'abonnement a gratuit
+-----------------------------
 */
 
 
@@ -974,7 +1055,9 @@ app.post('/event/change-plan', (req, res) => {
 });
 
 /*
+-----------------------------
   Changer le mot de passe
+-----------------------------
 */
 app.post('/event/change-password', async (req, res) => {
     const { old_password, new_password, confirm_password } = req.body;
@@ -1030,7 +1113,9 @@ app.post('/event/change-password', async (req, res) => {
 
 
 /*
+-----------------------------
   Delete un compte
+-----------------------------
 */
 
 
@@ -1041,28 +1126,38 @@ app.post('/event/delete-account', (req, res) => {
         return res.status(400).send('Utilisateur non connecté.');
     }
 
-    const deleteUserQuery = 'DELETE FROM e_utilisateur WHERE e_id = ?';
-
-    con.query(deleteUserQuery, [userId], (err, result) => {
+    // Start with deleting preferences
+    const deletePreferencesQuery = 'DELETE FROM preference WHERE utilisateur_id = ?';
+    con.query(deletePreferencesQuery, [userId], (err) => {
         if (err) {
-            console.error('Error deleting user:', err);
-            return res.status(500).send('Erreur interne du serveur.');
+            console.error('Error deleting user preferences:', err);
+            return res.status(500).send('Erreur lors de la suppression des préférences de l\'utilisateur.');
         }
 
-        req.session.destroy((err) => {
+        // Now delete the user
+        const deleteUserQuery = 'DELETE FROM e_utilisateur WHERE e_id = ?';
+        con.query(deleteUserQuery, [userId], (err) => {
             if (err) {
-                console.error('Error during logout:', err);
-                return res.status(500).send('Erreur lors de la déconnexion.');
+                console.error('Error deleting user:', err);
+                return res.status(500).send('Erreur lors de la suppression de l\'utilisateur.');
             }
-            res.redirect('/');
+
+            req.session.destroy((err) => {
+                if (err) {
+                    console.error('Error during logout:', err);
+                    return res.status(500).send('Erreur lors de la déconnexion.');
+                }
+                res.redirect('/');
+            });
         });
     });
 });
 
 
 /*
-/*
+-----------------------------
   Inscrire à un compte
+-----------------------------
 */
 
 import multer from 'multer';
@@ -1097,7 +1192,6 @@ app.post('/event/inscription', upload.single('photo'), (req, res) => {
     const { email, password, phone, firstName, lastName, birthdate, gender, selectedCard, selectedLikes } = req.body;
     const uploadedPhoto = req.file ? req.file.filename : null;
 
-    // Check if the email already exists
     const checkEmailQuery = "SELECT * FROM e_utilisateur WHERE e_courriel = ?";
     con.query(checkEmailQuery, [email], (err, result) => {
         if (err) {
@@ -1115,7 +1209,7 @@ app.post('/event/inscription', upload.single('photo'), (req, res) => {
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         `;
 
-        const defaultLocation = 'Inconnu'; // Default location
+        const defaultLocation = 'Inconnu';
 
         con.query(insertUserQuery, [lastName, firstName, birthdate, email, uploadedPhoto, defaultLocation, phone, password, 1, gender], (err, result) => {
             if (err) {
@@ -1123,10 +1217,8 @@ app.post('/event/inscription', upload.single('photo'), (req, res) => {
                 return res.status(500).send("Internal Server Error");
             }
 
-            // Retrieve the ID of the newly inserted user
             const userId = result.insertId;
 
-            // Prepare to insert card preference if selected
             let cardIdPromise = Promise.resolve();
             if (selectedCard) {
                 cardIdPromise = new Promise((resolve, reject) => {
@@ -1143,7 +1235,7 @@ app.post('/event/inscription', upload.single('photo'), (req, res) => {
                         }
 
                         const cardId = cardResult[0].id_card;
-                        // Now insert the preference
+
                         const insertCardPreferenceQuery = `
                             INSERT INTO preference (utilisateur_id, card_id)
                             VALUES (?, ?)
@@ -1159,15 +1251,14 @@ app.post('/event/inscription', upload.single('photo'), (req, res) => {
                 });
             }
 
-            // Insert likes preferences if selected
             let likesPromises = [];
             if (selectedLikes) {
-                const likesArray = selectedLikes.split(',').map(like => like.trim()); // Trim spaces
-                console.log("Trimmed likes being processed:", likesArray); // Debugging output
+                const likesArray = selectedLikes.split(',').map(like => like.trim());
+                console.log("Trimmed likes being processed:", likesArray);
 
                 likesPromises = likesArray.map(like => {
                     return new Promise((resolve, reject) => {
-                        console.log("Fetching like ID for:", like); // Debugging output
+                        console.log("Fetching like ID for:", like);
                         const fetchLikeIdQuery = "SELECT id_like FROM e_likes WHERE type_like = ?";
                         con.query(fetchLikeIdQuery, [like], (err, likeResult) => {
                             if (err) {
@@ -1176,12 +1267,12 @@ app.post('/event/inscription', upload.single('photo'), (req, res) => {
                             }
 
                             if (likeResult.length === 0) {
-                                console.error("Selected like not found in database:", like); // Debugging output
+                                console.error("Selected like not found in database:", like);
                                 return reject(`Selected like "${like}" not valid`);
                             }
 
                             const likeId = likeResult[0].id_like;
-                            // Now insert the preference
+
                             const insertLikePreferenceQuery = `
                     INSERT INTO preference (utilisateur_id, like_id)
                     VALUES (?, ?)
@@ -1191,7 +1282,7 @@ app.post('/event/inscription', upload.single('photo'), (req, res) => {
                                     console.error("Error inserting like preference:", err);
                                     return reject("Error inserting like preference");
                                 }
-                                console.log(`Like ${like} added/updated successfully.`); // Successful insert log
+                                console.log(`Like ${like} added/updated successfully.`);
                                 resolve();
                             });
                         });
@@ -1200,10 +1291,8 @@ app.post('/event/inscription', upload.single('photo'), (req, res) => {
             }
 
 
-            // Wait for all database operations to complete
             Promise.all([cardIdPromise, ...likesPromises])
                 .then(() => {
-                    // Log the user in by setting the session
                     req.session.user = {
                         e_id: userId,
                         e_nom: lastName,
@@ -1216,11 +1305,11 @@ app.post('/event/inscription', upload.single('photo'), (req, res) => {
                         abonnement_id: 1,
                         genre: gender
                     };
-                    return res.redirect('/'); // Redirect after successful registration
+                    return res.redirect('/');
                 })
                 .catch((error) => {
                     console.error("Error during registration:", error);
-                    return res.status(500).send(error); // Handle any errors from promises
+                    return res.status(500).send(error);
                 });
         });
     });

@@ -349,21 +349,19 @@
         fetch('/api/users')
             .then(response => response.json())
             .then(data => {
-                // Filter out the logged-in user from the list of users
+                console.log(data); // Log the data to check if users are being fetched correctly
                 users = data.filter(user => user.e_id !== parseInt(loggedInUserId));
 
-                cardContainer.innerHTML = ''; // Clear previous cards
-
-                // Check if there are any users left to display after filtering
+                cardContainer.innerHTML = '';
                 if (users.length === 0) {
                     cardContainer.innerHTML = '<p>No other users found.</p>';
-                    return; // Exit if no users left to show
+                    return;
                 }
 
-                // Render the first user
-                updateUserCard();
+                updateUserCard(); // Make sure this is called after checking users
             })
             .catch(error => console.error('Error fetching user data:', error));
+
 
         function setupButtonListeners(user) {
             const likeButton = document.querySelector('.like-button');
@@ -372,19 +370,19 @@
 
             if (likeButton) {
                 likeButton.addEventListener('click', function () {
-                    swipeCount++; // Increment swipe count
+                    swipeCount++;
                     showBounceIcon('heart', cardElement);
-                    cardElement.classList.add('swipe-right'); // Add the swipe-right animation
-                    setTimeout(() => nextUser(), 500); // Delay switching to the next user
+                    cardElement.classList.add('swipe-right');
+                    setTimeout(() => nextUser(), 500);
                 });
             }
 
             if (passButton) {
                 passButton.addEventListener('click', function () {
-                    swipeCount++; // Increment swipe count
+                    swipeCount++;
                     showBounceIcon('x', cardElement);
-                    cardElement.classList.add('swipe-left'); // Add the swipe-left animation
-                    setTimeout(() => nextUser(), 500); // Delay switching to the next user
+                    cardElement.classList.add('swipe-left');
+                    setTimeout(() => nextUser(), 500);
                 });
             }
         }
@@ -401,8 +399,8 @@
             cardElement.appendChild(iconElement);
 
             setTimeout(() => {
-                iconElement.remove(); // Remove the icon after animation completes
-            }, 500); // Match with the bounce animation duration
+                iconElement.remove();
+            }, 500);
         }
 
         function nextUser() {
@@ -410,16 +408,15 @@
 
             if (swipeCount >= maxSwipes) {
                 alert('You have reached your daily swipe limit.');
-                showCountdown(); // Show countdown once limit is reached
+                showCountdown();
                 swipesLeftElement.textContent = 0;
-                return; // Stop swiping if the limit is reached
+                return;
             }
 
-            currentIndex = (currentIndex + 1) % users.length; // Cycle through users
-            updateUserCard(); // Update the user card
-            swipesLeftElement.textContent = maxSwipes - swipeCount; // Update swipe count on UI
+            currentIndex = (currentIndex + 1) % users.length;
+            updateUserCard();
+            swipesLeftElement.textContent = maxSwipes - swipeCount;
 
-            // Remove the swipe classes after the animation ends
             cardElement.classList.remove('swipe-right', 'swipe-left');
         }
 
@@ -427,17 +424,21 @@
             const user = users[currentIndex]; // Get current user
             if (user) {
                 cardContainer.innerHTML = `
-                <div class="card">
-                    <img src="/uploads/${user.e_photo}" alt="${user.e_nom}">
-                    <h2>${user.e_nom}</h2>
-                    <p>À ${user.distance || 'undefined'} kilomètres de distance</p>
-                    <button class="button like-button"><i class="fas fa-heart"></i>Aimer</button>
-                    <button class="button pass-button"><i class="fas fa-times"></i>Passer</button>
-                </div>
-            `;
+            <div class="card">
+                <img src="/uploads/${user.e_photo}" alt="${user.e_nom}">
+                <h2>${user.e_nom}</h2>
+                <p>À ${user.distance || 'undefined'} kilomètres de distance</p>
+                <p>Préférences de Likes: ${user.likes.length > 0 ? user.likes.join(', ') : 'Aucune'}</p>
+                <button class="button like-button"><i class="fas fa-heart"></i>Aimer</button>
+                <button class="button pass-button"><i class="fas fa-times"></i>Passer</button>
+            </div>
+        `;
                 setupButtonListeners(user);
+            } else {
+                console.warn('No user found at current index:', currentIndex); // Warn if no user is found
             }
         }
+
 
         function showCountdown() {
             cardContainer.innerHTML = '<p>Revenez demain pour continuer à swiper !</p>';
