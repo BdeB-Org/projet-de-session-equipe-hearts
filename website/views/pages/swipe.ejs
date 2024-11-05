@@ -361,26 +361,47 @@
                 swipesLeftElement.textContent = maxSwipes - swipeCount;
 
                 // Fetch all users
+                // Fetch all users
                 fetch('/api/users')
                     .then(response => response.json())
                     .then(data => {
-                        console.log('All Users:', data); // Log all user data for debugging
+                        console.log('All Users:', data);
 
-                        users = data.filter(user => {
-                            return user.e_id !== parseInt(loggedInUserId) &&
-                                cardPreferences2.includes(user.card); // Check if user's card ID is in the logged-in user's preferences
+                        const loggedInUserLikes = preferenceResults.map(pref => pref.like_id);
+
+                        // Separate users into two arrays based on likes
+                        const usersWithSimilarLikes = [];
+                        const usersWithoutSimilarLikes = [];
+
+                        data.forEach(user => {
+                            const userLikes = user.likes || [];
+                            const hasSimilarLikes = userLikes.some(like => loggedInUserLikes.includes(like));
+                            if (hasSimilarLikes) {
+                                usersWithSimilarLikes.push(user);
+                            } else {
+                                usersWithoutSimilarLikes.push(user);
+                            }
                         });
 
-                        console.log('Filtered Users:', users); // Log filtered users
+                        usersWithSimilarLikes.sort((a, b) => {
+                            const aLikesCount = a.likes.filter(like => loggedInUserLikes.includes(like)).length;
+                            const bLikesCount = b.likes.filter(like => loggedInUserLikes.includes(like)).length;
+                            return bLikesCount - aLikesCount;
+                        });
+
+                        users = [...usersWithSimilarLikes, ...usersWithoutSimilarLikes].filter(user => user.e_id !== parseInt(loggedInUserId) && cardPreferences2.includes(user.card));
+
+                        console.log('Filtered Users:', users);
 
                         if (users.length === 0) {
                             cardContainer.innerHTML = '<p>No other users found.</p>';
                             return;
                         }
 
-                        updateUserCard(); // Call the function to update the displayed user card
+                        updateUserCard();
                     })
                     .catch(error => console.error('Error fetching user data:', error));
+
 
             })
             .catch(error => console.error('Error fetching preferences:', error));

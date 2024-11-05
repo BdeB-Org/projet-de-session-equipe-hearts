@@ -626,6 +626,7 @@ app.get("/event/swipe", function (req, res) {
             pageTitle: "Swipe",
             userDetails: req.session.user, // Make sure this is populated correctly
             cardPreferences: cardPreferences || [],
+            cardPreferences: cardPreferences2 || [],
             likePreferences: likePreferences // This should be an array
         });
     });
