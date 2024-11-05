@@ -610,16 +610,22 @@ app.get("/event/swipe", function (req, res) {
             .filter(pref => pref.card_id)
             .map(pref => cardNames[pref.card_id]);
 
+        const cardPreferences2 = preferenceResults
+            .filter(pref => pref.card_id)
+            .map(pref => pref.card_id);
+
         const likePreferences = preferenceResults
             .filter(pref => pref.like_id)
             .map(pref => likeNames[pref.like_id]);
+        console.log('Card Preferences:', cardPreferences);
+        console.log('Card Preferences:', cardPreferences2);
 
         // Ensure you're passing the user session data correctly
         res.render("pages/swipe", {
             siteTitle: "Swipe",
             pageTitle: "Swipe",
             userDetails: req.session.user, // Make sure this is populated correctly
-            cardPreferences: cardPreferences,
+            cardPreferences: cardPreferences || [],
             likePreferences: likePreferences // This should be an array
         });
     });
@@ -759,17 +765,19 @@ app.get('/api/users', (req, res) => {
             return res.status(500).json({ error: 'Error fetching users' });
         }
 
-        // Prepare users with their likes
-        const usersWithLikesPromises = results.map(async (user) => {
-            const likes = await getUserLikes(user.e_id); // Ensure this returns an array
+        // Prepare users with their likes and card data
+        const usersWithDetailsPromises = results.map(async (user) => {
+            const likes = await getUserLikes(user.e_id); // Fetch user likes
+            const card = await getUserCard(user.e_id); // Fetch user card
             return {
                 ...user,
-                likes: likes // Add the likes array here
+                likes: likes, // Add the likes array here
+                card: card // Add the card data here
             };
         });
 
-        Promise.all(usersWithLikesPromises).then(usersWithLikes => {
-            res.json(usersWithLikes);
+        Promise.all(usersWithDetailsPromises).then(usersWithDetails => {
+            res.json(usersWithDetails);
         });
     });
 });
@@ -794,6 +802,19 @@ function getUserLikes(userId) {
         });
     });
 }
+
+// Function to get user card information
+function getUserCard(userId) {
+    const cardQuery = 'SELECT card_id FROM preference WHERE utilisateur_id = ?'; // Corrected query
+    return new Promise((resolve, reject) => {
+        con.query(cardQuery, [userId], (err, results) => {
+            if (err) return reject(err);
+            const card = results[0] ? results[0].card_id : null; // Fetch card ID if exists
+            resolve(card);
+        });
+    });
+}
+
 
 
 app.get('/api/user/swipe-data/:userId', (req, res) => {
@@ -831,6 +852,25 @@ app.post('/api/user/update-swipe', (req, res) => {
         res.json({ success: true });
     });
 });
+
+app.post('/api/user/preferences', (req, res) => {
+    const userId = req.body.userId; // Get user ID from the request body
+
+    const getPreferencesQuery = `
+        SELECT card_id, like_id 
+        FROM preference 
+        WHERE utilisateur_id = ?`;
+
+    con.query(getPreferencesQuery, [userId], (err, preferenceResults) => {
+        if (err) {
+            console.error('Error fetching user preferences:', err);
+            return res.status(500).json({ error: 'Error fetching user preferences' });
+        }
+
+        res.json(preferenceResults); // Send the preferences as a JSON response
+    });
+});
+
 
 
 
@@ -1237,9 +1277,9 @@ app.post('/event/inscription', upload.single('photo'), (req, res) => {
                         const cardId = cardResult[0].id_card;
 
                         const insertCardPreferenceQuery = `
-                            INSERT INTO preference (utilisateur_id, card_id)
-                            VALUES (?, ?)
-                        `;
+                        INSERT INTO preference (utilisateur_id, card_id)
+                        VALUES (?, ?)
+                    `;
                         con.query(insertCardPreferenceQuery, [userId, cardId], (err) => {
                             if (err) {
                                 console.error("Error inserting card preference:", err);
