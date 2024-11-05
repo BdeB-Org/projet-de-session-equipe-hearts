@@ -24,7 +24,7 @@
                         <feMergeNode in="SourceGraphic"></feMergeNode>
                     </feMerge>
                 </filter>
-        
+
                 <!-- Pink Glow Effect (for Queen and King) -->
                 <filter id="pink-glow-effect" x="-50%" y="-50%" width="200%" height="200%">
                     <feFlood flood-color="#FF79A1" result="flood"></feFlood>
@@ -37,7 +37,7 @@
                 </filter>
             </defs>
         </svg>
-        
+
     </head>
 
     <body>
@@ -55,6 +55,9 @@
                 <!-- Form split into two columns -->
                 <form id="myForm" class="orbitron-font form-grid" action="/event/inscription" method="POST"
                     enctype="multipart/form-data">
+                    <!-- Champs cachés pour stocker les préférences sélectionnées -->
+                    <input type="hidden" id="selected-card" name="selectedCard" value="">
+                    <input type="hidden" id="selected-likes" name="selectedLikes" value="">
                     <!-- Left Column of Form -->
                     <div class="form-column">
                         <!-- Email -->
@@ -64,15 +67,13 @@
 
                         <!-- Password -->
                         <div class="step" id="step-1">
-                            <input type="password" id="password" name="password" placeholder="Mot de passe"
-                                 required>
-                                <!-- minlength -->
+                            <input type="password" id="password" name="password" placeholder="Mot de passe" required>
+                            <!-- minlength -->
                         </div>
 
                         <!-- Verify Password -->
                         <div class="step" id="step-2">
-                            <input type="password" id="verify-password" placeholder="Vérifiez le mot de passe"
-                                 required>
+                            <input type="password" id="verify-password" placeholder="Vérifiez le mot de passe" required>
                         </div>
 
                         <!-- Phone Number -->

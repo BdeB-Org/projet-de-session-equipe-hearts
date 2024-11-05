@@ -151,6 +151,8 @@ con.connect(function (err) {
     if (err) throw err;
     console.log("connected!");
     initializeSubscriptions();
+    initializeCards();
+    initializeLikes();
 });
 
 /*
@@ -245,6 +247,71 @@ const initializeSubscriptions = () => {
         });
     });
 };
+
+/*
+------------------------------------------
+Inititaliser la table des cartes
+------------------------------------------
+*/
+const initializeCards = () => {
+    const cards = [
+        { id_card: 1, type_card: 'Ace' },
+        { id_card: 2, type_card: 'Joker' },
+        { id_card: 3, type_card: 'Reine' },
+        { id_card: 4, type_card: 'Roi' }
+    ];
+
+    cards.forEach(card => {
+        const insertQuery = `
+            INSERT INTO e_card (id_card, type_card)
+            VALUES (?, ?)
+            ON DUPLICATE KEY UPDATE
+                type_card = VALUES(type_card);
+        `;
+
+        con.query(insertQuery, [card.id_card, card.type_card], (err) => {
+            if (err) {
+                console.error(`Error inserting card ${card.type_card}:`, err);
+            } else {
+                console.log(`Card ${card.type_card} added/updated successfully.`);
+            }
+        });
+    });
+};
+
+/*
+------------------------------------------
+Inititaliser la table des likes
+------------------------------------------
+*/
+const initializeLikes = () => {
+    const likes = [
+        { id_like: 1, type_like: 'Musique' },
+        { id_like: 2, type_like: 'Cinéma' },
+        { id_like: 3, type_like: 'Voyages' },
+        { id_like: 4, type_like: 'Sport' },
+        { id_like: 5, type_like: 'Lecture' },
+        { id_like: 6, type_like: 'Cuisine' }
+    ];
+
+    likes.forEach(like => {
+        const insertQuery = `
+            INSERT INTO e_likes (id_like, type_like)
+            VALUES (?, ?)
+            ON DUPLICATE KEY UPDATE
+                type_like = VALUES(type_like);
+        `;
+
+        con.query(insertQuery, [like.id_like, like.type_like], (err) => {
+            if (err) {
+                console.error(`Error inserting like ${like.type_like}:`, err);
+            } else {
+                console.log(`Like ${like.type_like} added/updated successfully.`);
+            }
+        });
+    });
+};
+
 
 /*
 ------------------------------------------
@@ -495,7 +562,7 @@ app.get("/event/payment", (req, res) => {
         userDetails: req.session.user,
         amount,
         subscriptionName: subscriptionType,
-        hashedUrl: hash // Pass the hash if needed for display purposes
+        hashedUrl: hash
     });
 });
 
@@ -518,7 +585,6 @@ app.get("/event/swipe", function (req, res) {
 
     });
 });
-
 app.get("/event/profil", function (req, res) {
     if (!req.session.user) {
         return res.redirect("/event/inscription");
@@ -530,28 +596,66 @@ app.get("/event/profil", function (req, res) {
         3: "Diamant"
     };
 
-    const userSubscriptionName = subscriptionNames[req.session.user.abonnement_id] || 'Aucun abonnement actif';
+    const cardNames = {
+        1: 'Ace',
+        2: 'Joker',
+        3: 'Reine',
+        4: 'Roi'
+    };
 
-    // Fetch user's photos from the database
+    const likeNames = {
+        1: 'Musique',
+        2: 'Cinéma',
+        3: 'Voyages',
+        4: 'Sport',
+        5: 'Lecture',
+        6: 'Cuisine'
+    };
+
+    const userSubscriptionName = subscriptionNames[req.session.user.abonnement_id] || 'Aucun abonnement actif';
     const userId = req.session.user.e_id;
+
     const getPhotosQuery = 'SELECT photo_url FROM e_photo WHERE utilisateur_id = ?';
-    con.query(getPhotosQuery, [userId], (err, results) => {
+    con.query(getPhotosQuery, [userId], (err, photoResults) => {
         if (err) {
             console.error('Error fetching user photos:', err);
             return res.status(500).send('Error fetching user photos');
         }
 
-        const userPhotos = results.map(row => row.photo_url);
+        const userPhotos = photoResults.map(row => row.photo_url);
 
-        res.render("pages/profil", {
-            siteTitle: "Profil",
-            pageTitle: "Votre Profil",
-            userDetails: req.session.user,
-            subscriptionName: userSubscriptionName,
-            userPhotos: userPhotos // Pass photos to the view
+        const getPreferencesQuery = `
+            SELECT card_id, like_id 
+            FROM preference 
+            WHERE utilisateur_id = ?`;
+        con.query(getPreferencesQuery, [userId], (err, preferenceResults) => {
+            if (err) {
+                console.error('Error fetching user preferences:', err);
+                return res.status(500).send('Error fetching user preferences');
+            }
+
+            const cardPreferences = preferenceResults
+                .filter(pref => pref.card_id)
+                .map(pref => cardNames[pref.card_id]);
+
+            const likePreferences = preferenceResults
+                .filter(pref => pref.like_id)
+                .map(pref => likeNames[pref.like_id]);
+
+            res.render("pages/profil", {
+                siteTitle: "Profil",
+                pageTitle: "Votre Profil",
+                userDetails: req.session.user,
+                subscriptionName: userSubscriptionName,
+                userPhotos: userPhotos,
+                cardPreferences: cardPreferences,
+                likePreferences: likePreferences
+            });
         });
     });
 });
+
+
 
 app.get('/event/download-receipt', (req, res) => {
     const { subscriptionType, amount, tvqAmount, tpsAmount, totalAmount, paymentId, confirmationEmail } = req.session;
@@ -990,47 +1094,138 @@ const upload = multer({
 });
 
 app.post('/event/inscription', upload.single('photo'), (req, res) => {
-    const { email, password, phone, firstName, lastName, birthdate } = req.body;
-    const uploadedPhoto = req.file ? req.file.filename : null; // Get the filename
+    const { email, password, phone, firstName, lastName, birthdate, gender, selectedCard, selectedLikes } = req.body;
+    const uploadedPhoto = req.file ? req.file.filename : null;
 
-    // Check if email already exists
+    // Check if the email already exists
     const checkEmailQuery = "SELECT * FROM e_utilisateur WHERE e_courriel = ?";
     con.query(checkEmailQuery, [email], (err, result) => {
         if (err) {
             console.error("Error checking email:", err);
-            return res.status(500).send("Erreur interne du serveur");
+            return res.status(500).send("Internal Server Error");
         }
 
         if (result.length > 0) {
-            return res.status(409).send("Email déjà utilisé");
+            return res.status(409).send("Email already in use");
         }
 
-        // If email does not exist, insert new user
+        // Insert the new user
         const insertUserQuery = `
-            INSERT INTO e_utilisateur (e_nom, e_prenom, date_naissance, e_courriel, e_photo, e_location, e_number, e_password, abonnement_id)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+            INSERT INTO e_utilisateur (e_nom, e_prenom, date_naissance, e_courriel, e_photo, e_location, e_number, e_password, abonnement_id, genre)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         `;
 
         const defaultLocation = 'Inconnu'; // Default location
 
-        con.query(insertUserQuery, [lastName, firstName, birthdate, email, uploadedPhoto, defaultLocation, phone, password, 1], (err, result) => {
+        con.query(insertUserQuery, [lastName, firstName, birthdate, email, uploadedPhoto, defaultLocation, phone, password, 1, gender], (err, result) => {
             if (err) {
                 console.error("Error inserting user:", err);
-                return res.status(500).send("Erreur interne du serveur");
+                return res.status(500).send("Internal Server Error");
             }
 
-            // Set session user correctly with the uploaded photo filename
-            req.session.user = {
-                email,
-                firstName,
-                lastName,
-                e_photo: uploadedPhoto // Store the filename here
-            };
+            // Retrieve the ID of the newly inserted user
+            const userId = result.insertId;
 
-            res.redirect('/'); // Redirect after successful registration
+            // Prepare to insert card preference if selected
+            let cardIdPromise = Promise.resolve();
+            if (selectedCard) {
+                cardIdPromise = new Promise((resolve, reject) => {
+                    const fetchCardIdQuery = "SELECT id_card FROM e_card WHERE type_card = ?";
+                    con.query(fetchCardIdQuery, [selectedCard], (err, cardResult) => {
+                        if (err) {
+                            console.error("Error fetching card ID:", err);
+                            return reject("Internal Server Error");
+                        }
+
+                        if (cardResult.length === 0) {
+                            console.error("Selected card not found in database.");
+                            return reject("Selected card not valid");
+                        }
+
+                        const cardId = cardResult[0].id_card;
+                        // Now insert the preference
+                        const insertCardPreferenceQuery = `
+                            INSERT INTO preference (utilisateur_id, card_id)
+                            VALUES (?, ?)
+                        `;
+                        con.query(insertCardPreferenceQuery, [userId, cardId], (err) => {
+                            if (err) {
+                                console.error("Error inserting card preference:", err);
+                                return reject("Error inserting card preference");
+                            }
+                            resolve();
+                        });
+                    });
+                });
+            }
+
+            // Insert likes preferences if selected
+            let likesPromises = [];
+            if (selectedLikes) {
+                const likesArray = selectedLikes.split(',').map(like => like.trim()); // Trim spaces
+                console.log("Trimmed likes being processed:", likesArray); // Debugging output
+
+                likesPromises = likesArray.map(like => {
+                    return new Promise((resolve, reject) => {
+                        console.log("Fetching like ID for:", like); // Debugging output
+                        const fetchLikeIdQuery = "SELECT id_like FROM e_likes WHERE type_like = ?";
+                        con.query(fetchLikeIdQuery, [like], (err, likeResult) => {
+                            if (err) {
+                                console.error("Error fetching like ID:", err);
+                                return reject("Internal Server Error");
+                            }
+
+                            if (likeResult.length === 0) {
+                                console.error("Selected like not found in database:", like); // Debugging output
+                                return reject(`Selected like "${like}" not valid`);
+                            }
+
+                            const likeId = likeResult[0].id_like;
+                            // Now insert the preference
+                            const insertLikePreferenceQuery = `
+                    INSERT INTO preference (utilisateur_id, like_id)
+                    VALUES (?, ?)
+                `;
+                            con.query(insertLikePreferenceQuery, [userId, likeId], (err) => {
+                                if (err) {
+                                    console.error("Error inserting like preference:", err);
+                                    return reject("Error inserting like preference");
+                                }
+                                console.log(`Like ${like} added/updated successfully.`); // Successful insert log
+                                resolve();
+                            });
+                        });
+                    });
+                });
+            }
+
+
+            // Wait for all database operations to complete
+            Promise.all([cardIdPromise, ...likesPromises])
+                .then(() => {
+                    // Log the user in by setting the session
+                    req.session.user = {
+                        e_id: userId,
+                        e_nom: lastName,
+                        e_prenom: firstName,
+                        date_naissance: birthdate,
+                        e_courriel: email,
+                        e_photo: uploadedPhoto,
+                        e_location: defaultLocation,
+                        e_number: phone,
+                        abonnement_id: 1,
+                        genre: gender
+                    };
+                    return res.redirect('/'); // Redirect after successful registration
+                })
+                .catch((error) => {
+                    console.error("Error during registration:", error);
+                    return res.status(500).send(error); // Handle any errors from promises
+                });
         });
     });
 });
+
 
 
 app.get('/uploads/:filename', (req, res) => {

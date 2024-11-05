@@ -282,6 +282,40 @@
                                         <p>Aucune photo téléchargée.</p>
                                         <% } %>
                     </div>
+                    <!-- Display User Card Preferences -->
+                    <div class="user-preference">
+                        <h3>Préférence de Carte:</h3>
+                        <p>
+                            <% if (cardPreferences.length> 0) { %>
+                                <ul>
+                                    <% cardPreferences.forEach(cardId=> { %>
+                                        <li>
+                                            <%= cardId %>
+                                        </li> <!-- Replace this with the actual card name if you want -->
+                                        <% }); %>
+                                </ul>
+                                <% } else { %>
+                                    <p>Aucune carte sélectionnée.</p>
+                                    <% } %>
+                        </p>
+                    </div>
+
+                    <!-- Display User Likes Preferences -->
+                    <div class="user-likes">
+                        <h3>Préférences de Likes:</h3>
+                        <% if (likePreferences.length> 0) { %>
+                            <ul>
+                                <% likePreferences.forEach(likeId=> { %>
+                                    <li>
+                                        <%= likeId %>
+                                    </li> <!-- Replace this with the actual like name if you want -->
+                                    <% }); %>
+                            </ul>
+                            <% } else { %>
+                                <p>Aucun like sélectionné.</p>
+                                <% } %>
+                    </div>
+
                 </div>
             </div>
 
