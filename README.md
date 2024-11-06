@@ -105,6 +105,14 @@ CREATE TABLE preference (
     FOREIGN KEY (like_id) REFERENCES e_likes(id_like)
 );
 
+CREATE TABLE likes (
+    like_id INT AUTO_INCREMENT PRIMARY KEY,
+    liker_id INT NOT NULL,
+    liked_id INT NOT NULL,
+    like_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (liker_id) REFERENCES e_utilisateur(e_id),
+    FOREIGN KEY (liked_id) REFERENCES e_utilisateur(e_id)
+);
 
 
 CREATE TABLE relation_5 (
