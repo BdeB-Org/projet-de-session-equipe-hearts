@@ -817,7 +817,6 @@ function getUserCard(userId) {
 }
 
 
-
 app.get('/api/user/swipe-data/:userId', (req, res) => {
     const userId = req.params.userId;
     const currentTime = new Date();
@@ -871,6 +870,75 @@ app.post('/api/user/preferences', (req, res) => {
         res.json(preferenceResults); // Send the preferences as a JSON response
     });
 });
+
+app.post('/api/user/like', (req, res) => {
+    const { userId, likedUserId } = req.body;
+
+    // Insert the like into the likes table
+    const insertLikeQuery = 'INSERT INTO likes (liker_id, liked_id) VALUES (?, ?)';
+    con.query(insertLikeQuery, [userId, likedUserId], (err, result) => {
+        if (err) {
+            console.error('Error inserting like:', err);
+            return res.status(500).json({ error: 'Database error during the like action.' });
+        }
+
+        // Check for mutual like
+        const checkMutualLikeQuery = 'SELECT * FROM likes WHERE liker_id = ? AND liked_id = ?';
+        con.query(checkMutualLikeQuery, [likedUserId, userId], (err, results) => {
+            if (err) {
+                console.error('Error checking for mutual like:', err);
+                return res.status(500).json({ error: 'Database error checking for mutual like.' });
+            }
+
+            if (results.length > 0) { // Mutual like found
+                // Insert a match
+                const insertMatchQuery = 'INSERT INTO matches (user1_id, user2_id) VALUES (?, ?)';
+                con.query(insertMatchQuery, [userId, likedUserId], (matchErr, matchResult) => {
+                    if (matchErr) {
+                        console.error('Error recording match:', matchErr);
+                        return res.status(500).json({ error: 'Database error recording match.' });
+                    }
+                    res.json({ match: true, message: 'Match found!' });
+                });
+            } else {
+                res.json({ match: false, message: 'Like recorded, no match found yet.' });
+            }
+        });
+    });
+});
+
+app.get('/api/user/details/:id', (req, res) => {
+    const { id } = req.params;
+    const query = "SELECT * FROM e_utilisateur WHERE e_id = ?";
+    con.query(query, [id], (err, results) => {
+        if (err) {
+            console.error('Error fetching user details:', err);
+            return res.status(500).json({ error: 'Database error fetching user details.' });
+        }
+        if (results.length === 0) {
+            return res.status(404).json({ error: 'User not found.' });
+        }
+        res.json(results[0]);
+    });
+});
+
+app.get('/api/user/matches', (req, res) => {
+    const userId = req.session.user.e_id;
+    const fetchMatchesQuery = `
+        SELECT u.e_id, u.e_nom, u.e_photo 
+        FROM matches m
+        JOIN e_utilisateur u ON u.e_id = m.user1_id OR u.e_id = m.user2_id
+        WHERE (m.user1_id = ? OR m.user2_id = ?) AND u.e_id != ?`;
+
+    con.query(fetchMatchesQuery, [userId, userId, userId], (err, results) => {
+        if (err) {
+            console.error('Error fetching matches:', err);
+            return res.status(500).json({ error: 'Database error fetching matches.' });
+        }
+        res.json(results);
+    });
+});
+
 
 
 
