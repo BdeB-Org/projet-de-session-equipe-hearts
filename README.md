@@ -57,6 +57,14 @@ ADD COLUMN twitterId VARCHAR(255) UNIQUE,
 ADD COLUMN appleId VARCHAR(255) UNIQUE;
 ADD COMLUM googleId VARCHAR(255) UNIQUE; 
 
+CREATE TABLE e_photo (
+    id_photo INT AUTO_INCREMENT NOT NULL,
+    utilisateur_id INT NOT NULL,
+    photo_url VARCHAR(255) NOT NULL,
+    PRIMARY KEY (id_photo),
+    FOREIGN KEY (utilisateur_id) REFERENCES e_utilisateur(e_id) ON DELETE CASCADE
+);
+
 CREATE TABLE e_abonnement (
     e_id INT NOT NULL,
     e_type VARCHAR(100) NOT NULL,
@@ -97,7 +105,23 @@ CREATE TABLE preference (
     FOREIGN KEY (like_id) REFERENCES e_likes(id_like)
 );
 
+CREATE TABLE likes (
+    like_id INT AUTO_INCREMENT PRIMARY KEY,
+    liker_id INT NOT NULL,
+    liked_id INT NOT NULL,
+    like_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (liker_id) REFERENCES e_utilisateur(e_id),
+    FOREIGN KEY (liked_id) REFERENCES e_utilisateur(e_id)
+);
 
+CREATE TABLE matches (
+    match_id INT AUTO_INCREMENT PRIMARY KEY,
+    user1_id INT NOT NULL,
+    user2_id INT NOT NULL,
+    match_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user1_id) REFERENCES e_utilisateur(e_id),
+    FOREIGN KEY (user2_id) REFERENCES e_utilisateur(e_id)
+);
 
 CREATE TABLE relation_5 (
     utilisateur_id_utilisateur INT NOT NULL,
