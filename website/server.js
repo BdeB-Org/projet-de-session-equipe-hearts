@@ -318,39 +318,64 @@ const initializeLikes = () => {
     Connect to GOOGLE FEUGH
 ------------------------------------------
 */
-
+// Configuration de Passport pour Google Strategy
+// Configuration de Passport pour Google Strategy
+// Configuration de la stratégie Google OAuth
+// Configuration de Passport pour Google Strategy
 passport.use(new GoogleStrategy({
     clientID: process.env.GOOGLE_CLIENT_ID,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
     callbackURL: '/auth/google/callback'
 }, (accessToken, refreshToken, profile, done) => {
-    const user = {
-        googleId: profile.id,
-        name: profile.displayName,
-        email: profile.emails[0].value,
-    };
-    const query = 'INSERT INTO e_utilisateur (googleId, e_nom, e_prenom, e_courriel) VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE e_nom = ?, e_prenom = ?';
-    con.query(query, [user.googleId, user.name.split(' ')[0], user.name.split(' ')[1], user.email, user.name.split(' ')[0], user.name.split(' ')[1]], (err) => {
+    const googleId = profile.id;
+    const nameParts = profile.displayName ? profile.displayName.split(' ') : ["Unknown", "User"];
+    const firstName = nameParts[0];
+    const lastName = nameParts[1] || "User";
+    const email = profile.emails && profile.emails[0] ? profile.emails[0].value : null;
+
+    // Check if the user is already registered
+    const checkUserQuery = 'SELECT * FROM e_utilisateur WHERE googleId = ?';
+    con.query(checkUserQuery, [googleId], (err, results) => {
         if (err) return done(err);
-        return done(null, user);
+
+        if (results.length > 0) {
+            // User is already registered, return the existing user
+            console.log('User already registered:', results[0]);
+            return done(new Error('User already exists'));
+        }
+
+        // Proceed with registration only if user is not found
+        const insertUserQuery = `
+            INSERT INTO e_utilisateur (googleId, e_nom, e_prenom, e_courriel, date_naissance, e_number, genre, e_location, abonnement_id)
+            VALUES (?, ?, ?, ?, NULL, '000-000-0000', 'Inconnu', 'Inconnu', 1)
+        `;
+        con.query(insertUserQuery, [googleId, lastName, firstName, email], (err, results) => {
+            if (err) return done(err);
+
+            // New user created successfully, marking as a new user
+            const newUser = {
+                e_id: results.insertId,
+                googleId: googleId,
+                e_nom: lastName,
+                e_prenom: firstName,
+                e_courriel: email,
+                e_photo: null,
+                abonnement_id: 1, // Default to Basic subscription
+                isNewUser: true // Flag to indicate this is a new user
+            };
+
+            return done(null, newUser);
+        });
     });
 }));
 
 
-app.get('/auth/google', (req, res, next) => {
-    console.log("Google Auth Route Hit");
-    passport.authenticate('google', {
-        scope: ['profile', 'email']
-    })(req, res, next);
-});
-
+// Serialization and Deserialization
 passport.serializeUser((user, done) => {
-    console.log('Serializing user:', user);
     done(null, user.googleId);
 });
 
 passport.deserializeUser((id, done) => {
-    console.log('Deserializing user with ID:', id);
     const query = 'SELECT * FROM e_utilisateur WHERE googleId = ?';
     con.query(query, [id], (err, results) => {
         if (err) return done(err);
@@ -358,12 +383,175 @@ passport.deserializeUser((id, done) => {
     });
 });
 
+// Google Auth Routes
+app.get('/auth/google', passport.authenticate('google', {
+    scope: ['profile', 'email']
+}));
 
+// Google Auth Callback Route
 app.get('/auth/google/callback', passport.authenticate('google', {
     failureRedirect: '/event/inscription'
 }), (req, res) => {
-    res.redirect('/');
+    if (!req.user) {
+        return res.redirect('/event/inscription');
+    }
+    req.session.user = {
+        e_id: req.user.e_id,
+        e_nom: req.user.e_nom,
+        e_prenom: req.user.e_prenom,
+        e_courriel: req.user.e_courriel,
+        e_photo: req.user.e_photo || null,
+        abonnement_id: req.user.abonnement_id || 1
+    };
+
+    console.log("User session after Google authentication:", req.session.user);
+
+    // If the user is already registered, redirect to profile
+    if (req.user.message === 'User already registered') {
+        return res.redirect('/profil');
+    }
+
+    // Redirect to google-completion to choose preferences
+    res.redirect('/event/google-completion');
 });
+
+// Route to complete user registration
+app.get('/event/google-completion', (req, res) => {
+    if (!req.session.user) {
+        console.log("User session not found, redirecting to inscription");
+        return res.redirect('/event/inscription');
+    }
+
+    console.log("User session found:", req.session.user);
+    res.render('pages/google-completion', {
+        siteTitle: "Compléter l'inscription",
+        pageTitle: "Compléter l'inscription",
+        userDetails: req.session.user
+    });
+});
+
+// POST Route for completing user information
+app.post('/event/google-completion', (req, res) => {
+    const { phone, birthdate, gender, selectedCard, selectedLikes } = req.body;
+    const user = req.session.user;
+
+    if (!user) {
+        return res.status(400).send("Utilisateur non connecté.");
+    }
+
+    // Validate birthdate
+    const isValidDate = (date) => {
+        const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+        return dateRegex.test(date) && !isNaN(new Date(date).getTime());
+    };
+
+    if (!isValidDate(birthdate)) {
+        return res.status(400).send("Date de naissance incorrecte. Veuillez entrer une date valide au format YYYY-MM-DD.");
+    }
+
+    // Validate gender
+    const validGenders = ["Homme", "Femme", "Non spécifié"];
+    const validGender = validGenders.includes(gender) ? gender : "Non spécifié";
+
+    // Update user information in the database
+    const updateUserQuery = `
+        UPDATE e_utilisateur 
+        SET date_naissance = ?, e_number = ?, genre = ? 
+        WHERE googleId = ?;
+    `;
+    con.query(updateUserQuery, [birthdate, phone, validGender, user.googleId], (err) => {
+        if (err) {
+            console.error("Erreur lors de la mise à jour de l'utilisateur:", err);
+            return res.status(500).send("Erreur serveur.");
+        }
+
+        // Insert card preference
+        let insertCardPromise = Promise.resolve();
+        if (selectedCard) {
+            insertCardPromise = new Promise((resolve, reject) => {
+                const fetchCardIdQuery = 'SELECT id_card FROM e_card WHERE type_card = ?';
+                con.query(fetchCardIdQuery, [selectedCard], (err, cardResult) => {
+                    if (err) {
+                        console.error("Erreur lors de la récupération de l'ID de la carte:", err);
+                        return reject(err);
+                    }
+                    if (cardResult.length === 0) {
+                        console.error("Carte non trouvée pour le type:", selectedCard);
+                        return reject(new Error("Carte non trouvée"));
+                    }
+                    const cardId = cardResult[0].id_card;
+                    const insertCardPreferenceQuery = `
+                        INSERT INTO preference (utilisateur_id, card_id) VALUES (?, ?)
+                    `;
+                    con.query(insertCardPreferenceQuery, [user.e_id, cardId], (err) => {
+                        if (err) {
+                            console.error("Erreur lors de l'insertion de la carte:", err);
+                            return reject(err);
+                        }
+                        resolve();
+                    });
+                });
+            });
+        }
+
+        // Insert like preferences
+        let insertPreferencesPromises = [];
+        if (selectedLikes) {
+            const likesArray = Array.isArray(selectedLikes) ? selectedLikes : [selectedLikes];
+            console.log("Likes array to be processed:", likesArray);
+
+            likesArray.forEach(like => {
+                const fetchLikeIdQuery = 'SELECT id_like FROM e_likes WHERE type_like = ?';
+                insertPreferencesPromises.push(new Promise((resolve, reject) => {
+                    con.query(fetchLikeIdQuery, [like], (err, likeResult) => {
+                        if (err) {
+                            console.error("Erreur lors de la récupération de l'ID du like:", err);
+                            return reject(err);
+                        }
+                        if (likeResult.length === 0) {
+                            console.error("Like non trouvé pour le type:", like);
+                            return reject(new Error(`Like non trouvé pour le type: ${like}`));
+                        }
+                        const likeId = likeResult[0].id_like;
+                        const insertLikePreferenceQuery = `
+                            INSERT INTO preference (utilisateur_id, like_id) VALUES (?, ?)
+                        `;
+                        con.query(insertLikePreferenceQuery, [user.e_id, likeId], (err) => {
+                            if (err) {
+                                console.error("Erreur lors de l'insertion du like:", err);
+                                return reject(err);
+                            }
+                            resolve();
+                        });
+                    });
+                }));
+            });
+        }
+
+        // Wait for all insert operations to complete
+        Promise.all([insertCardPromise, ...insertPreferencesPromises])
+            .then(() => {
+                req.session.user.date_naissance = birthdate;
+                req.session.user.e_number = phone;
+                req.session.user.genre = validGender;
+                res.redirect('/profil');
+            })
+            .catch((error) => {
+                console.error("Erreur lors de l'enregistrement des préférences:", error);
+                res.status(500).send("Erreur lors de l'enregistrement des préférences.");
+            });
+    });
+});
+
+// Redirect to profile if the session user is valid
+app.get('/profil', (req, res) => {
+    if (!req.session.user) {
+        return res.redirect('/event/inscription');
+    }
+    res.redirect('/event/profil');
+});
+
+
 
 /*
 ------------------------------------------
@@ -817,6 +1005,7 @@ function getUserCard(userId) {
 }
 
 
+
 app.get('/api/user/swipe-data/:userId', (req, res) => {
     const userId = req.params.userId;
     const currentTime = new Date();
@@ -870,75 +1059,6 @@ app.post('/api/user/preferences', (req, res) => {
         res.json(preferenceResults); // Send the preferences as a JSON response
     });
 });
-
-app.post('/api/user/like', (req, res) => {
-    const { userId, likedUserId } = req.body;
-
-    // Insert the like into the likes table
-    const insertLikeQuery = 'INSERT INTO likes (liker_id, liked_id) VALUES (?, ?)';
-    con.query(insertLikeQuery, [userId, likedUserId], (err, result) => {
-        if (err) {
-            console.error('Error inserting like:', err);
-            return res.status(500).json({ error: 'Database error during the like action.' });
-        }
-
-        // Check for mutual like
-        const checkMutualLikeQuery = 'SELECT * FROM likes WHERE liker_id = ? AND liked_id = ?';
-        con.query(checkMutualLikeQuery, [likedUserId, userId], (err, results) => {
-            if (err) {
-                console.error('Error checking for mutual like:', err);
-                return res.status(500).json({ error: 'Database error checking for mutual like.' });
-            }
-
-            if (results.length > 0) { // Mutual like found
-                // Insert a match
-                const insertMatchQuery = 'INSERT INTO matches (user1_id, user2_id) VALUES (?, ?)';
-                con.query(insertMatchQuery, [userId, likedUserId], (matchErr, matchResult) => {
-                    if (matchErr) {
-                        console.error('Error recording match:', matchErr);
-                        return res.status(500).json({ error: 'Database error recording match.' });
-                    }
-                    res.json({ match: true, message: 'Match found!' });
-                });
-            } else {
-                res.json({ match: false, message: 'Like recorded, no match found yet.' });
-            }
-        });
-    });
-});
-
-app.get('/api/user/details/:id', (req, res) => {
-    const { id } = req.params;
-    const query = "SELECT * FROM e_utilisateur WHERE e_id = ?";
-    con.query(query, [id], (err, results) => {
-        if (err) {
-            console.error('Error fetching user details:', err);
-            return res.status(500).json({ error: 'Database error fetching user details.' });
-        }
-        if (results.length === 0) {
-            return res.status(404).json({ error: 'User not found.' });
-        }
-        res.json(results[0]);
-    });
-});
-
-app.get('/api/user/matches', (req, res) => {
-    const userId = req.session.user.e_id;
-    const fetchMatchesQuery = `
-        SELECT u.e_id, u.e_nom, u.e_photo 
-        FROM matches m
-        JOIN e_utilisateur u ON u.e_id = m.user1_id OR u.e_id = m.user2_id
-        WHERE (m.user1_id = ? OR m.user2_id = ?) AND u.e_id != ?`;
-
-    con.query(fetchMatchesQuery, [userId, userId, userId], (err, results) => {
-        if (err) {
-            console.error('Error fetching matches:', err);
-            return res.status(500).json({ error: 'Database error fetching matches.' });
-        }
-        res.json(results);
-    });
-});
-
 
 
 
@@ -1361,43 +1481,35 @@ app.post('/event/inscription', upload.single('photo'), (req, res) => {
             }
 
             let likesPromises = [];
-            if (selectedLikes) {
-                const likesArray = selectedLikes.split(',').map(like => like.trim());
-                console.log("Trimmed likes being processed:", likesArray);
-
-                likesPromises = likesArray.map(like => {
-                    return new Promise((resolve, reject) => {
-                        console.log("Fetching like ID for:", like);
-                        const fetchLikeIdQuery = "SELECT id_like FROM e_likes WHERE type_like = ?";
-                        con.query(fetchLikeIdQuery, [like], (err, likeResult) => {
-                            if (err) {
-                                console.error("Error fetching like ID:", err);
-                                return reject("Internal Server Error");
-                            }
-
-                            if (likeResult.length === 0) {
-                                console.error("Selected like not found in database:", like);
-                                return reject(`Selected like "${like}" not valid`);
-                            }
-
-                            const likeId = likeResult[0].id_like;
-
-                            const insertLikePreferenceQuery = `
-                    INSERT INTO preference (utilisateur_id, like_id)
-                    VALUES (?, ?)
+if (selectedLikes) {
+    const likesArray = Array.isArray(selectedLikes) ? selectedLikes : [selectedLikes];
+    likesArray.forEach(like => {
+        const fetchLikeIdQuery = 'SELECT id_like FROM e_likes WHERE type_like = ?';
+        likesPromises.push(new Promise((resolve, reject) => {
+            con.query(fetchLikeIdQuery, [like], (err, likeResult) => {
+                if (err) {
+                    console.error("Erreur lors de la récupération de l'ID du like:", err);
+                    return reject("Erreur interne. Veuillez réessayer.");
+                }
+                if (likeResult.length === 0) {
+                    console.warn(`Like non trouvé pour: ${like}. Ignoré.`);
+                    return resolve(); // Skip the missing like
+                }
+                const likeId = likeResult[0].id_like;
+                const insertLikePreferenceQuery = `
+                    INSERT INTO preference (utilisateur_id, like_id) VALUES (?, ?)
                 `;
-                            con.query(insertLikePreferenceQuery, [userId, likeId], (err) => {
-                                if (err) {
-                                    console.error("Error inserting like preference:", err);
-                                    return reject("Error inserting like preference");
-                                }
-                                console.log(`Like ${like} added/updated successfully.`);
-                                resolve();
-                            });
-                        });
-                    });
+                con.query(insertLikePreferenceQuery, [user.e_id, likeId], (err) => {
+                    if (err) {
+                        console.error("Erreur lors de l'insertion du like:", err);
+                        return reject("Erreur lors de l'insertion du like");
+                    }
+                    resolve();
                 });
-            }
+            });
+        }));
+    });
+}
 
 
             Promise.all([cardIdPromise, ...likesPromises])
