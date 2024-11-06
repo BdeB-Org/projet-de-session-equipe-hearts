@@ -114,6 +114,14 @@ CREATE TABLE likes (
     FOREIGN KEY (liked_id) REFERENCES e_utilisateur(e_id)
 );
 
+CREATE TABLE matches (
+    match_id INT AUTO_INCREMENT PRIMARY KEY,
+    user1_id INT NOT NULL,
+    user2_id INT NOT NULL,
+    match_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user1_id) REFERENCES e_utilisateur(e_id),
+    FOREIGN KEY (user2_id) REFERENCES e_utilisateur(e_id)
+);
 
 CREATE TABLE relation_5 (
     utilisateur_id_utilisateur INT NOT NULL,
