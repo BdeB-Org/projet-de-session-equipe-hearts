@@ -32,6 +32,8 @@ ALTER TABLE likes DROP FOREIGN KEY likes_ibfk_2; -- user
 ALTER TABLE matches DROP FOREIGN KEY matches_ibfk_1;
 ALTER TABLE matches DROP FOREIGN KEY matches_ibfk_2;
 
+ALTER TABLE e_photo DROP FOREIGN KEY e_photo_ibfk_1;
+
 DROP TABLE IF EXISTS e_utilisateur;
 DROP TABLE IF EXISTS e_abonnement;
 DROP TABLE IF EXISTS lieu;
