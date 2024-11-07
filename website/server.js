@@ -340,8 +340,10 @@ passport.use(new GoogleStrategy({
 
         if (results.length > 0) {
             // User is already registered, return the existing user
+            const existingUser = results[0];
             console.log('User already registered:', results[0]);
-            return done(new Error('User already exists'));
+            existingUser.message = 'User already registered';
+            return done(null, existingUser);
         }
 
         // Proceed with registration only if user is not found
@@ -406,9 +408,8 @@ app.get('/auth/google/callback', passport.authenticate('google', {
 
     console.log("User session after Google authentication:", req.session.user);
 
-    // If the user is already registered, redirect to profile
     if (req.user.message === 'User already registered') {
-        return res.redirect('/profil');
+        return res.redirect('/');
     }
 
     // Redirect to google-completion to choose preferences

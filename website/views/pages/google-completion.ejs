@@ -1,17 +1,23 @@
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><%= siteTitle %></title>
+    <title>
+        <%= siteTitle %>
+    </title>
     <link rel="stylesheet" href="/path/to/your/main.css"> <!-- Assurez-vous que ce chemin est correct -->
     <style>
         /* Styles intégrés pour la page Google Completion */
         body {
-            background-color: #121212; /* Couleur de fond sombre pour un thème cyberpunk */
-            color: #ffffff; /* Texte en blanc pour le contraste */
-            font-family: 'Roboto', sans-serif; /* Police moderne */
+            background-color: #121212;
+            /* Couleur de fond sombre pour un thème cyberpunk */
+            color: #ffffff;
+            /* Texte en blanc pour le contraste */
+            font-family: 'Roboto', sans-serif;
+            /* Police moderne */
         }
 
         .container {
@@ -19,16 +25,21 @@
             margin: 0 auto;
             padding: 20px;
             text-align: center;
-            background: rgba(0, 0, 0, 0.8); /* Fond semi-transparent */
-            border-radius: 10px; /* Coins arrondis */
-            box-shadow: 0 0 20px #ff00ff; /* Ombre externe avec effet néon */
+            background: rgba(0, 0, 0, 0.8);
+            /* Fond semi-transparent */
+            border-radius: 10px;
+            /* Coins arrondis */
+            box-shadow: 0 0 20px #ff00ff;
+            /* Ombre externe avec effet néon */
         }
 
         h1 {
-            color: #ffcc00; /* Couleur de titre vive */
+            color: #ffcc00;
+            /* Couleur de titre vive */
             font-size: 2.5em;
             margin-bottom: 20px;
-            text-shadow: 0 0 10px #ffcc00; /* Effet néon sur le texte */
+            text-shadow: 0 0 10px #ffcc00;
+            /* Effet néon sur le texte */
         }
 
         label {
@@ -36,23 +47,28 @@
             font-size: 1.1em;
             margin-bottom: 5px;
             display: block;
-            color: #ffcc00; /* Couleur de label */
+            color: #ffcc00;
+            /* Couleur de label */
         }
 
-        input, select {
+        input,
+        select {
             width: 100%;
             padding: 10px;
             margin-bottom: 15px;
             border: none;
-            border-bottom: 2px solid #ff00ff; /* Bordure inférieure avec effet néon */
+            border-bottom: 2px solid #ff00ff;
+            /* Bordure inférieure avec effet néon */
             background: transparent;
             color: #ffffff;
             font-size: 1em;
         }
 
-        input:focus, select:focus {
+        input:focus,
+        select:focus {
             outline: none;
-            border-bottom: 2px solid #00ffff; /* Couleur différente pour le focus */
+            border-bottom: 2px solid #00ffff;
+            /* Couleur différente pour le focus */
         }
 
         .checkbox-group {
@@ -74,25 +90,32 @@
         }
 
         .submit-btn {
-            background-color: #ff00ff; /* Couleur de fond du bouton */
+            background-color: #ff00ff;
+            /* Couleur de fond du bouton */
             color: #ffffff;
             border: none;
             padding: 12px 20px;
             font-size: 1em;
             cursor: pointer;
             transition: background-color 0.3s;
-            border-radius: 5px; /* Coins arrondis */
-            box-shadow: 0 0 10px #ff00ff; /* Ombre externe avec effet néon */
+            border-radius: 5px;
+            /* Coins arrondis */
+            box-shadow: 0 0 10px #ff00ff;
+            /* Ombre externe avec effet néon */
         }
 
         .submit-btn:hover {
-            background-color: #ff1493; /* Changement de couleur au survol */
+            background-color: #ff1493;
+            /* Changement de couleur au survol */
         }
     </style>
 </head>
+
 <body>
     <div class="container">
-        <h1><%= pageTitle %></h1>
+        <h1>
+            <%= pageTitle %>
+        </h1>
         <form action="/event/google-completion" method="POST">
             <label for="phone">Numéro de téléphone</label>
             <input type="text" id="phone" name="phone" placeholder="000-000-0000" required>
@@ -116,11 +139,17 @@
             </select>
 
             <div class="checkbox-group">
-                <label for="music"><input type="checkbox" id="music" name="selectedLikes" value="Musique"> Musique</label>
+                <label for="music"><input type="checkbox" id="music" name="selectedLikes" value="Musique">
+                    Musique</label>
+                <label for="cinema"><input type="checkbox" id="cinema" name="selectedLikes" value="Cinéma">
+                    Musique</label>
                 <label for="sports"><input type="checkbox" id="sports" name="selectedLikes" value="Sport"> Sport</label>
-                <label for="cooking"><input type="checkbox" id="cooking" name="selectedLikes" value="Cuisine"> Cuisine</label>
-                <label for="travel"><input type="checkbox" id="travel" name="selectedLikes" value="Voyage"> Voyage</label>
-                <label for="reading"><input type="checkbox" id="reading" name="selectedLikes" value="Lecture"> Lecture</label>
+                <label for="cooking"><input type="checkbox" id="cooking" name="selectedLikes" value="Cuisine">
+                    Cuisine</label>
+                <label for="travel"><input type="checkbox" id="travel" name="selectedLikes" value="Voyages">
+                    Voyage</label>
+                <label for="reading"><input type="checkbox" id="reading" name="selectedLikes" value="Lecture">
+                    Lecture</label>
                 <!-- Ajoutez d'autres options de préférence ici -->
             </div>
 
@@ -128,4 +157,5 @@
         </form>
     </div>
 </body>
+
 </html>
