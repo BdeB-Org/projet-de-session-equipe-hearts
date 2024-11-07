@@ -1417,6 +1417,7 @@ app.post('/event/change-password', async (req, res) => {
 */
 
 
+
 app.post('/event/delete-account', (req, res) => {
     const userId = req.session.user ? req.session.user.e_id : null; // Ensure session exists
 
@@ -1424,28 +1425,46 @@ app.post('/event/delete-account', (req, res) => {
         return res.status(400).send('Utilisateur non connecté.');
     }
 
-    // Start with deleting preferences
-    const deletePreferencesQuery = 'DELETE FROM preference WHERE utilisateur_id = ?';
-    con.query(deletePreferencesQuery, [userId], (err) => {
+    // Delete likes where the user is either the liker or the liked
+    const deleteLikesQuery = 'DELETE FROM likes WHERE liker_id = ? OR liked_id = ?';
+    con.query(deleteLikesQuery, [userId, userId], (err) => {
         if (err) {
-            console.error('Error deleting user preferences:', err);
-            return res.status(500).send('Erreur lors de la suppression des préférences de l\'utilisateur.');
+            console.error('Error deleting likes:', err);
+            return res.status(500).send('Erreur lors de la suppression des likes.');
         }
 
-        // Now delete the user
-        const deleteUserQuery = 'DELETE FROM e_utilisateur WHERE e_id = ?';
-        con.query(deleteUserQuery, [userId], (err) => {
+        // Delete matches where the user is either user1 or user2
+        const deleteMatchesQuery = 'DELETE FROM matches WHERE user1_id = ? OR user2_id = ?';
+        con.query(deleteMatchesQuery, [userId, userId], (err) => {
             if (err) {
-                console.error('Error deleting user:', err);
-                return res.status(500).send('Erreur lors de la suppression de l\'utilisateur.');
+                console.error('Error deleting matches:', err);
+                return res.status(500).send('Erreur lors de la suppression des matches.');
             }
 
-            req.session.destroy((err) => {
+            // Delete preferences
+            const deletePreferencesQuery = 'DELETE FROM preference WHERE utilisateur_id = ?';
+            con.query(deletePreferencesQuery, [userId], (err) => {
                 if (err) {
-                    console.error('Error during logout:', err);
-                    return res.status(500).send('Erreur lors de la déconnexion.');
+                    console.error('Error deleting user preferences:', err);
+                    return res.status(500).send('Erreur lors de la suppression des préférences de l\'utilisateur.');
                 }
-                res.redirect('/');
+
+                // Now delete the user
+                const deleteUserQuery = 'DELETE FROM e_utilisateur WHERE e_id = ?';
+                con.query(deleteUserQuery, [userId], (err) => {
+                    if (err) {
+                        console.error('Error deleting user:', err);
+                        return res.status(500).send('Erreur lors de la suppression de l\'utilisateur.');
+                    }
+
+                    req.session.destroy((err) => {
+                        if (err) {
+                            console.error('Error during logout:', err);
+                            return res.status(500).send('Erreur lors de la déconnexion.');
+                        }
+                        res.redirect('/');
+                    });
+                });
             });
         });
     });
@@ -1515,8 +1534,9 @@ app.post('/event/inscription', upload.single('photo'), (req, res) => {
                 return res.status(500).send("Internal Server Error");
             }
 
+            // Retrieve the ID of the newly inserted user
             const userId = result.insertId;
-
+            // Prepare to insert card preference if selected
             let cardIdPromise = Promise.resolve();
             if (selectedCard) {
                 cardIdPromise = new Promise((resolve, reject) => {
@@ -1526,18 +1546,16 @@ app.post('/event/inscription', upload.single('photo'), (req, res) => {
                             console.error("Error fetching card ID:", err);
                             return reject("Internal Server Error");
                         }
-
                         if (cardResult.length === 0) {
                             console.error("Selected card not found in database.");
                             return reject("Selected card not valid");
                         }
-
                         const cardId = cardResult[0].id_card;
-
+                        // Now insert the preference
                         const insertCardPreferenceQuery = `
-                        INSERT INTO preference (utilisateur_id, card_id)
-                        VALUES (?, ?)
-                    `;
+                             INSERT INTO preference (utilisateur_id, card_id)
+                             VALUES (?, ?)
+                         `;
                         con.query(insertCardPreferenceQuery, [userId, cardId], (err) => {
                             if (err) {
                                 console.error("Error inserting card preference:", err);
@@ -1548,41 +1566,46 @@ app.post('/event/inscription', upload.single('photo'), (req, res) => {
                     });
                 });
             }
-
+            // Insert likes preferences if selected
             let likesPromises = [];
             if (selectedLikes) {
-                const likesArray = Array.isArray(selectedLikes) ? selectedLikes : [selectedLikes];
-                likesArray.forEach(like => {
-                    const fetchLikeIdQuery = 'SELECT id_like FROM e_likes WHERE type_like = ?';
-                    likesPromises.push(new Promise((resolve, reject) => {
+                const likesArray = selectedLikes.split(',').map(like => like.trim()); // Trim spaces
+                console.log("Trimmed likes being processed:", likesArray); // Debugging output
+                likesPromises = likesArray.map(like => {
+                    return new Promise((resolve, reject) => {
+                        console.log("Fetching like ID for:", like); // Debugging output
+                        const fetchLikeIdQuery = "SELECT id_like FROM e_likes WHERE type_like = ?";
                         con.query(fetchLikeIdQuery, [like], (err, likeResult) => {
                             if (err) {
-                                console.error("Erreur lors de la récupération de l'ID du like:", err);
-                                return reject("Erreur interne. Veuillez réessayer.");
+                                console.error("Error fetching like ID:", err);
+                                return reject("Internal Server Error");
                             }
                             if (likeResult.length === 0) {
-                                console.warn(`Like non trouvé pour: ${like}. Ignoré.`);
-                                return resolve(); // Skip the missing like
+                                console.error("Selected like not found in database:", like); // Debugging output
+                                return reject(`Selected like "${like}" not valid`);
                             }
                             const likeId = likeResult[0].id_like;
+                            // Now insert the preference
                             const insertLikePreferenceQuery = `
-                    INSERT INTO preference (utilisateur_id, like_id) VALUES (?, ?)
-                `;
-                            con.query(insertLikePreferenceQuery, [user.e_id, likeId], (err) => {
+                     INSERT INTO preference (utilisateur_id, like_id)
+                     VALUES (?, ?)
+                 `;
+                            con.query(insertLikePreferenceQuery, [userId, likeId], (err) => {
                                 if (err) {
-                                    console.error("Erreur lors de l'insertion du like:", err);
-                                    return reject("Erreur lors de l'insertion du like");
+                                    console.error("Error inserting like preference:", err);
+                                    return reject("Error inserting like preference");
                                 }
+                                console.log(`Like ${like} added/updated successfully.`); // Successful insert log
                                 resolve();
                             });
                         });
-                    }));
+                    });
                 });
             }
-
-
+            // Wait for all database operations to complete
             Promise.all([cardIdPromise, ...likesPromises])
                 .then(() => {
+                    // Log the user in by setting the session
                     req.session.user = {
                         e_id: userId,
                         e_nom: lastName,
@@ -1595,11 +1618,11 @@ app.post('/event/inscription', upload.single('photo'), (req, res) => {
                         abonnement_id: 1,
                         genre: gender
                     };
-                    return res.redirect('/');
+                    return res.redirect('/'); // Redirect after successful registration
                 })
                 .catch((error) => {
                     console.error("Error during registration:", error);
-                    return res.status(500).send(error);
+                    return res.status(500).send(error); // Handle any errors from promises
                 });
         });
     });

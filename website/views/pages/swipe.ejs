@@ -326,6 +326,46 @@
         opacity: 0;
         z-index: 1000;
     }
+
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0, 0, 0, 0.4);
+    }
+
+    .modal-content {
+        background-color: #fefefe;
+        margin: 10% auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 50%;
+        border-radius: 15px;
+        /*remoce cirecle*/
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1), 0 6px 20px rgba(0, 0, 0, 0.19);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .close {
+        color: #aaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+    }
+
+    .close:hover,
+    .close:focus {
+        color: black;
+        text-decoration: none;
+        cursor: pointer;
+    }
 </style>
 
 <body>
@@ -367,6 +407,15 @@
     </div>
 
     <div class="card-container"></div>
+    <div id="userModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <img id="modalImage" src="" alt="profile picture" style="width:100px; height:100px; border-radius:50%;">
+            <h4 id="modalName"></h4>
+            <p id="modalDetails"></p>
+        </div>
+    </div>
+
 
 </body>
 <script>
@@ -383,6 +432,8 @@
         const countdownTimerElement = document.getElementById("countdown-timer");
         const cardContainer = document.querySelector('.card-container');
         const matchesList = document.querySelector('.matches');
+        const modal = document.getElementById("userModal");
+        const span = document.getElementsByClassName("close")[0];
 
         const loggedInUserId = "<%= userDetails.e_id %>"; // Fetch the logged-in user's ID
         const userSubscriptionId = "<%= userDetails.abonnement_id %>"; // Fetch the logged-in user's subscription ID
@@ -623,7 +674,7 @@
                 cardContainer.innerHTML = `
                 <div class="card">
                     <img src="/uploads/${user.e_photo}" alt="${user.e_nom}">
-                    <h2>${user.e_nom}</h2>
+                    <h2>${user.e_prenom}</h2>
                     <p>À ${user.distance || 'undefined'} kilomètres de distance</p>
                     <p>Préférences de Likes: ${user.likes.length > 0 ? user.likes.join(', ') : 'Aucune'}</p>
                     <button class="button like-button"><i class="fas fa-heart"></i>Aimer</button>
@@ -661,6 +712,47 @@
                 }
             }, 1000);
         }
+
+        span.onclick = function () {
+            modal.style.display = "none";
+        }
+
+        window.onclick = function (event) {
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        }
+
+        const matchesContainer = document.querySelector('.matches');
+        matchesContainer.addEventListener('click', function (event) {
+            if (event.target.closest('a') && event.target.closest('.matches')) {
+                event.preventDefault();
+                const userId = event.target.getAttribute('href').split('/').pop();
+                fetch(`/api/user/details/${userId}`)
+                    .then(response => response.json())
+                    .then(user => {
+                        if (!user || !Array.isArray(user.likes)) {
+                            console.error('User details are incomplete', user);
+                            throw new Error('Incomplete user data');
+                        }
+                        const modalImage = document.getElementById('modalImage');
+                        const modalName = document.getElementById('modalName');
+                        const modalDetails = document.getElementById('modalDetails');
+
+                        modalImage.src = user.e_photo ? `/uploads/${user.e_photo}` : '/images/placeholder.png';
+                        modalImage.onerror = () => modalImage.src = '/images/placeholder.png';
+                        modalName.textContent = user.e_prenom;
+                        modalDetails = `Likes: ${userLikes > 0 ? userLikes.join(', ') : 'Aucune'}`;
+
+
+                        document.getElementById("userModal").style.display = "block";
+                    })
+                    .catch(err => {
+                        console.error('Failed to fetch user details:', err);
+                        alert('Failed to load user details.');
+                    });
+            }
+        });
     });
 
 </script>
