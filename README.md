@@ -99,16 +99,24 @@ CREATE TABLE e_likes (
     PRIMARY KEY (id_like)
 );
 
+CREATE TABLE e_sexualite (
+    id_sexualite INT AUTO_INCREMENT NOT NULL,
+    type_sexualite VARCHAR(50) NOT NULL,
+    PRIMARY KEY (id_sexualite)
+);
+
 
 CREATE TABLE preference (
     id_preference INT AUTO_INCREMENT NOT NULL,
     utilisateur_id INT,
     card_id INT,
     like_id INT,
+    sexualite_id INT,
     PRIMARY KEY (id_preference),
     FOREIGN KEY (utilisateur_id) REFERENCES e_utilisateur(e_id),
     FOREIGN KEY (card_id) REFERENCES e_card(id_card),
-    FOREIGN KEY (like_id) REFERENCES e_likes(id_like)
+    FOREIGN KEY (like_id) REFERENCES e_likes(id_like),
+    FOREIGN KEY (sexualite_id) REFERENCES e_sexualite(id_sexualite)
 );
 
 CREATE TABLE likes (
