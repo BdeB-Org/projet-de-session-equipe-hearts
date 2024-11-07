@@ -1,6 +1,5 @@
 # Pour deployer notre application 
 1. Ouvrir CMD(terminal) et entrez cette ligne de commande : docker run -d -p 3306:3306 --name heart-server -e MYSQL_ROOT_PASSWORD=oracle -e MYSQL_DATABASE=scott -e MYSQL_USER=scott -e MYSQL_PASSWORD=oracle mysql/mysql-server:latest
-   et
 2. Ouvrir Desktop Docker et partez le conteneur.
 3. Cliquez sur les 3 petits points et allez dans le terminal du conteneur heart-server.
 4. Entrez la commande dans la terminal du heart-server: mysql -u root -p et entrez le mot de passe : oracle 
@@ -27,6 +26,12 @@ ALTER TABLE preference DROP FOREIGN KEY preference_ibfk_3; -- Like_id
 ALTER TABLE relation_5 DROP FOREIGN KEY relation_5_ibfk_1; -- Utilisateur_id_utilisateur
 ALTER TABLE relation_5 DROP FOREIGN KEY relation_5_ibfk_2; -- Lieu_id_lieu
 
+ALTER TABLE likes DROP FOREIGN KEY likes_ibfk_1; -- user
+ALTER TABLE likes DROP FOREIGN KEY likes_ibfk_2; -- user
+
+ALTER TABLE matches DROP FOREIGN KEY matches_ibfk_1;
+ALTER TABLE matches DROP FOREIGN KEY matches_ibfk_2;
+
 DROP TABLE IF EXISTS e_utilisateur;
 DROP TABLE IF EXISTS e_abonnement;
 DROP TABLE IF EXISTS lieu;
@@ -34,12 +39,15 @@ DROP TABLE IF EXISTS preference;
 DROP TABLE IF EXISTS relation_5;
 DROP TABLE IF EXISTS e_card;
 DROP TABLE IF EXISTS e_likes;
+DROP TABLE IF EXISTS matches;
+DROP TABLE IF EXISTS likes;
+DROP TABLE IF EXISTS e_photo;
 
 CREATE TABLE e_utilisateur (
     e_id INT AUTO_INCREMENT NOT NULL,
     e_nom VARCHAR(100) NOT NULL,
     e_prenom VARCHAR(100) NOT NULL,
-    date_naissance DATE NOT NULL,
+    date_naissance DATE NULL,
     e_courriel VARCHAR(100) NOT NULL,
     e_photo VARCHAR(255) NULL,
     e_location TEXT NOT NULL,
@@ -49,13 +57,9 @@ CREATE TABLE e_utilisateur (
     swipe_count INT DEFAULT 0,
     last_swipe_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     genre VARCHAR(10) NOT NULL,
+    googleId VARCHAR(255) UNIQUE,
     PRIMARY KEY (e_id)
 );
-ALTER TABLE e_utilisateur 
-ADD COLUMN facebookId VARCHAR(255) UNIQUE,
-ADD COLUMN twitterId VARCHAR(255) UNIQUE,
-ADD COLUMN appleId VARCHAR(255) UNIQUE;
-ADD COMLUM googleId VARCHAR(255) UNIQUE; 
 
 CREATE TABLE e_photo (
     id_photo INT AUTO_INCREMENT NOT NULL,
