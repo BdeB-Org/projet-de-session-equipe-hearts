@@ -318,10 +318,7 @@ const initializeLikes = () => {
     Connect to GOOGLE FEUGH
 ------------------------------------------
 */
-// Configuration de Passport pour Google Strategy
-// Configuration de Passport pour Google Strategy
-// Configuration de la stratégie Google OAuth
-// Configuration de Passport pour Google Strategy
+
 passport.use(new GoogleStrategy({
     clientID: process.env.GOOGLE_CLIENT_ID,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
