@@ -11,7 +11,7 @@
 
 # Installez ces packages dans le terminal :
 
-npm install multer dotenv square nodemailer googleapis node-cron crypto-js passport-facebook passport-twitter passport-apple passport passport-google-oauth20 express-session
+npm install multer dotenv square nodemailer googleapis node-cron crypto-js passport-facebook passport-twitter passport-apple passport passport-google-oauth20 express-session axios
 
 # Base de données
 
