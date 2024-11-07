@@ -43,129 +43,143 @@
     <body>
         <main class="form_inscription">
             <div class="grid-container">
-                <!-- First Image -->
+
+ 
+
+                
+                
+
+            <!-- Form split into two columns -->
+            <form id="myForm" class="orbitron-font form-grid" action="/event/inscription" method="POST"
+                enctype="multipart/form-data">
+                <!-- Champs cachés pour stocker les préférences sélectionnées -->
+                <input type="hidden" id="selected-card" name="selectedCard" value="">
+                <input type="hidden" id="selected-likes" name="selectedLikes" value="">
+
+                               <input type="hidden" id="selectedSexualite" name="selectedSexualite" value="">
+
                 <div class="image-section image1">
-                    <img src="/images/swiper.png">
+                    <label for="radioHomme">
+                        <img src="/images/swiper.png" class="icon" id="imageHomme" alt="Homme">
+                    </label>
+                    <input type="radio" name="selectedImage" id="radioHomme" value="Homme" hidden required>
                 </div>
-                <!-- Second Image -->
+                
                 <div class="image-section image2">
-                    <img src="/images/swiper2.png">
+                    <label for="radioFemme">
+                        <img src="/images/swiper2.png" class="icon" id="imageFemme" alt="Femme">
+                    </label>
+                    <input type="radio" name="selectedImage" id="radioFemme" value="Femme" hidden required>
                 </div>
 
-                <!-- Form split into two columns -->
-                <form id="myForm" class="orbitron-font form-grid" action="/event/inscription" method="POST"
-                    enctype="multipart/form-data">
-                    <!-- Champs cachés pour stocker les préférences sélectionnées -->
-                    <input type="hidden" id="selected-card" name="selectedCard" value="">
-                    <input type="hidden" id="selected-likes" name="selectedLikes" value="">
-                    <!-- Left Column of Form -->
-                    <div class="form-column">
-                        <!-- Email -->
-                        <div class="step" id="step-0">
-                            <input type="email" id="email" name="email" placeholder="Adresse e-mail" required>
-                        </div>
-
-                        <!-- Password -->
-                        <div class="step" id="step-1">
-                            <input type="password" id="password" name="password" placeholder="Mot de passe" required>
-                            <!-- minlength -->
-                        </div>
-
-                        <!-- Verify Password -->
-                        <div class="step" id="step-2">
-                            <input type="password" id="verify-password" placeholder="Vérifiez le mot de passe" required>
-                        </div>
-
-                        <!-- Phone Number -->
-                        <div class="step" id="step-3">
-                            <input type="tel" id="phone" name="phone" placeholder="Numéro: 514-235-7369"
-                                pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}" required>
-                        </div>
-
-                        <!-- First Name -->
-                        <div class="step" id="step-4">
-                            <input type="text" id="first-name" name="firstName" placeholder="Prénom (Affiché)" required>
-                        </div>
-
-                        <!-- Last Name -->
-                        <div class="step" id="step-5">
-                            <input type="text" id="last-name" name="lastName" placeholder="Nom" required>
-                        </div>
+                <!-- Left Column of Form -->
+                <div class="form-column">
+                    <!-- Email -->
+                    <div class="step" id="step-0">
+                        <input type="email" id="email" name="email" placeholder="Adresse e-mail" required>
                     </div>
 
-                    <!-- Right Column of Form -->
-                    <div class="form-column">
-                        <!-- Birthdate -->
-                        <div class="step" id="step-6">
-                            <input type="date" id="birthdate" name="birthdate" required>
-                        </div>
+                    <!-- Password -->
+                    <div class="step" id="step-1">
+                        <input type="password" id="password" name="password" placeholder="Mot de passe" required>
+                        <!-- minlength -->
+                    </div>
 
-                        <!-- Gender -->
-                        <div class="step" id="step-7">
-                            <select id="gender" name="gender" required>
-                                <option value="" disabled selected>Genre</option>
-                                <option value="H">Homme</option>
-                                <option value="F">Femme</option>
-                                <option value="O">Autre</option>
-                            </select>
-                        </div>
+                    <!-- Verify Password -->
+                    <div class="step" id="step-2">
+                        <input type="password" id="verify-password" placeholder="Vérifiez le mot de passe" required>
+                    </div>
 
-                        <!-- Looking for? (CARDS) -->
-                        <p>Que cherchez-vous?</p>
-                        <div class="icon-container">
-                            <label for="ace"><img src="/images/ace.png" class="icon" id="ace" alt="Ace"></label>
-                            <label for="joker"><img src="/images/joker.png" class="icon" id="joker" alt="Joker"></label>
-                            <label for="reine"><img src="/images/queen.png" class="icon" id="reine" alt="Reine"></label>
-                            <label for="roi"><img src="/images/king.png" class="icon" id="roi" alt="Roi"></label>
-                        </div>
+                    <!-- Phone Number -->
+                    <div class="step" id="step-3">
+                        <input type="tel" id="phone" name="phone" placeholder="Numéro: 514-235-7369"
+                            pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}" required>
+                    </div>
+
+                    <!-- First Name -->
+                    <div class="step" id="step-4">
+                        <input type="text" id="first-name" name="firstName" placeholder="Prénom (Affiché)" required>
+                    </div>
+
+                    <!-- Last Name -->
+                    <div class="step" id="step-5">
+                        <input type="text" id="last-name" name="lastName" placeholder="Nom" required>
+                    </div>
+                </div>
+
+                <!-- Right Column of Form -->
+                <div class="form-column">
+                    <!-- Birthdate -->
+                    <div class="step" id="step-6">
+                        <input type="date" id="birthdate" name="birthdate" required>
+                    </div>
+
+                    <!-- Gender -->
+                    <div class="step" id="step-7">
+                        <select id="gender" name="gender" required>
+                            <option value="" disabled selected>Genre</option>
+                            <option value="H">Homme</option>
+                            <option value="F">Femme</option>
+                            <option value="O">Autre</option>
+                        </select>
+                    </div>
+
+                    <!-- Looking for? (CARDS) -->
+                    <p>Que cherchez-vous?</p>
+                    <div class="icon-container">
+                        <label for="ace"><img src="/images/ace.png" class="icon" id="ace" alt="Ace"></label>
+                        <label for="joker"><img src="/images/joker.png" class="icon" id="joker" alt="Joker"></label>
+                        <label for="reine"><img src="/images/queen.png" class="icon" id="reine" alt="Reine"></label>
+                        <label for="roi"><img src="/images/king.png" class="icon" id="roi" alt="Roi"></label>
+                    </div>
 
 
-                        <!-- Likes -->
-                        <div class="step" id="step-10">
-                            <p>Qu'est-ce que vous aimez?</p>
-                            <button type="button" id="pick-options-btn">Choisir options</button>
-                            <div id="selected-options"></div>
-                        </div>
-                        <div id="options-modal" class="modal">
-                            <div class="modal-content">
-                                <span class="close-btn">&times;</span>
-                                <h3>Choose Your Interests</h3>
-                                <div class="scrollable-options">
-                                    <label>
-                                        <input type="checkbox" name="interests" value="musique"> Musique
-                                    </label>
-                                    <label>
-                                        <input type="checkbox" name="interests" value="cinema"> Cinéma
-                                    </label>
-                                    <label>
-                                        <input type="checkbox" name="interests" value="voyages"> Voyages
-                                    </label>
-                                    <label>
-                                        <input type="checkbox" name="interests" value="sport"> Sport
-                                    </label>
-                                    <label>
-                                        <input type="checkbox" name="interests" value="lecture"> Lecture
-                                    </label>
-                                    <label>
-                                        <input type="checkbox" name="interests" value="cuisine"> Cuisine
-                                    </label>
-                                    <!-- Add more options as needed -->
-                                </div>
-                                <button type="button" id="save-options-btn">Save</button>
+                    <!-- Likes -->
+                    <div class="step" id="step-10">
+                        <p>Qu'est-ce que vous aimez?</p>
+                        <button type="button" id="pick-options-btn">Choisir options</button>
+                        <div id="selected-options"></div>
+                    </div>
+                    <div id="options-modal" class="modal">
+                        <div class="modal-content">
+                            <span class="close-btn">&times;</span>
+                            <h3>Choose Your Interests</h3>
+                            <div class="scrollable-options">
+                                <label>
+                                    <input type="checkbox" name="interests" value="musique"> Musique
+                                </label>
+                                <label>
+                                    <input type="checkbox" name="interests" value="cinema"> Cinéma
+                                </label>
+                                <label>
+                                    <input type="checkbox" name="interests" value="voyages"> Voyages
+                                </label>
+                                <label>
+                                    <input type="checkbox" name="interests" value="sport"> Sport
+                                </label>
+                                <label>
+                                    <input type="checkbox" name="interests" value="lecture"> Lecture
+                                </label>
+                                <label>
+                                    <input type="checkbox" name="interests" value="cuisine"> Cuisine
+                                </label>
+                                <!-- Add more options as needed -->
                             </div>
-                        </div>
-
-                        <!-- Photos -->
-                        <div class="step" id="step-11">
-                            <input type="file" id="photos" name="photo" accept="image/*" required>
+                            <button type="button" id="save-options-btn">Save</button>
                         </div>
                     </div>
 
-                    <!-- Submit Button -->
-                    <div class="submit-button-container">
-                        <button type="submit" class="next-button">Soumettre</button>
+                    <!-- Photos -->
+                    <div class="step" id="step-11">
+                        <input type="file" id="photos" name="photo" accept="image/*" required>
                     </div>
-                </form>
+                </div>
+
+                <!-- Submit Button -->
+                <div class="submit-button-container">
+                    <button type="submit" class="next-button">Soumettre</button>
+                </div>
+            </form>
             </div>
         </main>
 

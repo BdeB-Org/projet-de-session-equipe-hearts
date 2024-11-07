@@ -153,6 +153,7 @@ con.connect(function (err) {
     initializeSubscriptions();
     initializeCards();
     initializeLikes();
+    initializeSexualite();
 });
 
 /*
@@ -279,6 +280,34 @@ const initializeCards = () => {
     });
 };
 
+/*
+------------------------------------------
+Inititaliser la table des sexualite
+------------------------------------------
+*/
+const initializeSexualite = () => {
+    const sexualites = [
+        { id_sexualite: 1, type_sexualite: 'Homme' },
+        { id_sexualite: 2, type_sexualite: 'Femme' }
+    ];
+
+    sexualites.forEach(sexualite => {
+        const insertQuery = `
+            INSERT INTO e_sexualite (id_sexualite, type_sexualite)
+            VALUES (?, ?)
+            ON DUPLICATE KEY UPDATE
+                type_sexualite = VALUES(type_sexualite);
+        `;
+
+        con.query(insertQuery, [sexualite.id_sexualite, sexualite.type_sexualite], (err) => {
+            if (err) {
+                console.error(`Error inserting sexualite ${sexualite.type_sexualite}:`, err);
+            } else {
+                console.log(`Sexualite ${sexualite.type_sexualite} added/updated successfully.`);
+            }
+        });
+    });
+};
 /*
 ------------------------------------------
 Inititaliser la table des likes
@@ -1503,7 +1532,7 @@ const upload = multer({
 });
 
 app.post('/event/inscription', upload.single('photo'), (req, res) => {
-    const { email, password, phone, firstName, lastName, birthdate, gender, selectedCard, selectedLikes } = req.body;
+    const { email, password, phone, firstName, lastName, birthdate, gender, selectedCard, selectedLikes, selectedSexualite } = req.body;
     const uploadedPhoto = req.file ? req.file.filename : null;
 
     const checkEmailQuery = "SELECT * FROM e_utilisateur WHERE e_courriel = ?";
@@ -1566,6 +1595,7 @@ app.post('/event/inscription', upload.single('photo'), (req, res) => {
             // Insert likes preferences if selected
             let likesPromises = [];
             if (selectedLikes) {
+                console.log(selectedLikes);
                 const likesArray = selectedLikes.split(',').map(like => like.trim()); // Trim spaces
                 console.log("Trimmed likes being processed:", likesArray); // Debugging output
                 likesPromises = likesArray.map(like => {
@@ -1599,8 +1629,45 @@ app.post('/event/inscription', upload.single('photo'), (req, res) => {
                     });
                 });
             }
-            // Wait for all database operations to complete
-            Promise.all([cardIdPromise, ...likesPromises])
+
+            let sexualiteIdPromise = Promise.resolve();
+            if (selectedSexualite) {
+                console.log("Selected sexualite:", selectedSexualite); // Log selectedSexualite value
+            
+                sexualiteIdPromise = new Promise((resolve, reject) => {
+                    const fetchSexualiteIdQuery = "SELECT id_sexualite FROM e_sexualite WHERE id_sexualite = ?";
+                    console.log("Running query:", fetchSexualiteIdQuery, "with value:", selectedSexualite);
+            
+                    con.query(fetchSexualiteIdQuery, [selectedSexualite], (err, sexualiteResult) => {
+                        if (err) {
+                            console.error("Error fetching sexualite ID:", err);
+                            return reject("Internal Server Error");
+                        }
+                        if (sexualiteResult.length === 0) {
+                            console.error("Selected sexualite not found in database:", selectedSexualite);
+                            return reject("Selected sexualite not valid");
+                        }
+                        const sexualiteId = sexualiteResult[0].id_sexualite;
+                        // Insert the preference
+                        const insertSexualitePreferenceQuery = `
+                            INSERT INTO preference (utilisateur_id, sexualite_id)
+                            VALUES (?, ?)
+                        `;
+                        con.query(insertSexualitePreferenceQuery, [userId, sexualiteId], (err) => {
+                            if (err) {
+                                console.error("Error inserting sexualite preference:", err);
+                                return reject("Error inserting sexualite preference");
+                            }
+                            resolve();
+                        });
+                    });
+                }).catch((error) => {
+                    console.error("Promise error in sexualiteIdPromise:", error);
+                });
+            }
+            
+            // Wait for all promises to resolve and handle any rejections
+            Promise.all([cardIdPromise, sexualiteIdPromise, ...likesPromises])
                 .then(() => {
                     // Log the user in by setting the session
                     req.session.user = {

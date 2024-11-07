@@ -64,3 +64,36 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 });
+
+document.addEventListener('DOMContentLoaded', () => {
+    const images = document.querySelectorAll('.image-section');
+
+    images.forEach(image => {
+        image.addEventListener('click', () => {
+            // Remove the 'selected' class from all images
+            images.forEach(img => img.classList.remove('selected'));
+            
+            // Add the 'selected' class to the clicked image
+            image.classList.add('selected');
+
+            // Check the associated radio button
+            const radioButton = document.getElementById("radio" + image.querySelector('img').alt);
+            radioButton.checked = true;
+
+            // Set the hidden selectedSexualite field
+            const selectedSexualiteField = document.getElementById('selectedSexualite');
+            selectedSexualiteField.value = image.querySelector('img').alt === 'Homme' ? '1' : '2';
+        });
+    });
+
+    // Prevent form submission if no image is selected
+    document.getElementById('myForm').addEventListener('submit', (e) => {
+        const isSelected = document.querySelector('input[name="selectedImage"]:checked');
+        console.log("isSelected:", isSelected); // Debug log
+
+        if (!isSelected) {
+            alert("Vous n'avez pas encore choisi entre 'Homme' ou 'Femme'. Faites votre choix avec les images à gauche.");
+            e.preventDefault(); // Prevent form submission
+        }
+    });
+});

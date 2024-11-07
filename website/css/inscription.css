@@ -256,3 +256,83 @@ p {
   cursor: pointer;
   margin-top: 10px;
 }
+
+/* Flicker effect on hover */
+@keyframes flicker {
+  0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% {
+      opacity: 1;
+      filter: brightness(1.1);
+  }
+  20%, 24%, 55% {
+      opacity: 0.6;
+      filter: brightness(1.5);
+  }
+}
+
+.image-section {
+  position: relative;
+  display: inline-block;
+}
+
+.image-section img {
+  position: relative;
+  z-index: 1;
+  transition: transform 0.3s ease;
+}
+
+.image-section img:hover {
+  animation: flicker 1s linear infinite;
+}
+
+/* Cyberpunk Edge Effect */
+.image-section::before,
+.image-section.selected::before {
+  content: "";
+  position: absolute;
+  top: -5px;
+  left: -5px;
+  right: -5px;
+  bottom: -5px;
+  border-radius: 10px;
+  background: linear-gradient(45deg, #ff00ff, #00ffff);
+  opacity: 0.7;
+  z-index: 0;
+  filter: blur(10px);
+  transition: opacity 0.3s ease;
+}
+
+.image-section img:hover::before,
+.image-section:hover::before,
+.image-section.selected::before {
+  opacity: 1;
+  filter: blur(15px);
+}
+
+/* Additional Outer Glow */
+.image-section::after,
+.image-section.selected::after {
+  content: "";
+  position: absolute;
+  top: -8px;
+  left: -8px;
+  right: -8px;
+  bottom: -8px;
+  border-radius: 12px;
+  background: linear-gradient(45deg, #ff00ff, transparent);
+  z-index: 0;
+  filter: blur(20px);
+  opacity: 0.5;
+  transition: opacity 0.3s ease;
+}
+
+.image-section:hover::after,
+.image-section.selected::after {
+  opacity: 0.8;
+  filter: blur(25px);
+}
+
+/* Selected state (keeps glow on click) */
+.image-section.selected img {
+  animation: none; /* Disable flicker animation if desired */
+  transform: scale(1.05); /* Optional: Add a slight scale for selected state */
+}
