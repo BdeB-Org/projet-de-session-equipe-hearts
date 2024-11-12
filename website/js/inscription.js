@@ -1,99 +1,349 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // Remplir les champs avec les valeurs stockées dans localStorage
-    const storedEmail = localStorage.getItem('email');
-    const storedPassword = localStorage.getItem('password');
+    
+    const questions = [
+        { id: 'email', prompt: "Entrez votre courriel" },
+        { id: 'password', prompt: "Créez un mot de passe" },
+        { id: 'verify-password', prompt: "Vérifiez votre mot de passe" },
+        { id: 'phone', prompt: "Entrez votre numéro de téléphone" },
+        { id: 'first-name', prompt: "Entrez votre prénom" },
+        { id: 'last-name', prompt: "Entrez votre nom de famille" },
+        { id: 'birthdate', prompt: "Quelle est votre date de naissance" },
+        { id: 'gender', prompt: "Sélectionnez votre genre" },
+        { id: 'selected-card', prompt: "Choissisez votre carte" },
+        { id: 'selected-likes', prompt: "Choissisez vos préférences" },
+        { id: 'photos', prompt: "Soumettre votre première photo" },
+        { id: 'selectedImage', prompt: "Choisissez qui vous voulez dater" }
+    ];
 
-    if (storedEmail) {
-        document.getElementById('email').value = storedEmail;
-        localStorage.removeItem('email'); // Supprimer après utilisation si souhaité
+    let currentQuestion = 0;
+
+    // Show the initial question right away
+    showBotMessage(questions[currentQuestion].prompt);
+
+    // Event listener for the send button
+    const sendButton = document.querySelector('.send-button');
+    if (sendButton) {
+        sendButton.addEventListener('click', handleResponse);
+    } else {
+        console.error('Send button not found in the DOM');
     }
 
-    if (storedPassword) {
-        document.getElementById('password').value = storedPassword;
-        localStorage.removeItem('password'); // Supprimer après utilisation si souhaité
-    }
-
-    // Gestion de la sélection des icônes
-    const icons = document.querySelectorAll('.icon');
-    let selectedIcon = null; // Stocker l'icône sélectionnée
-
-    icons.forEach(icon => {
-        icon.addEventListener('click', (event) => {
-            event.preventDefault(); // Empêcher le comportement par défaut
-
-            // Retirer la classe 'selected' de l'icône actuellement sélectionnée, le cas échéant
-            if (selectedIcon) {
-                selectedIcon.classList.remove('selected');
-            }
-
-            // Ajouter la classe 'selected' à l'icône cliquée
-            icon.classList.add('selected');
-            selectedIcon = icon; // Définir l'icône nouvellement cliquée comme l'icône sélectionnée
-
-            // Mettre à jour le champ caché avec l'ID de l'icône sélectionnée
-            const iconId = icon.id; // ID de l'icône, comme 'ace', 'joker', etc.
-            document.getElementById('selected-card').value = iconId; // Mettre à jour le champ caché
-        });
-    });
-
-    // Gestion du modal
-    document.getElementById("pick-options-btn").addEventListener("click", function () {
-        document.getElementById("options-modal").style.display = "block"; // Ouvrir le modal
-    });
-
-    document.querySelector(".close-btn").addEventListener("click", function () {
-        document.getElementById("options-modal").style.display = "none"; // Fermer le modal
-    });
-
-    document.getElementById("save-options-btn").addEventListener("click", function () {
-        const checkboxes = document.querySelectorAll('.scrollable-options input[type="checkbox"]');
-        const selected = Array.from(checkboxes)
-            .filter(checkbox => checkbox.checked)
-            .map(checkbox => checkbox.value);
-
-        document.getElementById("selected-options").textContent = selected.join(", ");
-        document.getElementById("selected-likes").value = selected.join(','); // Mettre à jour le champ caché
-        document.getElementById("options-modal").style.display = "none"; // Fermer le modal
-    });
-
-    // Fermer le modal lorsque l'utilisateur clique en dehors de celui-ci
-    window.addEventListener("click", function (event) {
-        const modal = document.getElementById("options-modal");
-        if (event.target === modal) {
-            modal.style.display = "none"; // Fermer le modal
+    // Event listener for the Enter key in the input field
+    const userInput = document.getElementById('userInput');
+    userInput.addEventListener('keypress', function (event) {
+        if (event.key === 'Enter') {
+            event.preventDefault(); // Prevent the default Enter key behavior
+            handleResponse();
         }
     });
-});
 
-document.addEventListener('DOMContentLoaded', () => {
-    const images = document.querySelectorAll('.image-section');
+    // Create date input element for the birthdate question
+    const dateInput = document.createElement('input');
+    dateInput.type = 'date';
+    dateInput.id = 'dateInput';
+    dateInput.style.display = 'none'; // Hidden by default
+    document.querySelector('.input-container').insertBefore(dateInput, sendButton);
 
-    images.forEach(image => {
-        image.addEventListener('click', () => {
-            // Remove the 'selected' class from all images
-            images.forEach(img => img.classList.remove('selected'));
+    dateInput.addEventListener('change', () => {
+        showUserResponse(dateInput.value);
+        saveResponse('birthdate', dateInput.value);
+        dateInput.style.display = 'none'; // Hide date input
+        userInput.style.display = ''; // Re-enable text input
+        currentQuestion++;
+        showNextQuestion();
+    });
+
+    function handleResponse() {
+        const userInputValue = userInput.value.trim();
+        if (!userInputValue) return;
+
+        showUserResponse(userInputValue);
+        saveResponse(questions[currentQuestion].id, userInputValue);
+
+        userInput.value = ''; // Clear the input field
+
+        // Remove the blinking effect from the previous bot message
+        const lastBotMessage = document.querySelector('.bot-message .blinking-line');
+        if (lastBotMessage) {
+            lastBotMessage.classList.remove('blinking-line');
+        }
+
+        // Move to the next question if there are more questions
+        if (currentQuestion < questions.length - 1) {
+            currentQuestion++;
+            showNextQuestion();
+        } else {
+            submitForm(); // Submit the form once all questions are answered
+        }
+    }
+
+    function showNextQuestion() {
+        const nextQuestion = questions[currentQuestion];
+    
+        if (nextQuestion.id === 'birthdate') {
+            // Show date input for birthdate
+            userInput.style.display = 'none';
+            dateInput.style.display = '';
+            sendButton.style.display = 'none';
+            showBotMessage(nextQuestion.prompt);
+        } else if (nextQuestion.id === 'gender') {
+            // Show gender radio buttons
+            userInput.style.display = 'none';
+            sendButton.style.display = 'none';
+            showBotMessage(nextQuestion.prompt);
+    
+            const radioContainer = document.createElement('div');
+            radioContainer.className = 'radio-container';
+            radioContainer.innerHTML = `
+                <label><input type="radio" name="gender" value="H" required> Homme</label>
+                <label><input type="radio" name="gender" value="F"> Femme</label>
+                <label><input type="radio" name="gender" value="O"> Autre</label>
+            `;
+    
+            const chatContainer = document.querySelector('.chat-container');
+            const inputContainer = document.querySelector('.input-container');
+            chatContainer.insertBefore(radioContainer, inputContainer);
+    
+            scrollToBottom();
+    
+            radioContainer.addEventListener('change', () => {
+                const selectedOption = document.querySelector('input[name="gender"]:checked');
+                if (selectedOption) {
+                    showUserResponse(selectedOption.nextSibling.textContent.trim());
+                    saveResponse('gender', selectedOption.value);
+                    radioContainer.remove();
+                    sendButton.style.display = '';
+                    userInput.style.display = '';
+                    currentQuestion++;
+                    showNextQuestion();
+                }
+            });
+        } else if (nextQuestion.id === 'selected-card') {
+            // Show card selection icons
+            userInput.style.display = 'none';
+            sendButton.style.display = 'none';
+            showBotMessage(nextQuestion.prompt);
+    
+            const iconContainer = document.createElement('div');
+            iconContainer.className = 'icon-container';
+            iconContainer.innerHTML = `
+                <label for="ace"><img src="/images/ace.png" class="icon" id="ace" alt="Ace"></label>
+                <label for="joker"><img src="/images/joker.png" class="icon" id="joker" alt="Joker"></label>
+                <label for="reine"><img src="/images/queen.png" class="icon" id="reine" alt="Reine"></label>
+                <label for="roi"><img src="/images/king.png" class="icon" id="roi" alt="Roi"></label>
+            `;
+    
+            const chatContainer = document.querySelector('.chat-container');
+            const inputContainer = document.querySelector('.input-container');
+            chatContainer.insertBefore(iconContainer, inputContainer);
+    
+            setTimeout(scrollToBottom, 100);
+    
+            iconContainer.addEventListener('click', (event) => {
+                const selectedIcon = event.target.closest('img');
+                if (selectedIcon) {
+                    const cardType = selectedIcon.alt;
+                    showUserResponse(cardType);
+                    saveResponse('selected-card', cardType);
+                    iconContainer.remove();
+                    sendButton.style.display = '';
+                    userInput.style.display = '';
+                    currentQuestion++;
+                    showNextQuestion();
+                }
+            });
+        } else if (nextQuestion.id === 'selected-likes') {
+            // Show modal for likes/preferences selection
+            userInput.style.display = 'none';
+            sendButton.style.display = 'none';
+            showBotMessage(nextQuestion.prompt);
+    
+            const modal = document.createElement('div');
+            modal.id = 'options-modal';
+            modal.className = 'modal';
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <span class="close-btn">&times;</span>
+                    <h3>Choisissez vos préférences</h3>
+                    <div class="scrollable-options">
+                        <label><input type="checkbox" name="interests" value="musique"> Musique</label>
+                        <label><input type="checkbox" name="interests" value="cinema"> Cinéma</label>
+                        <label><input type="checkbox" name="interests" value="voyages"> Voyages</label>
+                        <label><input type="checkbox" name="interests" value="sport"> Sport</label>
+                        <label><input type="checkbox" name="interests" value="lecture"> Lecture</label>
+                        <label><input type="checkbox" name="interests" value="cuisine"> Cuisine</label>
+                    </div>
+                    <button type="button" id="save-options-btn">Save</button>
+                </div>
+            `;
+    
+            const chatContainer = document.querySelector('.chat-container');
+            chatContainer.appendChild(modal);
+    
+            modal.style.display = 'block';
+    
+            modal.querySelector('.close-btn').addEventListener('click', () => {
+                modal.style.display = 'none';
+            });
+    
+            document.getElementById('save-options-btn').addEventListener('click', () => {
+                const selectedOptions = Array.from(document.querySelectorAll('input[name="interests"]:checked'))
+                    .map(checkbox => checkbox.nextSibling.textContent.trim());
+                
+                showUserResponse(`Sélections: ${selectedOptions.join(', ')}`);
+                saveResponse('selected-likes', selectedOptions.join(', '));
+    
+                modal.style.display = 'none';
+                modal.remove();
+    
+                sendButton.style.display = '';
+                userInput.style.display = '';
+                currentQuestion++;
+                showNextQuestion();
+            });
+        } else if (nextQuestion.id === 'selectedImage') {
+            // Show image selection for "who you want to date" question
+            userInput.style.display = 'none';
+            sendButton.style.display = '';
+            showBotMessage(nextQuestion.prompt);
+    
+            const imageSection = document.createElement('div');
+            imageSection.className = 'image-selection';
+            imageSection.innerHTML = `
+                <div class="image-section image1">
+                    <label for="radioHomme">
+                        <img src="/images/swiper.png" class="icon" id="imageHomme" alt="Homme">
+                    </label>
+                    <input type="radio" name="selectedImage" id="radioHomme" value="Homme" hidden required>
+                </div>
+                <div class="image-section image2">
+                    <label for="radioFemme">
+                        <img src="/images/swiper2.png" class="icon" id="imageFemme" alt="Femme">
+                    </label>
+                    <input type="radio" name="selectedImage" id="radioFemme" value="Femme" hidden required>
+                </div>
+            `;
+    
+            const chatContainer = document.querySelector('.chat-container');
+            const inputContainer = document.querySelector('.input-container');
+            chatContainer.insertBefore(imageSection, inputContainer);
             
-            // Add the 'selected' class to the clicked image
-            image.classList.add('selected');
-
-            // Check the associated radio button
-            const radioButton = document.getElementById("radio" + image.querySelector('img').alt);
-            radioButton.checked = true;
-
-            // Set the hidden selectedSexualite field
-            const selectedSexualiteField = document.getElementById('selectedSexualite');
-            selectedSexualiteField.value = image.querySelector('img').alt === 'Homme' ? '1' : '2';
-        });
-    });
-
-    // Prevent form submission if no image is selected
-    document.getElementById('myForm').addEventListener('submit', (e) => {
-        const isSelected = document.querySelector('input[name="selectedImage"]:checked');
-        console.log("isSelected:", isSelected); // Debug log
-
-        if (!isSelected) {
-            alert("Vous n'avez pas encore choisi entre 'Homme' ou 'Femme'. Faites votre choix avec les images à gauche.");
-            e.preventDefault(); // Prevent form submission
+            setTimeout(scrollToBottom, 100);
+        
+    
+            imageSection.addEventListener('click', (event) => {
+                const selectedImage = event.target.closest('img');
+                if (selectedImage) {
+                    const choice = selectedImage.alt;
+                    showUserResponse(`Image choisie: ${choice}`);
+                    saveResponse('selectedImage', choice);
+                    imageSection.remove();
+                    userInput.style.display = '';
+                    currentQuestion++;
+                    showNextQuestion();
+                }
+            });
+        } else if (nextQuestion.id === 'photos') {
+            // Show file input for photo upload
+            userInput.style.display = 'none';
+            sendButton.style.display = '';
+            showBotMessage(nextQuestion.prompt);
+    
+            // Create a file input for photo upload
+            const photoInput = document.createElement('input');
+            photoInput.type = 'file';
+            photoInput.accept = 'image/*';
+            photoInput.id = 'photoUpload';
+            photoInput.className = 'photo-upload';
+    
+            const chatContainer = document.querySelector('.chat-container');
+            const inputContainer = document.querySelector('.input-container');
+            chatContainer.insertBefore(photoInput, inputContainer);
+    
+            sendButton.addEventListener('click', function handlePhotoSubmit() {
+                if (photoInput.files.length > 0) {
+                    const fileName = photoInput.files[0].name;
+                    showUserResponse(`Photo sélectionnée : ${fileName}`);
+                    
+                    // Directly assign the file to the hidden input in the form
+                    const formFileInput = document.getElementById('photos');
+                    formFileInput.files = photoInput.files;
+    
+                    // Clean up
+                    photoInput.remove();
+                    sendButton.removeEventListener('click', handlePhotoSubmit);
+    
+                    // Advance to the next question
+                    currentQuestion++;
+                    showNextQuestion();
+                } else {
+                    // Alert user to choose a file if they haven't yet
+                    alert("Veuillez sélectionner une photo avant de continuer.");
+                }
+            });
+        } else if (currentQuestion < questions.length - 1) {
+            // Handle other questions as before
+            userInput.style.display = '';
+            sendButton.style.display = '';
+            showBotMessage(nextQuestion.prompt);
+        } else {
+            // If this is the last question, submit the form
+            submitForm();
         }
-    });
+    }
+    
+    
+
+
+    function showBotMessage(message) {
+        const botMessageDiv = document.createElement('div');
+        botMessageDiv.className = 'message bot-message';
+        
+        // Place the blinking line directly after the message text in the same span
+        botMessageDiv.innerHTML = `<span class="typing-effect">${message}<span class="blinking-line"></span></span>`;
+    
+        const chatContainer = document.querySelector('.chat-container');
+        const inputContainer = document.querySelector('.input-container');
+        chatContainer.insertBefore(botMessageDiv, inputContainer);
+    
+        scrollToBottom();
+    
+        // Remove the blinking line for specific questions
+        if (message.includes("date de naissance") || message.includes("genre") || message.includes("carte") || message.includes("préférence")) {
+            const blinkingLine = botMessageDiv.querySelector('.blinking-line');
+            if (blinkingLine) {
+                blinkingLine.remove();
+            }
+        }
+    }
+    
+
+    function showUserResponse(response) {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = 'message user-message';
+        messageDiv.textContent = response;
+
+        // Insert the user message above the input container
+        const chatContainer = document.querySelector('.chat-container');
+        const inputContainer = document.querySelector('.input-container');
+        chatContainer.insertBefore(messageDiv, inputContainer);
+
+        scrollToBottom();
+    }
+
+    function saveResponse(fieldId, response) {
+        const field = document.getElementById(fieldId);
+        if (field) {
+            field.value = response;
+        }
+    }
+
+    function submitForm() {
+        document.getElementById('myForm').submit();
+    }
+
+    function scrollToBottom() {
+        const chatContainer = document.querySelector('.chat-container');
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+    }
 });

@@ -1,203 +1,150 @@
+/* General Body and Font Settings */
 body {
   margin: 0;
   font-family: "Orbitron", sans-serif;
   background-color: #000;
 }
 
-.form_inscription {
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  width: 100%;
-  height: 100vh;
-}
-
-.grid-container {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr 1fr;
-  /* Four equal columns */
-  grid-gap: 40px;
-  /* Spacing between columns */
-  width: 95%;
-  max-width: 1600px;
-  /* Maximum width for large screens */
-  align-items: start;
-  margin: 0 auto;
-  margin-top: -100px;
-}
-
-.image-section {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: auto;
-}
-
-.image-section img {
-  width: 100%;
-  height: auto;
-  max-width: 100%;
+/* Chat Container for Chat-Style Interface */
+.chat-container {
+  max-width: 600px;
+  max-height: 70vh; /* Limit the height so it scrolls when content overflows */
+  margin: auto;
+  padding: 20px;
+  background-color: #1a1a1a;
   border-radius: 10px;
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 0 15px rgba(255, 0, 255, 0.5);
+  position: relative;
+  color: #fff;
+  overflow-y: auto; /* Enable vertical scrolling */
 }
 
-.form-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  /* Two equal columns for form */
-  grid-column: 3 / span 2;
-  /* Form spans the last two columns */
-  gap: 60px;
+.chat-container::-webkit-scrollbar {
+  width: 6px; /* Slim scrollbar */
 }
 
-.form-column {
+.chat-container::-webkit-scrollbar-thumb {
+  background-color: #534b4f; /* Cyberpunk-themed color */
+  border-radius: 10px;
+}
+
+.chat-container::-webkit-scrollbar-track {
+  background-color: #333;
+}
+
+.messages-container {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px;
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 10px;
 }
-
-.step input,
-.step select {
-  font-family: "Orbitron", sans-serif;
-  background: linear-gradient(90deg, #F4F4F4 15%, #FFA3AC 75%);
-  border: none;
-  padding: 15px 20px;
-  font-size: 16px;
-  border-radius: 10px;
-  width: 100%;
-  outline: none;
-  color: #333;
-  transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
-}
-
-.step input:focus,
-.step select:focus {
-  border: 2px solid #FF7991;
-  box-shadow: 0px 0px 10px rgba(255, 163, 172, 0.5);
-  transform: scale(1.03);
-  color: #FF7991;
-}
-
-.submit-button-container {
-  grid-column: 1 / span 2;
+/* Message Styles */
+.message {
   display: flex;
-  justify-content: center;
-  margin-top: 20px;
-}
-
-.next-button {
-  font-family: "Orbitron", sans-serif;
-  padding: 15px 30px;
-  background-color: #FF7991;
-  color: #fff;
-  border: none;
-  border-radius: 12px;
-  font-size: 18px;
-  cursor: pointer;
-  transition: background-color 0.3s ease, transform 0.3s ease;
-}
-
-.next-button:hover {
-  background-color: #e06578;
-  transform: scale(1.1);
-}
-
-.icon-container {
-  display: flex;
-  justify-content: space-around;
-  /* Adjust to space out the icons */
   align-items: center;
-  margin-top: -15px;
-  padding: 10px;
-  background: linear-gradient(90deg, #FF7991 0%, #F4F4F4 100%);
-  border-radius: 15px;
-  box-shadow: 0 4px 8px rgba(255, 163, 172, 0.5);
-  z-index: 1;
-  /* Ensure the icons are above any overlapping elements */
+  margin: 10px 0;
+  border-radius: 20px;
+  padding: 12px;
 }
 
-.icon-container img {
-  width: 60px;
-  /* Adjust icon size */
-  height: auto;
-  padding: 10px;
-  cursor: pointer;
-  /* Make icons clickable */
-  z-index: 2;
-  /* Ensure the icons themselves are clickable */
-  transition: transform 0.3s ease, filter 0.3s ease;
-}
-
-.icon-container img:hover {
-  transform: scale(1.2);
-  /* Slight scale on hover */
-}
-
-.icon-container img.selected {
-  filter: url(#glow-effect);
-  /* Apply white glow by default */
-  transform: scale(1.1);
-  transition: filter 0.3s ease, transform 0.3s ease;
-}
-
-
-.icon-container img:active {
-  filter: brightness(1.5);
-  /* Apply the glow effect on active/click */
-}
-
-p {
-  color: #FF7991;
-  font-size: 16px;
-  text-align: center;
-  margin-bottom: 10px;
-  margin-top: -5px;
-  font-weight: bold;
-}
-
-#queen.selected,
-#king.selected {
-  filter: url(#pink-glow-effect);
-  /* Apply pink glow for Queen and King */
-}
-
-#joker {
-  width: 70px;
-}
-
-#king {
-  width: 55px;
-}
-
-
-
-/* General Styles */
-.txt {
-  font-size: 20px;
+.user-message {
+  background-color: #007bff;
   color: white;
+  align-self: flex-end;
+  max-width: 75%;
+  margin-left: auto;
 }
 
-
-#pick-options-btn {
-  background-color: #FF7991;
-  color: #fff;
-  padding: 10px 20px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-
-}
-
-#selected-options {
-  margin-top: 10px;
+.bot-message {
+  background-color: #2b2b2b;
   color: #ffcc00;
-  font-size: 14px;
+  align-self: flex-start;
+  max-width: 80%;
 }
 
-/* Modal Styles */
+.typing-effect {
+  display: inline-block;
+  white-space: nowrap;
+  overflow: hidden;
+  animation: typing 2s steps(30, end) forwards;
+  width: auto; 
+  vertical-align: bottom; 
+}
+
+
+.blinking-line {
+  display: inline-block;
+  width: 2px;
+  height: 1em;
+  background-color: #ffcc00; /* Adjust color as needed */
+  margin-left: 5px;
+  animation: blink 1s step-end infinite;
+}
+
+/* Blinking animation keyframes */
+@keyframes blink {
+  50% { opacity: 0; }
+}
+
+
+
+.input-container {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    background: linear-gradient(90deg, #1a1a1a, #2b2b2b);
+    border-top: 1px solid #333;
+}
+
+.input-field {
+  flex-grow: 1;
+  padding: 10px;
+  border-radius: 20px;
+  background-color: #333;
+  color: #ffcc00;
+  border: 1px solid #555;
+  font-size: 16px;
+  outline: none;
+}
+
+.send-button {
+  background-color: #ff007f;
+  color: #fff;
+  padding: 10px;
+  border-radius: 50%;
+  border: none;
+  margin-left: 10px;
+  cursor: pointer;
+  transition: transform 0.3s;
+}
+
+.send-button:hover {
+  background-color: #e6006f;
+  transform: scale(1.1);
+}
+
+/* Flickering Effect */
+@keyframes typing {
+  from { width: 0; }
+  to { width: 100%; }
+}
+
+@keyframes flicker {
+  0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% {
+      opacity: 1;
+      filter: brightness(1.1);
+  }
+  20%, 24%, 55% {
+      opacity: 0.6;
+      filter: brightness(1.5);
+  }
+}
+
+/* Modal and Options for Interests */
 .modal {
   display: none;
-  /* Hidden by default */
   position: fixed;
   z-index: 1000;
   left: 0;
@@ -205,7 +152,6 @@ p {
   width: 100%;
   height: 100%;
   background-color: rgba(0, 0, 0, 0.7);
-  /* Semi-transparent background */
 }
 
 .modal-content {
@@ -220,7 +166,6 @@ p {
 
 .scrollable-options {
   max-height: 200px;
-  /* Height limit for scrolling */
   overflow-y: auto;
   margin-top: 10px;
   padding: 10px;
@@ -235,10 +180,6 @@ p {
   cursor: pointer;
 }
 
-.scrollable-options input[type="checkbox"] {
-  margin-right: 10px;
-}
-
 .close-btn {
   color: #ffcc00;
   float: right;
@@ -246,7 +187,7 @@ p {
   cursor: pointer;
 }
 
-/* Button for saving selected options */
+/* Save Button in Modal */
 #save-options-btn {
   background-color: #ffcc00;
   color: #24043a;
@@ -257,60 +198,163 @@ p {
   margin-top: 10px;
 }
 
-/* Flicker effect on hover */
-@keyframes flicker {
-  0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% {
-      opacity: 1;
-      filter: brightness(1.1);
-  }
-  20%, 24%, 55% {
-      opacity: 0.6;
-      filter: brightness(1.5);
-  }
+/* Styles for Selected Interests */
+#pick-options-btn {
+  background-color: #FF7991;
+  color: #fff;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
 }
 
+#selected-options {
+  margin-top: 10px;
+  color: #ffcc00;
+  font-size: 14px;
+}
+
+/*  style pour icones */
+/* Container for the icons */
+.icon-container {
+  display: flex;
+  justify-content: space-around;
+  margin: 20px 0;
+  padding: 10px;
+  background-color: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(255, 0, 255, 0.5);
+}
+
+/* Styling for each icon */
+.icon-container .icon {
+  width: 70px;
+  height: 70px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+/* Hover effect for icons */
+.icon-container .icon:hover {
+  transform: scale(1.1);
+  box-shadow: 0 0 15px rgba(255, 165, 0, 0.7);
+}
+
+/* Selected icon styling for better visual feedback */
+.icon-container .icon:active {
+  transform: scale(0.9);
+  box-shadow: 0 0 10px rgba(0, 255, 255, 0.7);
+}
+
+/* Optional: Add a border effect to make icons stand out more */
+.icon-container label {
+  padding: 5px;
+  border-radius: 10px;
+  transition: background-color 0.3s;
+}
+
+.icon-container label:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Style pour pop-up prefs*/
+
+/* Modal background styling */
+.modal {
+  display: none; /* Hidden by default */
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7); /* Semi-transparent background */
+}
+
+/* Modal content styling */
+.modal-content {
+  background-color: #1a1a1a;
+  margin: 10% auto;
+  padding: 20px;
+  border-radius: 10px;
+  width: 80%;
+  max-width: 400px;
+  color: #ffcc00;
+  box-shadow: 0 0 15px rgba(255, 0, 255, 0.5);
+  text-align: center;
+}
+
+/* Scrollable options styling */
+.scrollable-options {
+  max-height: 200px;
+  overflow-y: auto;
+  padding: 10px;
+  background-color: #000;
+  border-radius: 5px;
+  color: #fff;
+}
+
+/* Individual option label styling */
+.scrollable-options label {
+  display: block;
+  padding: 5px 0;
+  cursor: pointer;
+}
+
+/* Close button styling */
+.close-btn {
+  color: #ffcc00;
+  float: right;
+  font-size: 24px;
+  cursor: pointer;
+}
+
+/* Save button styling */
+#save-options-btn {
+  background-color: #ff007f;
+  color: #fff;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+/* Trigger button styling */
+#pick-options-btn {
+  background-color: #ffcc00;
+  color: #24043a;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+
+/* style pour quand select image (H/F) */
+
+/* Cyberpunk Edge Effect for Image Selection */
 .image-section {
   position: relative;
   display: inline-block;
+  margin: 20px;
+  transition: transform 0.3s;
+  filter: drop-shadow(0 0 10px #ff00ff) drop-shadow(0 0 20px #00ffff);
 }
 
 .image-section img {
-  position: relative;
-  z-index: 1;
-  transition: transform 0.3s ease;
-}
-
-.image-section img:hover {
-  animation: flicker 1s linear infinite;
-}
-
-/* Cyberpunk Edge Effect */
-.image-section::before,
-.image-section.selected::before {
-  content: "";
-  position: absolute;
-  top: -5px;
-  left: -5px;
-  right: -5px;
-  bottom: -5px;
+  width: 200px;
+  height: 200px;
   border-radius: 10px;
-  background: linear-gradient(45deg, #ff00ff, #00ffff);
-  opacity: 0.7;
-  z-index: 0;
-  filter: blur(10px);
-  transition: opacity 0.3s ease;
+  cursor: pointer;
+  transition: transform 0.4s ease, box-shadow 0.4s ease;
+  box-shadow: 0 0 15px rgba(255, 0, 255, 0.7), 0 0 25px rgba(0, 255, 255, 0.7);
 }
 
-.image-section img:hover::before,
-.image-section:hover::before,
-.image-section.selected::before {
-  opacity: 1;
-  filter: blur(15px);
-}
-
-/* Additional Outer Glow */
-.image-section::after,
-.image-section.selected::after {
+/* Cyberpunk glow and edge effect */
+.image-section::before {
   content: "";
   position: absolute;
   top: -8px;
@@ -318,21 +362,51 @@ p {
   right: -8px;
   bottom: -8px;
   border-radius: 12px;
-  background: linear-gradient(45deg, #ff00ff, transparent);
-  z-index: 0;
+  background: linear-gradient(135deg, rgba(255, 0, 255, 0.5), rgba(0, 255, 255, 0.5));
+  opacity: 0.9;
+  filter: blur(15px);
+  transition: transform 0.4s ease, opacity 0.4s ease;
+  z-index: -1;
+}
+
+/* Hover effects */
+.image-section:hover {
+  transform: scale(1.05);
+}
+
+.image-section:hover::before {
+  opacity: 1;
   filter: blur(20px);
-  opacity: 0.5;
-  transition: opacity 0.3s ease;
 }
 
-.image-section:hover::after,
-.image-section.selected::after {
-  opacity: 0.8;
-  filter: blur(25px);
+/* Holographic-like color cycling effect on hover */
+.image-section:hover img {
+  transform: scale(1.1);
+  box-shadow: 0 0 20px rgba(0, 255, 255, 0.8), 0 0 10px rgba(255, 0, 255, 0.8);
 }
 
-/* Selected state (keeps glow on click) */
-.image-section.selected img {
-  animation: none; /* Disable flicker animation if desired */
-  transform: scale(1.05); /* Optional: Add a slight scale for selected state */
+/* Flicker effect for a glitchy look */
+@keyframes flicker {
+  0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% {
+    opacity: 1;
+  }
+  20%, 24%, 55% {
+    opacity: 0.6;
+  }
+}
+
+.image-section img:hover {
+  animation: flicker 1.5s infinite alternate;
+}
+
+/* Style for labels to keep them aligned with the cyberpunk theme */
+.image-section label {
+  display: block;
+  padding: 5px;
+  color: #ff00ff;
+  font-family: 'Orbitron', sans-serif;
+  text-align: center;
+  margin-top: 10px;
+  font-size: 14px;
+  text-shadow: 0 0 5px rgba(0, 255, 255, 0.8), 0 0 10px rgba(255, 0, 255, 0.8);
 }

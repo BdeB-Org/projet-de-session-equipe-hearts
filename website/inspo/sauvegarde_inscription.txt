@@ -1,0 +1,638 @@
+<%- include ("../partials/header.ejs") %>
+    <!DOCTYPE html>
+    <html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Hearts</title>
+        <link rel="stylesheet" href="/inscription.css">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400..900&display=swap" rel="stylesheet">
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+
+        <svg xmlns="http://www.w3.org/2000/svg" version="1.1">
+            <defs>
+                <!-- White Glow Effect (for Ace and Joker) -->
+                <filter id="glow-effect" x="-50%" y="-50%" width="200%" height="200%">
+                    <feFlood flood-color="white" result="flood"></feFlood>
+                    <feComposite in="flood" in2="SourceGraphic" operator="in" result="mask"></feComposite>
+                    <feGaussianBlur in="mask" stdDeviation="6" result="blurred"></feGaussianBlur>
+                    <feMerge>
+                        <feMergeNode in="blurred"></feMergeNode>
+                        <feMergeNode in="SourceGraphic"></feMergeNode>
+                    </feMerge>
+                </filter>
+
+                <!-- Pink Glow Effect (for Queen and King) -->
+                <filter id="pink-glow-effect" x="-50%" y="-50%" width="200%" height="200%">
+                    <feFlood flood-color="#FF79A1" result="flood"></feFlood>
+                    <feComposite in="flood" in2="SourceGraphic" operator="in" result="mask"></feComposite>
+                    <feGaussianBlur in="mask" stdDeviation="6" result="blurred"></feGaussianBlur>
+                    <feMerge>
+                        <feMergeNode in="blurred"></feMergeNode>
+                        <feMergeNode in="SourceGraphic"></feMergeNode>
+                    </feMerge>
+                </filter>
+            </defs>
+        </svg>
+
+    </head>
+
+    <body>
+        <main class="form_inscription">
+            <div class="grid-container">
+
+ 
+
+                
+                
+
+            <!-- Form split into two columns -->
+            <form id="myForm" class="orbitron-font form-grid" action="/event/inscription" method="POST"
+                enctype="multipart/form-data">
+                <!-- Champs cachés pour stocker les préférences sélectionnées -->
+                <input type="hidden" id="selected-card" name="selectedCard" value="">
+                <input type="hidden" id="selected-likes" name="selectedLikes" value="">
+
+                               <input type="hidden" id="selectedSexualite" name="selectedSexualite" value="">
+
+                <div class="image-section image1">
+                    <label for="radioHomme">
+                        <img src="/images/swiper.png" class="icon" id="imageHomme" alt="Homme">
+                    </label>
+                    <input type="radio" name="selectedImage" id="radioHomme" value="Homme" hidden required>
+                </div>
+                
+                <div class="image-section image2">
+                    <label for="radioFemme">
+                        <img src="/images/swiper2.png" class="icon" id="imageFemme" alt="Femme">
+                    </label>
+                    <input type="radio" name="selectedImage" id="radioFemme" value="Femme" hidden required>
+                </div>
+
+                <!-- Left Column of Form -->
+                <div class="form-column">
+                    <!-- Email -->
+                    <div class="step" id="step-0">
+                        <input type="email" id="email" name="email" placeholder="Adresse e-mail" required>
+                    </div>
+
+                    <!-- Password -->
+                    <div class="step" id="step-1">
+                        <input type="password" id="password" name="password" placeholder="Mot de passe" required>
+                        <!-- minlength -->
+                    </div>
+
+                    <!-- Verify Password -->
+                    <div class="step" id="step-2">
+                        <input type="password" id="verify-password" placeholder="Vérifiez le mot de passe" required>
+                    </div>
+
+                    <!-- Phone Number -->
+                    <div class="step" id="step-3">
+                        <input type="tel" id="phone" name="phone" placeholder="Numéro: 514-235-7369"
+                            pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}" required>
+                    </div>
+
+                    <!-- First Name -->
+                    <div class="step" id="step-4">
+                        <input type="text" id="first-name" name="firstName" placeholder="Prénom (Affiché)" required>
+                    </div>
+
+                    <!-- Last Name -->
+                    <div class="step" id="step-5">
+                        <input type="text" id="last-name" name="lastName" placeholder="Nom" required>
+                    </div>
+                </div>
+
+                <!-- Right Column of Form -->
+                <div class="form-column">
+                    <!-- Birthdate -->
+                    <div class="step" id="step-6">
+                        <input type="date" id="birthdate" name="birthdate" required>
+                    </div>
+
+                    <!-- Gender -->
+                    <div class="step" id="step-7">
+                        <select id="gender" name="gender" required>
+                            <option value="" disabled selected>Genre</option>
+                            <option value="H">Homme</option>
+                            <option value="F">Femme</option>
+                            <option value="O">Autre</option>
+                        </select>
+                    </div>
+
+                    <!-- Looking for? (CARDS) -->
+                    <p>Que cherchez-vous?</p>
+                    <div class="icon-container">
+                        <label for="ace"><img src="/images/ace.png" class="icon" id="ace" alt="Ace"></label>
+                        <label for="joker"><img src="/images/joker.png" class="icon" id="joker" alt="Joker"></label>
+                        <label for="reine"><img src="/images/queen.png" class="icon" id="reine" alt="Reine"></label>
+                        <label for="roi"><img src="/images/king.png" class="icon" id="roi" alt="Roi"></label>
+                    </div>
+
+
+                    <!-- Likes -->
+                    <div class="step" id="step-10">
+                        <p>Qu'est-ce que vous aimez?</p>
+                        <button type="button" id="pick-options-btn">Choisir options</button>
+                        <div id="selected-options"></div>
+                    </div>
+                    <div id="options-modal" class="modal">
+                        <div class="modal-content">
+                            <span class="close-btn">&times;</span>
+                            <h3>Choose Your Interests</h3>
+                            <div class="scrollable-options">
+                                <label>
+                                    <input type="checkbox" name="interests" value="musique"> Musique
+                                </label>
+                                <label>
+                                    <input type="checkbox" name="interests" value="cinema"> Cinéma
+                                </label>
+                                <label>
+                                    <input type="checkbox" name="interests" value="voyages"> Voyages
+                                </label>
+                                <label>
+                                    <input type="checkbox" name="interests" value="sport"> Sport
+                                </label>
+                                <label>
+                                    <input type="checkbox" name="interests" value="lecture"> Lecture
+                                </label>
+                                <label>
+                                    <input type="checkbox" name="interests" value="cuisine"> Cuisine
+                                </label>
+                                <!-- Add more options as needed -->
+                            </div>
+                            <button type="button" id="save-options-btn">Save</button>
+                        </div>
+                    </div>
+
+                    <!-- Photos -->
+                    <div class="step" id="step-11">
+                        <input type="file" id="photos" name="photo" accept="image/*" required>
+                    </div>
+                </div>
+
+                <!-- Submit Button -->
+                <div class="submit-button-container">
+                    <button type="submit" class="next-button">Soumettre</button>
+                </div>
+            </form>
+            </div>
+        </main>
+
+        <script src="/js/inscription.js"></script>
+    </body>
+
+    </html>
+    <%- include ("../partials/footer.ejs") %>
+
+
+---------
+
+
+
+body {
+  margin: 0;
+  font-family: "Orbitron", sans-serif;
+  background-color: #000;
+}
+
+.form_inscription {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  width: 100%;
+  height: 100vh;
+}
+
+.grid-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  /* Four equal columns */
+  grid-gap: 40px;
+  /* Spacing between columns */
+  width: 95%;
+  max-width: 1600px;
+  /* Maximum width for large screens */
+  align-items: start;
+  margin: 0 auto;
+  margin-top: -100px;
+}
+
+.image-section {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: auto;
+}
+
+.image-section img {
+  width: 100%;
+  height: auto;
+  max-width: 100%;
+  border-radius: 10px;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  /* Two equal columns for form */
+  grid-column: 3 / span 2;
+  /* Form spans the last two columns */
+  gap: 60px;
+}
+
+.form-column {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.step input,
+.step select {
+  font-family: "Orbitron", sans-serif;
+  background: linear-gradient(90deg, #F4F4F4 15%, #FFA3AC 75%);
+  border: none;
+  padding: 15px 20px;
+  font-size: 16px;
+  border-radius: 10px;
+  width: 100%;
+  outline: none;
+  color: #333;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
+}
+
+.step input:focus,
+.step select:focus {
+  border: 2px solid #FF7991;
+  box-shadow: 0px 0px 10px rgba(255, 163, 172, 0.5);
+  transform: scale(1.03);
+  color: #FF7991;
+}
+
+.submit-button-container {
+  grid-column: 1 / span 2;
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.next-button {
+  font-family: "Orbitron", sans-serif;
+  padding: 15px 30px;
+  background-color: #FF7991;
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  font-size: 18px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.next-button:hover {
+  background-color: #e06578;
+  transform: scale(1.1);
+}
+
+.icon-container {
+  display: flex;
+  justify-content: space-around;
+  /* Adjust to space out the icons */
+  align-items: center;
+  margin-top: -15px;
+  padding: 10px;
+  background: linear-gradient(90deg, #FF7991 0%, #F4F4F4 100%);
+  border-radius: 15px;
+  box-shadow: 0 4px 8px rgba(255, 163, 172, 0.5);
+  z-index: 1;
+  /* Ensure the icons are above any overlapping elements */
+}
+
+.icon-container img {
+  width: 60px;
+  /* Adjust icon size */
+  height: auto;
+  padding: 10px;
+  cursor: pointer;
+  /* Make icons clickable */
+  z-index: 2;
+  /* Ensure the icons themselves are clickable */
+  transition: transform 0.3s ease, filter 0.3s ease;
+}
+
+.icon-container img:hover {
+  transform: scale(1.2);
+  /* Slight scale on hover */
+}
+
+.icon-container img.selected {
+  filter: url(#glow-effect);
+  /* Apply white glow by default */
+  transform: scale(1.1);
+  transition: filter 0.3s ease, transform 0.3s ease;
+}
+
+
+.icon-container img:active {
+  filter: brightness(1.5);
+  /* Apply the glow effect on active/click */
+}
+
+p {
+  color: #FF7991;
+  font-size: 16px;
+  text-align: center;
+  margin-bottom: 10px;
+  margin-top: -5px;
+  font-weight: bold;
+}
+
+#queen.selected,
+#king.selected {
+  filter: url(#pink-glow-effect);
+  /* Apply pink glow for Queen and King */
+}
+
+#joker {
+  width: 70px;
+}
+
+#king {
+  width: 55px;
+}
+
+
+
+/* General Styles */
+.txt {
+  font-size: 20px;
+  color: white;
+}
+
+
+#pick-options-btn {
+  background-color: #FF7991;
+  color: #fff;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+
+}
+
+#selected-options {
+  margin-top: 10px;
+  color: #ffcc00;
+  font-size: 14px;
+}
+
+/* Modal Styles */
+.modal {
+  display: none;
+  /* Hidden by default */
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+  /* Semi-transparent background */
+}
+
+.modal-content {
+  background-color: #24043a;
+  padding: 20px;
+  margin: 10% auto;
+  border-radius: 10px;
+  width: 80%;
+  max-width: 500px;
+  color: #ffcc00;
+}
+
+.scrollable-options {
+  max-height: 200px;
+  /* Height limit for scrolling */
+  overflow-y: auto;
+  margin-top: 10px;
+  padding: 10px;
+  background-color: #000;
+  border-radius: 5px;
+  color: #fff;
+}
+
+.scrollable-options label {
+  display: block;
+  padding: 5px 0;
+  cursor: pointer;
+}
+
+.scrollable-options input[type="checkbox"] {
+  margin-right: 10px;
+}
+
+.close-btn {
+  color: #ffcc00;
+  float: right;
+  font-size: 24px;
+  cursor: pointer;
+}
+
+/* Button for saving selected options */
+#save-options-btn {
+  background-color: #ffcc00;
+  color: #24043a;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+/* Flicker effect on hover */
+@keyframes flicker {
+  0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% {
+      opacity: 1;
+      filter: brightness(1.1);
+  }
+  20%, 24%, 55% {
+      opacity: 0.6;
+      filter: brightness(1.5);
+  }
+}
+
+.image-section {
+  position: relative;
+  display: inline-block;
+}
+
+.image-section img {
+  position: relative;
+  z-index: 1;
+  transition: transform 0.3s ease;
+}
+
+.image-section img:hover {
+  animation: flicker 1s linear infinite;
+}
+
+/* Cyberpunk Edge Effect */
+.image-section::before,
+.image-section.selected::before {
+  content: "";
+  position: absolute;
+  top: -5px;
+  left: -5px;
+  right: -5px;
+  bottom: -5px;
+  border-radius: 10px;
+  background: linear-gradient(45deg, #ff00ff, #00ffff);
+  opacity: 0.7;
+  z-index: 0;
+  filter: blur(10px);
+  transition: opacity 0.3s ease;
+}
+
+.image-section img:hover::before,
+.image-section:hover::before,
+.image-section.selected::before {
+  opacity: 1;
+  filter: blur(15px);
+}
+
+/* Additional Outer Glow */
+.image-section::after,
+.image-section.selected::after {
+  content: "";
+  position: absolute;
+  top: -8px;
+  left: -8px;
+  right: -8px;
+  bottom: -8px;
+  border-radius: 12px;
+  background: linear-gradient(45deg, #ff00ff, transparent);
+  z-index: 0;
+  filter: blur(20px);
+  opacity: 0.5;
+  transition: opacity 0.3s ease;
+}
+
+.image-section:hover::after,
+.image-section.selected::after {
+  opacity: 0.8;
+  filter: blur(25px);
+}
+
+/* Selected state (keeps glow on click) */
+.image-section.selected img {
+  animation: none; /* Disable flicker animation if desired */
+  transform: scale(1.05); /* Optional: Add a slight scale for selected state */
+}
+
+
+----------
+
+
+document.addEventListener('DOMContentLoaded', () => {
+    // Remplir les champs avec les valeurs stockées dans localStorage
+    const storedEmail = localStorage.getItem('email');
+    const storedPassword = localStorage.getItem('password');
+
+    if (storedEmail) {
+        document.getElementById('email').value = storedEmail;
+        localStorage.removeItem('email'); // Supprimer après utilisation si souhaité
+    }
+
+    if (storedPassword) {
+        document.getElementById('password').value = storedPassword;
+        localStorage.removeItem('password'); // Supprimer après utilisation si souhaité
+    }
+
+    // Gestion de la sélection des icônes
+    const icons = document.querySelectorAll('.icon');
+    let selectedIcon = null; // Stocker l'icône sélectionnée
+
+    icons.forEach(icon => {
+        icon.addEventListener('click', (event) => {
+            event.preventDefault(); // Empêcher le comportement par défaut
+
+            // Retirer la classe 'selected' de l'icône actuellement sélectionnée, le cas échéant
+            if (selectedIcon) {
+                selectedIcon.classList.remove('selected');
+            }
+
+            // Ajouter la classe 'selected' à l'icône cliquée
+            icon.classList.add('selected');
+            selectedIcon = icon; // Définir l'icône nouvellement cliquée comme l'icône sélectionnée
+
+            // Mettre à jour le champ caché avec l'ID de l'icône sélectionnée
+            const iconId = icon.id; // ID de l'icône, comme 'ace', 'joker', etc.
+            document.getElementById('selected-card').value = iconId; // Mettre à jour le champ caché
+        });
+    });
+
+    // Gestion du modal
+    document.getElementById("pick-options-btn").addEventListener("click", function () {
+        document.getElementById("options-modal").style.display = "block"; // Ouvrir le modal
+    });
+
+    document.querySelector(".close-btn").addEventListener("click", function () {
+        document.getElementById("options-modal").style.display = "none"; // Fermer le modal
+    });
+
+    document.getElementById("save-options-btn").addEventListener("click", function () {
+        const checkboxes = document.querySelectorAll('.scrollable-options input[type="checkbox"]');
+        const selected = Array.from(checkboxes)
+            .filter(checkbox => checkbox.checked)
+            .map(checkbox => checkbox.value);
+
+        document.getElementById("selected-options").textContent = selected.join(", ");
+        document.getElementById("selected-likes").value = selected.join(','); // Mettre à jour le champ caché
+        document.getElementById("options-modal").style.display = "none"; // Fermer le modal
+    });
+
+    // Fermer le modal lorsque l'utilisateur clique en dehors de celui-ci
+    window.addEventListener("click", function (event) {
+        const modal = document.getElementById("options-modal");
+        if (event.target === modal) {
+            modal.style.display = "none"; // Fermer le modal
+        }
+    });
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+    const images = document.querySelectorAll('.image-section');
+
+    images.forEach(image => {
+        image.addEventListener('click', () => {
+            // Remove the 'selected' class from all images
+            images.forEach(img => img.classList.remove('selected'));
+            
+            // Add the 'selected' class to the clicked image
+            image.classList.add('selected');
+
+            // Check the associated radio button
+            const radioButton = document.getElementById("radio" + image.querySelector('img').alt);
+            radioButton.checked = true;
+
+            // Set the hidden selectedSexualite field
+            const selectedSexualiteField = document.getElementById('selectedSexualite');
+            selectedSexualiteField.value = image.querySelector('img').alt === 'Homme' ? '1' : '2';
+        });
+    });
+
+    // Prevent form submission if no image is selected
+    document.getElementById('myForm').addEventListener('submit', (e) => {
+        const isSelected = document.querySelector('input[name="selectedImage"]:checked');
+        console.log("isSelected:", isSelected); // Debug log
+
+        if (!isSelected) {
+            alert("Vous n'avez pas encore choisi entre 'Homme' ou 'Femme'. Faites votre choix avec les images à gauche.");
+            e.preventDefault(); // Prevent form submission
+        }
+    });
+});
