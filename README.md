@@ -9,7 +9,7 @@
 9. Ouvrez http://localhost:4000/ dans votre navigateur web.
 10. Ajoutez les modules nodes suivants :
 
-# Installez ces packages dans le terminal :
+# Packages (Terminal VS)
 
 npm install multer dotenv square nodemailer googleapis node-cron crypto-js passport-facebook passport-twitter passport-apple passport passport-google-oauth20 express-session axios
 
