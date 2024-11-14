@@ -149,3 +149,87 @@ GRANT ALL PRIVILEGES ON *.* TO 'scott'@'%';
 ALTER USER 'scott'@'%' IDENTIFIED WITH mysql_native_password BY 'oracle';
 FLUSH PRIVILEGES;
 
+#Apres de run le serveur: node server.js. Met ca dans la bdd
+
+INSERT INTO e_utilisateur (e_nom, e_prenom, e_courriel, e_password, e_photo, e_location, e_number, abonnement_id, swipe_count, last_swipe_time, genre, googleId)
+VALUES
+    ('Test1', 'User', '1@gmail.com', 'a', 'user1photo.jpg', 'Montreal', '1234567890', 1, 0, CURRENT_TIMESTAMP, 'Homme', '1'),
+    ('Test2', 'User', '2@gmail.com', 'a', 'user2photo.jpg', 'Montreal', '1234567890', 1, 0, CURRENT_TIMESTAMP, 'Homme', '2'),
+    ('Test3', 'User', '3@gmail.com', 'a', 'user3photo.jpg', 'Montreal', '1234567890', 1, 0, CURRENT_TIMESTAMP, 'Femme', '3'),
+    ('Test4', 'User', '4@gmail.com', 'a', 'user4photo.jpg', 'Montreal', '1234567890', 1, 0, CURRENT_TIMESTAMP, 'Femme', '4'),
+    ('Test5', 'User', '5@gmail.com', 'a', 'user5photo.jpg', 'Montreal', '1234567890', 1, 0, CURRENT_TIMESTAMP, 'Homme', '5'),
+    ('Test6', 'User', '6@gmail.com', 'a', 'user6photo.jpg', 'Montreal', '1234567890', 1, 0, CURRENT_TIMESTAMP, 'Femme', '6'),
+    ('Test7', 'User', '7@gmail.com', 'a', 'user7photo.jpg', 'Montreal', '1234567890', 1, 0, CURRENT_TIMESTAMP, 'Homme', '7'),
+    ('Test8', 'User', '8@gmail.com', 'a', 'user8photo.jpg', 'Montreal', '1234567890', 1, 0, CURRENT_TIMESTAMP, 'Femme', '8'),
+    ('Test9', 'User', '9@gmail.com', 'a', 'user9photo.jpg', 'Montreal', '1234567890', 1, 0, CURRENT_TIMESTAMP, 'Homme', '9'),
+    ('Test10', 'User', '10@gmail.com', 'a', 'user10photo.jpg', 'Montreal', '1234567890', 1, 0, CURRENT_TIMESTAMP, 'Femme', '20');
+
+INSERT INTO preference (utilisateur_id, card_id, like_id, sexualite_id)
+VALUES
+    (1, 2, 1, 1),  -- Test1: Joker, Musique, Homme
+    (1, 2, 3, 1),  -- Test1: Joker, Voyages, Homme
+    (1, 2, 4, 1);  -- Test1: Joker, Sport, Homme
+-- Preferences for Test2 (User with e_id = 2)
+INSERT INTO preference (utilisateur_id, card_id, like_id, sexualite_id)
+VALUES
+    (2, 2, 1, 1),  -- Test2: Joker, Musique, Homme
+    (2, 2, 2, 1),  -- Test2: Joker, Cinéma, Homme
+    (2, 2, 3, 1);  -- Test2: Joker, Voyages, Homme
+
+-- Preferences for Test3 (User with e_id = 3)
+INSERT INTO preference (utilisateur_id, card_id, like_id, sexualite_id)
+VALUES
+    (3, 3, 1, 2),  -- Test3: Reine, Musique, Femme
+    (3, 3, 4, 2),  -- Test3: Reine, Sport, Femme
+    (3, 3, 6, 2);  -- Test3: Reine, Cuisine, Femme
+
+-- Preferences for Test4 (User with e_id = 4)
+INSERT INTO preference (utilisateur_id, card_id, like_id, sexualite_id)
+VALUES
+    (4, 4, 1, 2),  -- Test4: Roi, Musique, Femme
+    (4, 4, 3, 2),  -- Test4: Roi, Voyages, Femme
+    (4, 4, 5, 2);  -- Test4: Roi, Lecture, Femme
+
+-- Preferences for Test5 (User with e_id = 5)
+INSERT INTO preference (utilisateur_id, card_id, like_id, sexualite_id)
+VALUES
+    (5, 1, 1, 1),  -- Test5: Ace, Musique, Homme
+    (5, 1, 4, 1),  -- Test5: Ace, Sport, Homme
+    (5, 1, 6, 1);  -- Test5: Ace, Cuisine, Homme
+
+-- Preferences for Test6 (User with e_id = 6)
+INSERT INTO preference (utilisateur_id, card_id, like_id, sexualite_id)
+VALUES
+    (6, 2, 2, 2),  -- Test6: Joker, Cinéma, Femme
+    (6, 2, 3, 2),  -- Test6: Joker, Voyages, Femme
+    (6, 2, 5, 2);  -- Test6: Joker, Lecture, Femme
+
+-- Preferences for Test7 (User with e_id = 7)
+INSERT INTO preference (utilisateur_id, card_id, like_id, sexualite_id)
+VALUES
+    (7, 3, 1, 1),  -- Test7: Reine, Musique, Homme
+    (7, 3, 2, 1),  -- Test7: Reine, Cinéma, Homme
+    (7, 3, 4, 1);  -- Test7: Reine, Sport, Homme
+
+-- Preferences for Test8 (User with e_id = 8)
+INSERT INTO preference (utilisateur_id, card_id, like_id, sexualite_id)
+VALUES
+    (8, 4, 1, 2),  -- Test8: Roi, Musique, Femme
+    (8, 4, 2, 2),  -- Test8: Roi, Cinéma, Femme
+    (8, 4, 3, 2);  -- Test8: Roi, Voyages, Femme
+
+-- Preferences for Test9 (User with e_id = 9)
+INSERT INTO preference (utilisateur_id, card_id, like_id, sexualite_id)
+VALUES
+    (9, 1, 2, 1),  -- Test9: Ace, Cinéma, Homme
+    (9, 1, 4, 1),  -- Test9: Ace, Sport, Homme
+    (9, 1, 5, 1);  -- Test9: Ace, Lecture, Homme
+
+-- Preferences for Test10 (User with e_id = 10)
+INSERT INTO preference (utilisateur_id, card_id, like_id, sexualite_id)
+VALUES
+    (10, 2, 1, 2),  -- Test10: Joker, Musique, Femme
+    (10, 2, 4, 2),  -- Test10: Joker, Sport, Femme
+    (10, 2, 6, 2);  -- Test10: Joker, Cuisine, Femme
+
+
