@@ -1124,7 +1124,17 @@ app.post('/api/user/like', (req, res) => {
 
 app.get('/api/user/details/:id', (req, res) => {
     const { id } = req.params;
-    const query = "SELECT * FROM e_utilisateur WHERE e_id = ?";
+    const query = `
+    SELECT u.*, p.like_id, l.type_like, p.card_id, c.type_card, p.sexualite_id, s.type_sexualite
+    FROM e_utilisateur u
+    LEFT JOIN preference p ON p.utilisateur_id = u.e_id
+    LEFT JOIN e_likes l ON l.id_like = p.like_id
+    LEFT JOIN e_card c ON c.id_card = p.card_id
+    LEFT JOIN e_sexualite s ON s.id_sexualite = p.sexualite_id
+    WHERE u.e_id = ?
+`;
+
+
     con.query(query, [id], (err, results) => {
         if (err) {
             console.error('Error fetching user details:', err);
@@ -1133,9 +1143,20 @@ app.get('/api/user/details/:id', (req, res) => {
         if (results.length === 0) {
             return res.status(404).json({ error: 'User not found.' });
         }
-        res.json(results[0]);
+
+        const preferences = results.map(row => row.type_like).filter(Boolean);
+        const cards = results.map(row => row.type_card).filter(Boolean);
+        const sexualities = results.map(row => row.type_sexualite).filter(Boolean);
+
+        res.json({
+            ...results[0],
+            preferences,
+            cards,
+            sexualities
+        });
     });
 });
+
 
 app.get('/api/user/matches', (req, res) => {
     const userId = req.session.user.e_id;
@@ -1633,11 +1654,11 @@ app.post('/event/inscription', upload.single('photo'), (req, res) => {
             let sexualiteIdPromise = Promise.resolve();
             if (selectedSexualite) {
                 console.log("Selected sexualite:", selectedSexualite); // Log selectedSexualite value
-            
+
                 sexualiteIdPromise = new Promise((resolve, reject) => {
                     const fetchSexualiteIdQuery = "SELECT id_sexualite FROM e_sexualite WHERE id_sexualite = ?";
                     console.log("Running query:", fetchSexualiteIdQuery, "with value:", selectedSexualite);
-            
+
                     con.query(fetchSexualiteIdQuery, [selectedSexualite], (err, sexualiteResult) => {
                         if (err) {
                             console.error("Error fetching sexualite ID:", err);
@@ -1665,7 +1686,7 @@ app.post('/event/inscription', upload.single('photo'), (req, res) => {
                     console.error("Promise error in sexualiteIdPromise:", error);
                 });
             }
-            
+
             // Wait for all promises to resolve and handle any rejections
             Promise.all([cardIdPromise, sexualiteIdPromise, ...likesPromises])
                 .then(() => {

@@ -722,7 +722,6 @@
                 modal.style.display = "none";
             }
         }
-
         const matchesContainer = document.querySelector('.matches');
         matchesContainer.addEventListener('click', function (event) {
             if (event.target.closest('a') && event.target.closest('.matches')) {
@@ -731,19 +730,29 @@
                 fetch(`/api/user/details/${userId}`)
                     .then(response => response.json())
                     .then(user => {
-                        if (!user || !Array.isArray(user.likes)) {
-                            console.error('User details are incomplete', user);
-                            throw new Error('Incomplete user data');
-                        }
                         const modalImage = document.getElementById('modalImage');
                         const modalName = document.getElementById('modalName');
                         const modalDetails = document.getElementById('modalDetails');
+                        const modalCard = document.getElementById('modalCard');
+                        const modalGender = document.getElementById('modalGender');
 
                         modalImage.src = user.e_photo ? `/uploads/${user.e_photo}` : '/images/placeholder.png';
                         modalImage.onerror = () => modalImage.src = '/images/placeholder.png';
                         modalName.textContent = user.e_prenom;
-                        modalDetails = `Likes: ${userLikes > 0 ? userLikes.join(', ') : 'Aucune'}`;
 
+                        const preferencesText = user.preferences.length > 0
+                            ? `Likes: ${user.preferences.join(', ')}`
+                            : 'No preferences listed.';
+
+                        const cardText = user.cards.length > 0
+                            ? `Card: ${user.cards.join(', ')}`
+                            : 'No card listed.';
+
+                        const genderText = user.sexualities.length > 0
+                            ? `Gender: ${user.sexualities.join(', ')}`
+                            : 'No gender listed.';
+
+                        modalDetails.innerHTML = `${preferencesText}<br>${cardText}<br>${genderText}`;
 
                         document.getElementById("userModal").style.display = "block";
                     })
@@ -753,6 +762,8 @@
                     });
             }
         });
+
+
     });
 
 </script>
