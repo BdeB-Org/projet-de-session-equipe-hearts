@@ -1,6 +1,8 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400..900&display=swap" rel="stylesheet">
 
+
+
 <style>
     body {
         background-color: #0d0d0d;
@@ -530,6 +532,7 @@
                     console.log('Like button clicked');
                     handleLike(loggedInUserId, user.e_id);
                     swipeCount++;
+                    user.swiped = true;  // Mark the user as swiped
                     showBounceIcon('heart', cardElement);
                     cardElement.classList.add('swipe-right');
                     setTimeout(() => nextUser(), 500);
@@ -539,6 +542,7 @@
             if (passButton) {
                 passButton.addEventListener('click', function () {
                     swipeCount++;
+                    user.swiped = true;  // Mark the user as swiped
                     showBounceIcon('x', cardElement);
                     cardElement.classList.add('swipe-left');
                     setTimeout(() => nextUser(), 500);
@@ -658,7 +662,7 @@
 
             // Check if swipe limit reached
             if (swipeCount >= maxSwipes) {
-                alert('You have reached your daily swipe limit.');
+                alert('Limit de swipe atteint. Revenez demain!');
                 showCountdown();
                 swipesLeftElement.textContent = 0;
                 return;
@@ -666,10 +670,16 @@
 
             // Increment the current index
             currentIndex = (currentIndex + 1) % users.length;
+
+            // If there are no users left, show a "No more users" message
+            if (currentIndex === 0 && users.every(user => user.swiped)) {
+                swipesLeftElement.textContent = maxSwipes - swipeCount;
+                cardContainer.innerHTML = '<p>Plus de user. C chien be better.</p>';
+                return;
+            }
+
             updateUserCard(); // Update to the next user
             swipesLeftElement.textContent = maxSwipes - swipeCount; // Update remaining swipes
-
-            // Remove swipe classes
             cardElement.classList.remove('swipe-right', 'swipe-left');
         }
 
@@ -678,15 +688,15 @@
 
             if (user) {
                 cardContainer.innerHTML = `
-                <div class="card">
-                    <img src="/uploads/${user.e_photo}" alt="${user.e_nom}">
-                    <h2>${user.e_prenom}</h2>
-                    <p>À ${user.distance || 'undefined'} kilomètres de distance</p>
-                    <p>Préférences de Likes: ${user.likes.length > 0 ? user.likes.join(', ') : 'Aucune'}</p>
-                    <button class="button like-button"><i class="fas fa-heart"></i>Aimer</button>
-                    <button class="button pass-button"><i class="fas fa-times"></i>Passer</button>
-                </div>
-            `;
+        <div class="card">
+            <img src="/uploads/${user.e_photo}" alt="${user.e_nom}">
+            <h2>${user.e_prenom}</h2>
+            <p>À ${user.distance || 'undefined'} kilomètres de distance</p>
+            <p>Préférences de Likes: ${user.likes.length > 0 ? user.likes.join(', ') : 'Aucune'}</p>
+            <button class="button like-button"><i class="fas fa-heart"></i>Aimer</button>
+            <button class="button pass-button"><i class="fas fa-times"></i>Passer</button>
+        </div>
+    `;
                 setupButtonListeners(user);
             } else {
                 console.warn('No user found at current index:', currentIndex); // Warn if no user is found
