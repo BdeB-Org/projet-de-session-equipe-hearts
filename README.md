@@ -149,7 +149,7 @@ GRANT ALL PRIVILEGES ON *.* TO 'scott'@'%';
 ALTER USER 'scott'@'%' IDENTIFIED WITH mysql_native_password BY 'oracle';
 FLUSH PRIVILEGES;
 
-#Apres de run le serveur: node server.js. Met ca dans la bdd
+# Insertions de la bdd (comptes test)
 
 INSERT INTO e_utilisateur (e_nom, e_prenom, e_courriel, e_password, e_photo, e_location, e_number, abonnement_id, swipe_count, last_swipe_time, genre, googleId)
 VALUES
