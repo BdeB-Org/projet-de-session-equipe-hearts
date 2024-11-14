@@ -449,7 +449,12 @@
             .then(response => response.json())
             .then(preferenceResults => {
                 const cardPreferences2 = preferenceResults.map(pref => pref.card_id || null).filter(Boolean);
-                console.log('Card Preferences:', cardPreferences2); // Log for debugging
+                const sexualitePreferences = preferenceResults.map(pref => pref.sexualite_id || null).filter(Boolean);
+
+                console.log('Preference Results:', preferenceResults);
+                console.log('Card Preferences:', cardPreferences2);
+                console.log('Sexualite Preferences:', sexualitePreferences);
+
 
                 // Set the swipe limit based on subscription type
                 switch (parseInt(userSubscriptionId)) {
@@ -468,8 +473,6 @@
 
                 swipesLeftElement.textContent = maxSwipes - swipeCount;
 
-                // Fetch all users
-                // Fetch all users
                 fetch('/api/users')
                     .then(response => response.json())
                     .then(data => {
@@ -477,7 +480,6 @@
 
                         const loggedInUserLikes = preferenceResults.map(pref => pref.like_id);
 
-                        // Separate users into two arrays based on likes
                         const usersWithSimilarLikes = [];
                         const usersWithoutSimilarLikes = [];
 
@@ -497,7 +499,13 @@
                             return bLikesCount - aLikesCount;
                         });
 
-                        users = [...usersWithSimilarLikes, ...usersWithoutSimilarLikes].filter(user => user.e_id !== parseInt(loggedInUserId) && cardPreferences2.includes(user.card));
+                        users = [...usersWithSimilarLikes, ...usersWithoutSimilarLikes]
+
+                            .filter(user => user.e_id !== parseInt(loggedInUserId) &&
+                                sexualitePreferences.includes(user.sexualite) &&
+                                cardPreferences2.includes(user.card)
+
+                            );
 
                         console.log('Filtered Users:', users);
 
@@ -509,8 +517,6 @@
                         updateUserCard();
                     })
                     .catch(error => console.error('Error fetching user data:', error));
-
-
             })
             .catch(error => console.error('Error fetching preferences:', error));
 

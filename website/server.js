@@ -811,9 +811,8 @@ app.get("/event/swipe", function (req, res) {
     };
 
     const getPreferencesQuery = `
-        SELECT card_id, like_id 
-        FROM preference 
-        WHERE utilisateur_id = ?`;
+        SELECT card_id, like_id, sexualite_id FROM preference WHERE utilisateur_id = ?
+        `;
 
     con.query(getPreferencesQuery, [userId], (err, preferenceResults) => {
         if (err) {
@@ -829,6 +828,10 @@ app.get("/event/swipe", function (req, res) {
             .filter(pref => pref.card_id)
             .map(pref => pref.card_id);
 
+        const sexualitePreferences = preferenceResults
+            .filter(pref => pref.sexualite_id)
+            .map(pref => pref.sexualite_id)
+
         const likePreferences = preferenceResults
             .filter(pref => pref.like_id)
             .map(pref => likeNames[pref.like_id]);
@@ -842,6 +845,7 @@ app.get("/event/swipe", function (req, res) {
             userDetails: req.session.user, // Make sure this is populated correctly
             cardPreferences: cardPreferences || [],
             cardPreferences: cardPreferences2 || [],
+            sexualitePreferences: sexualitePreferences || [],
             likePreferences: likePreferences // This should be an array
         });
     });
@@ -981,22 +985,26 @@ app.get('/api/users', (req, res) => {
             return res.status(500).json({ error: 'Error fetching users' });
         }
 
-        // Prepare users with their likes and card data
         const usersWithDetailsPromises = results.map(async (user) => {
-            const likes = await getUserLikes(user.e_id); // Fetch user likes
-            const card = await getUserCard(user.e_id); // Fetch user card
+            const likes = await getUserLikes(user.e_id);
+            const card = await getUserCard(user.e_id);
+            const sexualite = await getUserSexualite(user.e_id);
+
             return {
                 ...user,
-                likes: likes, // Add the likes array here
-                card: card // Add the card data here
+                likes: likes,
+                card: card,
+                sexualite: sexualite
             };
         });
 
         Promise.all(usersWithDetailsPromises).then(usersWithDetails => {
+            console.log('Users with all details:', usersWithDetails);
             res.json(usersWithDetails);
         });
     });
 });
+
 
 
 function getUserLikes(userId) {
@@ -1013,19 +1021,32 @@ function getUserLikes(userId) {
     return new Promise((resolve, reject) => {
         con.query(likesQuery, [userId], (err, results) => {
             if (err) return reject(err);
-            const likeNamesList = results.map(row => likeNames[row.like_id]); // Ensure this returns a string array
+            const likeNamesList = results.map(row => likeNames[row.like_id]);
             resolve(likeNamesList);
         });
     });
 }
 
-// Function to get user card information
+function getUserSexualite(userId) {
+    const sexualiteQuery = 'SELECT sexualite_id FROM preference WHERE utilisateur_id = ?';
+    return new Promise((resolve, reject) => {
+        con.query(sexualiteQuery, [userId], (err, results) => {
+            if (err) return reject(err);
+            const sexualite = results[0] ? results[0].sexualite_id : null;
+            console.log("Sexualite:", sexualite);
+            resolve(sexualite);
+        });
+    });
+}
+
+
 function getUserCard(userId) {
-    const cardQuery = 'SELECT card_id FROM preference WHERE utilisateur_id = ?'; // Corrected query
+    const cardQuery = 'SELECT card_id FROM preference WHERE utilisateur_id = ?';
     return new Promise((resolve, reject) => {
         con.query(cardQuery, [userId], (err, results) => {
             if (err) return reject(err);
-            const card = results[0] ? results[0].card_id : null; // Fetch card ID if exists
+            const card = results[0] ? results[0].card_id : null;
+            console.log("cards", card);
             resolve(card);
         });
     });
@@ -1072,7 +1093,7 @@ app.post('/api/user/preferences', (req, res) => {
     const userId = req.body.userId; // Get user ID from the request body
 
     const getPreferencesQuery = `
-        SELECT card_id, like_id 
+        SELECT card_id, like_id, sexualite_id
         FROM preference 
         WHERE utilisateur_id = ?`;
 
