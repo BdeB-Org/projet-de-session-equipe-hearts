@@ -1,3 +1,6 @@
+let isEditing = false;
+let editingFieldId = null;
+
 document.addEventListener('DOMContentLoaded', () => {
     
     const questions = [
@@ -55,19 +58,50 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function handleResponse() {
         const userInputValue = userInput.value.trim();
+    
+        // For the first question (email), check if the input is a valid email
+        if (questions[currentQuestion].id === 'email' && !isValidEmail(userInputValue)) {
+            alert("Veuillez entrer une adresse e-mail valide.");
+            return; // Stop if the email is invalid
+        }
+    
+        // Set the input field type to "password" for password and verify-password questions
+        if (questions[currentQuestion].id === 'password' || questions[currentQuestion].id === 'verify-password') {
+            userInput.type = 'password';
+        }
+    
+        // Check if we are on the verify-password question and validate passwords match
+        if (questions[currentQuestion].id === 'verify-password') {
+            const password = document.getElementById('password').value;
+            if (userInputValue !== password) {
+                alert("Les mots de passe ne correspondent pas. Veuillez réessayer.");
+                return; // Stop if passwords don't match
+            }
+        }
+    
         if (!userInputValue) return;
-
-        showUserResponse(userInputValue);
+    
+        // Display asterisks instead of the actual password in chat
+        const displayValue = (questions[currentQuestion].id === 'password' || questions[currentQuestion].id === 'verify-password')
+        ? '*'.repeat(userInputValue.length) : userInputValue;
+    
+    
+        showUserResponse(displayValue); // Show hidden password as asterisks
         saveResponse(questions[currentQuestion].id, userInputValue);
-
+    
         userInput.value = ''; // Clear the input field
-
+    
         // Remove the blinking effect from the previous bot message
         const lastBotMessage = document.querySelector('.bot-message .blinking-line');
         if (lastBotMessage) {
             lastBotMessage.classList.remove('blinking-line');
         }
-
+    
+        // Reset input type to text for other questions after password questions are answered
+        if (questions[currentQuestion].id === 'verify-password') {
+            userInput.type = 'text';
+        }
+    
         // Move to the next question if there are more questions
         if (currentQuestion < questions.length - 1) {
             currentQuestion++;
@@ -76,9 +110,34 @@ document.addEventListener('DOMContentLoaded', () => {
             submitForm(); // Submit the form once all questions are answered
         }
     }
+    
+    function isValidEmail(email) {
+        // Simple email regex pattern for validation
+        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailPattern.test(email);
+    }
 
     function showNextQuestion() {
         const nextQuestion = questions[currentQuestion];
+
+        if (nextQuestion.id === 'password' || nextQuestion.id === 'verify-password') {
+            // Set input type to password
+            userInput.type = 'password';
+        } else if (nextQuestion.id === 'phone') {
+            // Set input type to text and add a placeholder for phone formatting
+            userInput.type = 'text';
+            userInput.placeholder = 'XXX-XXX-XXXX';
+    
+            // Add phone formatting logic
+            userInput.addEventListener('input', formatPhoneNumber);
+        } else {
+            // Reset input type to text for other questions and remove phone formatting
+            userInput.type = 'text';
+            userInput.placeholder = '';
+    
+            // Remove phone formatting listener if it was added previously
+            userInput.removeEventListener('input', formatPhoneNumber);
+        }
     
         if (nextQuestion.id === 'birthdate') {
             // Show date input for birthdate
@@ -292,7 +351,24 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
     
-    
+function formatPhoneNumber(event) {
+    const input = event.target;
+    let inputValue = input.value.replace(/\D/g, ''); // Remove all non-digit characters
+
+    // Apply formatting
+    if (inputValue.length > 3 && inputValue.length <= 6) {
+        input.value = `${inputValue.slice(0, 3)}-${inputValue.slice(3)}`;
+    } else if (inputValue.length > 6) {
+        input.value = `${inputValue.slice(0, 3)}-${inputValue.slice(3, 6)}-${inputValue.slice(6, 10)}`;
+    } else {
+        input.value = inputValue;
+    }
+
+    // Limit to 10 digits
+    if (inputValue.length > 10) {
+        input.value = input.value.slice(0, 12);
+    }
+}
 
 
     function showBotMessage(message) {
@@ -318,17 +394,25 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
 
-    function showUserResponse(response) {
+    function showUserResponse(response, fieldId) {
         const messageDiv = document.createElement('div');
         messageDiv.className = 'message user-message';
-        messageDiv.textContent = response;
-
-        // Insert the user message above the input container
+    
+        // Add user response with a pencil icon for editing
+        messageDiv.innerHTML = `
+            <span>${response}</span>
+            <i class="fa-solid fa-pencil edit-icon" data-field-id="${fieldId}" style="cursor: pointer; margin-left: 10px;"></i>
+        `;
+    
         const chatContainer = document.querySelector('.chat-container');
         const inputContainer = document.querySelector('.input-container');
         chatContainer.insertBefore(messageDiv, inputContainer);
-
+    
         scrollToBottom();
+    
+        // Add event listener to the pencil icon to enable editing
+        const editIcon = messageDiv.querySelector('.edit-icon');
+        editIcon.addEventListener('click', () => editResponse(fieldId, response));
     }
 
     function saveResponse(fieldId, response) {
@@ -346,4 +430,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const chatContainer = document.querySelector('.chat-container');
         chatContainer.scrollTop = chatContainer.scrollHeight;
     }
+
+    
 });
