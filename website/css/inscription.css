@@ -69,10 +69,9 @@ body {
   white-space: nowrap;
   overflow: hidden;
   animation: typing 2s steps(30, end) forwards;
-  width: auto; 
-  vertical-align: bottom; 
+  width: auto;
+  vertical-align: bottom;
 }
-
 
 .blinking-line {
   display: inline-block;
@@ -85,17 +84,17 @@ body {
 
 /* Blinking animation keyframes */
 @keyframes blink {
-  50% { opacity: 0; }
+  50% {
+    opacity: 0;
+  }
 }
 
-
-
 .input-container {
-    display: flex;
-    align-items: center;
-    padding: 10px;
-    background: linear-gradient(90deg, #1a1a1a, #2b2b2b);
-    border-top: 1px solid #333;
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  background: linear-gradient(90deg, #1a1a1a, #2b2b2b);
+  border-top: 1px solid #333;
 }
 
 .input-field {
@@ -127,18 +126,31 @@ body {
 
 /* Flickering Effect */
 @keyframes typing {
-  from { width: 0; }
-  to { width: 100%; }
+  from {
+    width: 0;
+  }
+  to {
+    width: 100%;
+  }
 }
 
 @keyframes flicker {
-  0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% {
-      opacity: 1;
-      filter: brightness(1.1);
+  0%,
+  19%,
+  21%,
+  23%,
+  25%,
+  54%,
+  56%,
+  100% {
+    opacity: 1;
+    filter: brightness(1.1);
   }
-  20%, 24%, 55% {
-      opacity: 0.6;
-      filter: brightness(1.5);
+  20%,
+  24%,
+  55% {
+    opacity: 0.6;
+    filter: brightness(1.5);
   }
 }
 
@@ -200,7 +212,7 @@ body {
 
 /* Styles for Selected Interests */
 #pick-options-btn {
-  background-color: #FF7991;
+  background-color: #ff7991;
   color: #fff;
   padding: 10px 20px;
   border: none;
@@ -332,7 +344,6 @@ body {
   margin-top: 10px;
 }
 
-
 /* style pour quand select image (H/F) */
 
 /* Cyberpunk Edge Effect for Image Selection */
@@ -362,7 +373,11 @@ body {
   right: -8px;
   bottom: -8px;
   border-radius: 12px;
-  background: linear-gradient(135deg, rgba(255, 0, 255, 0.5), rgba(0, 255, 255, 0.5));
+  background: linear-gradient(
+    135deg,
+    rgba(255, 0, 255, 0.5),
+    rgba(0, 255, 255, 0.5)
+  );
   opacity: 0.9;
   filter: blur(15px);
   transition: transform 0.4s ease, opacity 0.4s ease;
@@ -387,10 +402,19 @@ body {
 
 /* Flicker effect for a glitchy look */
 @keyframes flicker {
-  0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% {
+  0%,
+  19%,
+  21%,
+  23%,
+  25%,
+  54%,
+  56%,
+  100% {
     opacity: 1;
   }
-  20%, 24%, 55% {
+  20%,
+  24%,
+  55% {
     opacity: 0.6;
   }
 }
@@ -404,7 +428,7 @@ body {
   display: block;
   padding: 5px;
   color: #ff00ff;
-  font-family: 'Orbitron', sans-serif;
+  font-family: "Orbitron", sans-serif;
   text-align: center;
   margin-top: 10px;
   font-size: 14px;
