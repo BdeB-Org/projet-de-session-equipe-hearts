@@ -19,6 +19,7 @@ import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
 import FacebookStrategy from 'passport-facebook';
 import TwitterStrategy from 'passport-twitter';
 import AppleStrategy from 'passport-apple';
+import axios from 'axios';
 
 import fs from 'fs';
 
@@ -154,6 +155,65 @@ con.connect(function (err) {
     initializeCards();
     initializeLikes();
     initializeSexualite();
+});
+
+/*
+------------------------------------------
+    Geolocation
+------------------------------------------
+*/
+
+
+function getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2) {
+    const R = 6371;
+    const dLat = deg2rad(lat2 - lat1);
+    const dLon = deg2rad(lon2 - lon1);
+
+    const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) *
+        Math.sin(dLon / 2) * Math.sin(dLon / 2);
+
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    const d = R * c;
+    return d;
+}
+
+function deg2rad(deg) {
+    return deg * (Math.PI / 180);
+}
+
+const coords = [
+    { lat: 40.7127837, lon: -74.0059413, name: 'New York, NY' },
+    { lat: 34.0522342, lon: -118.2436849, name: 'Los Angeles, CA' },
+    { lat: 37.3382082, lon: -121.8863286, name: 'San Jose, CA' },
+    { lat: 41.8781136, lon: -87.6297982, name: 'Chicago, IL' },
+    { lat: 47.6062095, lon: -122.3320708, name: 'Seattle, WA' }
+];
+
+app.get('/api/user-location', async (req, res) => {
+    try {
+        const userLocation = await axios.get('http://ip-api.com/json/?fields=lat,lon');
+        const { lat: userLat, lon: userLon } = userLocation.data;
+
+        if (!userLat || !userLon) {
+            return res.status(500).send('Could not retrieve user location');
+        }
+
+        const distances = coords.map((location) => {
+            const distance = getDistanceFromLatLonInKm(userLat, userLon, location.lat, location.lon);
+            return { city: location.name, distance: distance.toFixed(2) };
+        });
+
+        res.json({
+            success: true,
+            userLocation: { lat: userLat, lon: userLon },
+            distances: distances
+        });
+
+    } catch (error) {
+        console.error('Error fetching user location:', error);
+        res.status(500).send('Error fetching geolocation data');
+    }
 });
 
 /*
