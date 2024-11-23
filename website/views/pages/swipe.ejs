@@ -366,6 +366,69 @@
     text-decoration: none;
     cursor: pointer;
   }
+
+  .calendar-slot {
+    padding: 10px;
+    margin: 5px;
+    background-color: #333;
+    color: white;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+  }
+
+  .calendar-slot.selected {
+    background-color: #00bfff;
+    color: #000;
+    font-weight: bold;
+  }
+
+  .calendar-container {
+    margin-top: 20px;
+  }
+
+  .calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 10px;
+    margin-top: 10px;
+  }
+
+  .calendar-day {
+    background-color: rgba(255, 255, 255, 0.1);
+    border: 1px solid #00bfff;
+    border-radius: 5px;
+    padding: 10px;
+    text-align: center;
+    color: white;
+  }
+
+  .calendar-day strong {
+    display: block;
+    margin-bottom: 5px;
+    font-size: 1.2em;
+  }
+
+  .time-slot {
+    margin-top: 5px;
+    padding: 5px;
+    background-color: #333;
+    color: white;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 0.9em;
+  }
+
+  .time-slot:hover {
+    background-color: #00bfff;
+    color: black;
+  }
+
+  .time-slot.selected {
+    background-color: #ff007f;
+    color: white;
+    font-weight: bold;
+  }
 </style>
 
 <body>
@@ -413,10 +476,29 @@
       <img id="modalImage" src="" alt="profile picture" style="width: 100px; height: 100px; border-radius: 50%" />
       <h4 id="modalName"></h4>
       <p id="modalDetails"></p>
+      <button class="set-date-button" data-match-id="<%= matches.user_id %>">Set Date</button>
+
     </div>
+    <div id="availabilityModal" class="modal">
+      <div class="modal-content">
+        <span class="close">&times;</span>
+        <h3 id="calendar-title">Sélectionnez vos disponibilités</h3>
+        <div class="calendar-container">
+          <h2 id="calendar-month">Mois : <span id="currentMonth"></span></h2>
+          <div class="calendar-grid">
+            <!-- Days and Time Slots will be dynamically populated -->
+          </div>
+        </div>
+        <button id="confirmAvailability">Confirmer</button>
+      </div>
+    </div>
+
   </div>
 </body>
 <script>
+  const userId = "<%= userDetails.e_id %>";
+
+
   document.addEventListener("DOMContentLoaded", function () {
     let users = [];
     let currentIndex = 0;
@@ -435,6 +517,9 @@
 
     const loggedInUserId = "<%= userDetails.e_id %>"; // Fetch the logged-in user's ID
     const userSubscriptionId = "<%= userDetails.abonnement_id %>"; // Fetch the logged-in user's subscription ID
+    const matchesNigga = "<%= matches.match_id %>";
+    console.log(matchesNigga);
+
 
     // Fetch user preferences
     fetch("/api/user/preferences", {
@@ -603,6 +688,7 @@
           a.href = `/user/profile/${likedUserId}`;
           a.textContent = user.e_nom; // Place the name inside the <a> tag
 
+
           li.appendChild(img);
           li.appendChild(a);
           matchesList.appendChild(li);
@@ -718,7 +804,7 @@
           })
           .catch((error) => console.error('Error fetching distance data:', error));
       } else {
-        console.warn("No user found at current index:", currentIndex); // Warn if no user is found
+        console.warn("No user found at current index:", currentIndex);
       }
     }
 
@@ -731,11 +817,10 @@
 
       const now = new Date();
       const nextReset = new Date();
-      nextReset.setHours(24, 0, 0, 0); // Set to next 12 am (midnight)
+      nextReset.setHours(24, 0, 0, 0);
 
-      // Update countdown every second
       const countdownInterval = setInterval(() => {
-        const now = new Date(); // Recalculate 'now' each second
+        const now = new Date();
         const timeLeft = nextReset - now;
 
         const hours = Math.floor(
@@ -748,7 +833,7 @@
 
         if (timeLeft <= 0) {
           clearInterval(countdownInterval);
-          location.reload(); // Reload the page at 12 am to refresh swipes
+          location.reload();
         }
       }, 1000);
     }
@@ -809,4 +894,182 @@
       }
     });
   });
+
+
+  document.querySelectorAll('.set-date-button').forEach(button => {
+    button.addEventListener('click', function () {
+      const matchedUserId = button.getAttribute('data-match-id');
+      console.log("Matched User ID:", matchedUserId);
+      if (!matchedUserId) {
+        alert("Matched User ID is missing or invalid.");
+        return;
+      }
+      openCalendarModal(matchedUserId);
+    });
+  });
+
+
+
+  function openCalendarModal(matchId) {
+    fetch(`/api/get-availability/${matchId}`)
+      .then(response => response.json())
+      .then(firstUserAvailability => {
+        const availableSlots = firstUserAvailability.map(
+          slot => `${slot.date}-${slot.time_range}`
+        );
+
+        populateCalendarWithRestrictedOptions(availableSlots);
+      })
+      .catch(err => console.error("Error fetching availability:", err));
+  }
+
+
+  document.querySelector('#availabilityModal .close').addEventListener('click', () => {
+    document.getElementById('availabilityModal').style.display = 'none';
+  });
+
+
+  function populateCalendar(monthName, daysInMonth) {
+    const calendarGrid = document.querySelector(".calendar-grid");
+    const currentMonth = document.getElementById("currentMonth");
+    calendarGrid.innerHTML = "";
+    currentMonth.textContent = monthName;
+
+    const timeSlots = ["8h-12h", "12h-15h", "15h-18h", "18h-21h"];
+
+    for (let day = 1; day <= daysInMonth; day++) {
+      const dayElement = document.createElement("div");
+      dayElement.className = "calendar-day";
+      dayElement.innerHTML = `<strong>${day}</strong>`;
+
+      timeSlots.forEach((slot) => {
+        const slotElement = document.createElement("div");
+        slotElement.className = "time-slot";
+        slotElement.textContent = slot;
+
+        slotElement.addEventListener("click", () => {
+          slotElement.classList.toggle("selected");
+        });
+
+        dayElement.appendChild(slotElement);
+      });
+
+      calendarGrid.appendChild(dayElement);
+    }
+  }
+
+  function populateCalendarWithRestrictedOptions(availableSlots) {
+    const calendarGrid = document.querySelector(".calendar-grid");
+    calendarGrid.innerHTML = "";
+
+    const timeSlots = ["8h-12h", "12h-15h", "15h-18h", "18h-21h"];
+    const daysInMonth = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).getDate();
+
+    for (let day = 1; day <= daysInMonth; day++) {
+      const date = new Date();
+      date.setDate(day);
+      const formattedDate = date.toISOString().split("T")[0];
+
+      const dayElement = document.createElement("div");
+      dayElement.className = "calendar-day";
+      dayElement.innerHTML = `<strong>${day}</strong>`;
+
+      timeSlots.forEach(slot => {
+        const slotKey = `${formattedDate}-${slot}`;
+        const slotElement = document.createElement("div");
+        slotElement.className = `time-slot ${availableSlots.includes(slotKey) ? "" : "disabled"
+          }`;
+        slotElement.textContent = slot;
+
+        if (availableSlots.includes(slotKey)) {
+          slotElement.addEventListener("click", () => {
+            slotElement.classList.toggle("selected");
+          });
+        }
+
+        dayElement.appendChild(slotElement);
+      });
+
+      calendarGrid.appendChild(dayElement);
+    }
+  }
+
+
+  // Call the function when opening the modal
+  document.querySelector(".set-date-button").addEventListener("click", () => {
+    const daysInMonth = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).getDate(); // Calculate days in current month
+    const monthName = new Date().toLocaleString("fr-FR", { month: "long" }); // Get current month in French
+    populateCalendar(monthName, daysInMonth);
+
+    document.getElementById("availabilityModal").style.display = "block";
+  });
+
+  // Close modal
+  document.querySelector("#availabilityModal .close").addEventListener("click", () => {
+    document.getElementById("availabilityModal").style.display = "none";
+  });
+
+
+
+  let selectedSlots = []; // Store selected slots
+
+  function selectSlot(slot) {
+    const slotKey = `${slot.date}-${slot.time_range}`;
+    const index = selectedSlots.findIndex(s => s.date === slot.date && s.time_range === slot.time_range);
+
+    if (index === -1) {
+      selectedSlots.push(slot); // Add slot
+    } else {
+      selectedSlots.splice(index, 1); // Remove slot
+    }
+
+    const slotElement = [...document.querySelectorAll('.calendar-slot')].find(
+      el => el.dataset.date === slot.date && el.dataset.time_range === slot.time_range
+    );
+
+    if (slotElement) {
+      slotElement.classList.toggle('selected');
+    }
+
+    console.log('Selected slots:', selectedSlots);
+  }
+
+
+  document.getElementById("confirmAvailability").addEventListener("click", () => {
+    const matchId = document.querySelector(".set-date-button").getAttribute("data-match-id"); // Get matchId
+    if (!matchId) {
+      alert("Match ID is missing or invalid.");
+      return;
+    }
+
+    const selectedSlots = Array.from(document.querySelectorAll(".time-slot.selected")).map(
+      slot => {
+        const day = slot.closest(".calendar-day").querySelector("strong").textContent;
+        const date = new Date();
+        date.setDate(day);
+        const formattedDate = date.toISOString().split("T")[0];
+        return {
+          date: formattedDate,
+          time_range: slot.textContent,
+        };
+      }
+    );
+
+    fetch("/api/save-availability", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ userId, matchId, availabilities: selectedSlots }),
+    })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          alert("Disponibilités enregistrées !");
+          document.getElementById("availabilityModal").style.display = "none";
+        } else {
+          alert("Erreur lors de l'enregistrement des disponibilités.");
+        }
+      })
+      .catch(err => console.error("Error saving availability:", err));
+  });
+
 </script>

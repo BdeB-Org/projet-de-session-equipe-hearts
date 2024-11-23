@@ -320,8 +320,6 @@
             </div>
 
 
-
-
             <div class="profile-container">
                 <div class="profile-header">
                     <h1>Profil</h1>
@@ -388,6 +386,11 @@
                     </form>
 
                 </div>
+                <form id="update-profile-picture-form" enctype="multipart/form-data">
+                    <label for="profilePicture">Upload New Profile Picture:</label>
+                    <input type="file" id="profilePicture" name="profilePicture" accept="image/*" required>
+                    <button type="submit">Update Picture</button>
+                </form>
             </div>
             <div class="profile-arrow right-arrow" title="Modifier profil">&#9654;</div>
 
@@ -463,11 +466,6 @@
                     }, 500);
                 }
             });
-
-
-
-
-
 
             document.getElementById("edit-profile-btn").addEventListener("click", function () {
                 const form = document.getElementById("update-profile-form");
@@ -584,5 +582,27 @@
                 });
             });
 
+            document.getElementById('update-profile-picture-form').addEventListener('submit', function (e) {
+                e.preventDefault();
+
+                const formData = new FormData(this);
+
+                fetch('/event/update-profile-picture', {
+                    method: 'POST',
+                    body: formData
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            alert(data.message);
+                            document.querySelector('.profile-picture').src = data.photoUrl; // Update profile picture on the page
+                        } else {
+                            alert(data.message);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error updating profile picture:', error);
+                    });
+            });
         </script>
     </body>

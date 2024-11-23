@@ -858,130 +858,6 @@ app.get("/event/apropos", function (req, res) {
     });
 });
 
-app.get("/event/swipe", (req, res) => {
-    const userId = req.session.user.e_id; // Get logged-in user ID from session
-
-    const cardNames = {
-        1: 'Ace',
-        2: 'Joker',
-        3: 'Reine',
-        4: 'Roi'
-    };
-
-    const likeNames = {
-        1: 'Musique',
-        2: 'Cinéma',
-        3: 'Voyages',
-        4: 'Sport',
-        5: 'Lecture',
-        6: 'Cuisine'
-    };
-
-    const getPreferencesQuery = `
-        SELECT card_id, like_id, sexualite_id FROM preference WHERE utilisateur_id = ?;
-    `;
-
-    // Fetch the preferences of the logged-in user
-    con.query(getPreferencesQuery, [userId], (err, preferenceResults) => {
-        if (err) {
-            console.error('Error fetching user preferences:', err);
-            return res.status(500).send('Error fetching user preferences');
-        }
-
-        // Fetch preferences for the logged-in user
-        const cardPreferences = preferenceResults
-            .filter(pref => pref.card_id)
-            .map(pref => cardNames[pref.card_id]);
-
-        const cardPreferences2 = preferenceResults
-            .filter(pref => pref.card_id)
-            .map(pref => pref.card_id);
-
-        const sexualitePreferences = preferenceResults
-            .filter(pref => pref.sexualite_id)
-            .map(pref => pref.sexualite_id);
-
-        const likePreferences = preferenceResults
-            .filter(pref => pref.like_id)
-            .map(pref => likeNames[pref.like_id]);
-
-        console.log('Card Preferences:', cardPreferences);
-        console.log('Card Preferences 2:', cardPreferences2);
-        console.log('Sexualite Preferences:', sexualitePreferences);
-        console.log('Like Preferences:', likePreferences);
-
-        // Fetch the logged-in user's location from the session
-        const userLocation = req.session.user.e_location;
-        console.log('User Location:', userLocation); // Check if this is correct
-
-        if (!userLocation || !userLocation.includes(',')) {
-            console.error('Invalid location format or missing location data');
-            return res.status(400).send('Invalid location format');
-        }
-
-        // Split the location string and extract lat, lon
-        const locationParts = userLocation.split(','); // Assuming "Latitude: x, Longitude: y"
-        if (locationParts.length !== 2) {
-            console.error('Location data is not in the correct format');
-            return res.status(400).send('Location format is incorrect');
-        }
-
-        const userLat = parseFloat(locationParts[0].split(':')[1].trim());
-        const userLon = parseFloat(locationParts[1].split(':')[1].trim());
-
-        if (isNaN(userLat) || isNaN(userLon)) {
-            console.error('Invalid latitude or longitude values');
-            return res.status(400).send('Invalid latitude or longitude');
-        }
-
-        // Fetch all users except the logged-in user
-        const getUsersQuery = 'SELECT * FROM e_utilisateur WHERE e_id != ?';
-        con.query(getUsersQuery, [userId], (err, users) => {
-            if (err) {
-                console.error('Error fetching users:', err);
-                return res.status(500).send('Error fetching users');
-            }
-
-            // Calculate distance from the logged-in user for each user
-            const usersWithDistances = users.map(user => {
-                const userLatLon = user.e_location.split(',');
-
-                // Ensure correct format for user's location
-                if (userLatLon.length !== 2) {
-                    console.error('User location is not in the correct format');
-                    return { ...user, distance: 'Unknown' }; // Skip this user if the format is wrong
-                }
-
-                const otherUserLat = parseFloat(userLatLon[0].split(':')[1].trim());
-                const otherUserLon = parseFloat(userLatLon[1].split(':')[1].trim());
-
-                if (isNaN(otherUserLat) || isNaN(otherUserLon)) {
-                    console.error('Invalid latitude or longitude values for user');
-                    return { ...user, distance: 'Unknown' }; // Skip this user if the coordinates are invalid
-                }
-
-                // Calculate the correct distance between logged-in user and other users
-                const distance = getDistanceFromLatLonInKm(userLat, userLon, otherUserLat, otherUserLon);
-                return {
-                    ...user,
-                    distance: distance.toFixed(2)
-                };
-            });
-
-            // Render the swipe page with users and their calculated distances
-            res.render("pages/swipe", {
-                siteTitle: "Swipe",
-                pageTitle: "Swipe",
-                userDetails: req.session.user,
-                cardPreferences: cardPreferences || [],
-                cardPreferences2: cardPreferences2 || [],
-                sexualitePreferences: sexualitePreferences || [],
-                likePreferences: likePreferences || [],
-                usersWithDistances: usersWithDistances // Pass the users with their distances
-            });
-        });
-    });
-});
 
 app.get("/event/profil", function (req, res) {
     if (!req.session.user) {
@@ -1112,6 +988,163 @@ app.get('/event/download-receipt', (req, res) => {
     Pages swipes
 -----------------------------
 */
+
+app.get("/event/swipe", (req, res) => {
+    const userId = req.session.user.e_id; // Get logged-in user ID from session
+
+    const cardNames = {
+        1: 'Ace',
+        2: 'Joker',
+        3: 'Reine',
+        4: 'Roi'
+    };
+
+    const likeNames = {
+        1: 'Musique',
+        2: 'Cinéma',
+        3: 'Voyages',
+        4: 'Sport',
+        5: 'Lecture',
+        6: 'Cuisine'
+    };
+
+    const getPreferencesQuery = `
+        SELECT card_id, like_id, sexualite_id FROM preference WHERE utilisateur_id = ?;
+    `;
+
+    // Fetch the preferences of the logged-in user
+    con.query(getPreferencesQuery, [userId], (err, preferenceResults) => {
+        if (err) {
+            console.error('Error fetching user preferences:', err);
+            return res.status(500).send('Error fetching user preferences');
+        }
+
+        // Fetch preferences for the logged-in user
+        const cardPreferences = preferenceResults
+            .filter(pref => pref.card_id)
+            .map(pref => cardNames[pref.card_id]);
+
+        const cardPreferences2 = preferenceResults
+            .filter(pref => pref.card_id)
+            .map(pref => pref.card_id);
+
+        const sexualitePreferences = preferenceResults
+            .filter(pref => pref.sexualite_id)
+            .map(pref => pref.sexualite_id);
+
+        const likePreferences = preferenceResults
+            .filter(pref => pref.like_id)
+            .map(pref => likeNames[pref.like_id]);
+
+        console.log('Card Preferences:', cardPreferences);
+        console.log('Card Preferences 2:', cardPreferences2);
+        console.log('Sexualite Preferences:', sexualitePreferences);
+        console.log('Like Preferences:', likePreferences);
+
+        const getMatchesQuery = `
+        SELECT DISTINCT u.*,
+            (SELECT GROUP_CONCAT(type_card)
+             FROM preference
+             JOIN e_card ON preference.card_id = e_card.id_card
+             WHERE utilisateur_id = u.e_id) AS cards,
+            (SELECT GROUP_CONCAT(type_like)
+             FROM preference
+             JOIN e_likes ON preference.like_id = e_likes.id_like
+             WHERE utilisateur_id = u.e_id) AS likes
+        FROM matches m
+        JOIN e_utilisateur u
+            ON (u.e_id = m.user1_id AND m.user2_id = ?)
+            OR (u.e_id = m.user2_id AND m.user1_id = ?)
+        WHERE u.e_id != ?; -- Exclude the logged-in user
+    `;
+
+        // Exécuter la requête pour récupérer les matches
+        con.query(getMatchesQuery, [userId, userId, userId], (err, matches) => {
+            if (err) {
+                console.error('Erreur en récupérant les matches:', err);
+                return res.status(500).send('Erreur en récupérant les matches');
+            }
+
+            console.log("Matches trouvés:", matches);
+
+
+            // Fetch the logged-in user's location from the session
+            const userLocation = req.session.user.e_location;
+            console.log('User Location:', userLocation); // Check if this is correct
+
+            if (!userLocation || !userLocation.includes(',')) {
+                console.error('Invalid location format or missing location data');
+                return res.status(400).send('Invalid location format');
+            }
+
+            // Split the location string and extract lat, lon
+            const locationParts = userLocation.split(','); // Assuming "Latitude: x, Longitude: y"
+            if (locationParts.length !== 2) {
+                console.error('Location data is not in the correct format');
+                return res.status(400).send('Location format is incorrect');
+            }
+
+            const userLat = parseFloat(locationParts[0].split(':')[1].trim());
+            const userLon = parseFloat(locationParts[1].split(':')[1].trim());
+
+            if (isNaN(userLat) || isNaN(userLon)) {
+                console.error('Invalid latitude or longitude values');
+                return res.status(400).send('Invalid latitude or longitude');
+            }
+
+            // Fetch all users except the logged-in user
+            const getUsersQuery = 'SELECT * FROM e_utilisateur WHERE e_id != ?';
+            con.query(getUsersQuery, [userId], (err, users) => {
+                if (err) {
+                    console.error('Error fetching users:', err);
+                    return res.status(500).send('Error fetching users');
+                }
+
+                // Calculate distance from the logged-in user for each user
+                const usersWithDistances = users.map(user => {
+                    const userLatLon = user.e_location.split(',');
+
+                    // Ensure correct format for user's location
+                    if (userLatLon.length !== 2) {
+                        console.error('User location is not in the correct format');
+                        return { ...user, distance: 'Unknown' }; // Skip this user if the format is wrong
+                    }
+
+                    const otherUserLat = parseFloat(userLatLon[0].split(':')[1].trim());
+                    const otherUserLon = parseFloat(userLatLon[1].split(':')[1].trim());
+
+                    if (isNaN(otherUserLat) || isNaN(otherUserLon)) {
+                        console.error('Invalid latitude or longitude values for user');
+                        return { ...user, distance: 'Unknown' }; // Skip this user if the coordinates are invalid
+                    }
+
+                    // Calculate the correct distance between logged-in user and other users
+                    const distance = getDistanceFromLatLonInKm(userLat, userLon, otherUserLat, otherUserLon);
+                    return {
+                        ...user,
+                        distance: distance.toFixed(2)
+                    };
+                });
+
+                // Render the swipe page with users and their calculated distances
+                res.render("pages/swipe", {
+                    siteTitle: "Swipe",
+                    pageTitle: "Swipe",
+                    userDetails: req.session.user,
+                    cardPreferences: cardPreferences || [],
+                    cardPreferences2: cardPreferences2 || [],
+                    sexualitePreferences: sexualitePreferences || [],
+                    likePreferences: likePreferences || [],
+                    matches, matches,
+                    usersWithDistances: usersWithDistances // Pass the users with their distances
+                });
+            });
+        }
+        );
+    });
+});
+
+
 app.get('/api/users', (req, res) => {
     const query = 'SELECT * FROM e_utilisateur';
     con.query(query, (err, results) => {
@@ -1243,7 +1276,6 @@ app.post('/api/user/preferences', (req, res) => {
 
 app.post('/api/user/like', (req, res) => {
     const { userId, likedUserId } = req.body;
-
     // Insert the like into the likes table
     const insertLikeQuery = 'INSERT INTO likes (liker_id, liked_id) VALUES (?, ?)';
     con.query(insertLikeQuery, [userId, likedUserId], (err, result) => {
@@ -1251,7 +1283,6 @@ app.post('/api/user/like', (req, res) => {
             console.error('Error inserting like:', err);
             return res.status(500).json({ error: 'Database error during the like action.' });
         }
-
         // Check for mutual like
         const checkMutualLikeQuery = 'SELECT * FROM likes WHERE liker_id = ? AND liked_id = ?';
         con.query(checkMutualLikeQuery, [likedUserId, userId], (err, results) => {
@@ -1259,10 +1290,10 @@ app.post('/api/user/like', (req, res) => {
                 console.error('Error checking for mutual like:', err);
                 return res.status(500).json({ error: 'Database error checking for mutual like.' });
             }
-
             if (results.length > 0) { // Mutual like found
                 // Insert a match
                 const insertMatchQuery = 'INSERT INTO matches (user1_id, user2_id) VALUES (?, ?)';
+                console.log("Its inserting again")
                 con.query(insertMatchQuery, [userId, likedUserId], (matchErr, matchResult) => {
                     if (matchErr) {
                         console.error('Error recording match:', matchErr);
@@ -1330,7 +1361,82 @@ app.get('/api/user/matches', (req, res) => {
     });
 });
 
+app.post('/api/save-availability', (req, res) => {
+    const { userId, matchId, availabilities } = req.body;
 
+    if (!userId || !matchId || !Array.isArray(availabilities)) {
+        return res.status(400).json({ error: "Invalid data" });
+    }
+
+    // Fetch availability of the first user
+    const queryFirstUser = `
+        SELECT date, time_range 
+        FROM availability 
+        WHERE user_id = ?;
+    `;
+    con.query(queryFirstUser, [matchId], (err, firstUserAvailabilities) => {
+        if (err) {
+            console.error("Error fetching first user's availability:", err);
+            return res.status(500).json({ error: "Error fetching availability" });
+        }
+
+        const validSlots = new Set(
+            firstUserAvailabilities.map(slot => `${slot.date}-${slot.time_range}`)
+        );
+
+        // Filter only valid slots
+        const filteredAvailabilities = availabilities.filter(slot =>
+            validSlots.has(`${slot.date}-${slot.time_range}`)
+        );
+
+        if (filteredAvailabilities.length === 0) {
+            return res.status(400).json({ error: "No valid slots selected" });
+        }
+
+        // Insert filtered availabilities
+        const queries = filteredAvailabilities.map(slot => {
+            return new Promise((resolve, reject) => {
+                const query = `
+                    INSERT INTO availability (user_id, match_id, date, time_range)
+                    VALUES (?, ?, ?, ?)
+                    ON DUPLICATE KEY UPDATE time_range = VALUES(time_range);
+                `;
+                con.query(
+                    query,
+                    [userId, matchId, slot.date, slot.time_range],
+                    (err, results) => {
+                        if (err) return reject(err);
+                        resolve(results);
+                    }
+                );
+            });
+        });
+
+        Promise.all(queries)
+            .then(() => res.json({ success: true }))
+            .catch(err => {
+                console.error("Error saving availability:", err);
+                res.status(500).json({ error: "Database error" });
+            });
+    });
+});
+
+
+app.get('/api/get-availability/:matchId', (req, res) => {
+    const { matchId } = req.params;
+    const query = `
+        SELECT date, time_range 
+        FROM availability 
+        WHERE user_id = ?;
+    `;
+    con.query(query, [matchId], (err, results) => {
+        if (err) {
+            console.error("Error fetching availability:", err);
+            return res.status(500).json({ error: "Error fetching availability" });
+        }
+        res.json(results);
+    });
+});
 
 
 
@@ -1995,3 +2101,57 @@ app.delete('/event/delete-photo/:photoUrl', (req, res) => {
         res.json({ success: true, message: 'Photo deleted successfully.' });
     });
 });
+
+
+app.post('/event/update-profile-picture', upload.single('profilePicture'), (req, res) => {
+    const userId = req.session.user.e_id; // Ensure the user is logged in
+    const uploadedPhoto = req.file ? req.file.filename : null;
+
+    if (!userId) {
+        return res.status(400).json({ success: false, message: 'Utilisateur non connecté.' });
+    }
+
+    if (!uploadedPhoto) {
+        return res.status(400).json({ success: false, message: 'Aucune photo téléchargée.' });
+    }
+
+    // Get the existing profile picture to delete later
+    const getPhotoQuery = 'SELECT e_photo FROM e_utilisateur WHERE e_id = ?';
+    con.query(getPhotoQuery, [userId], (err, result) => {
+        if (err) {
+            console.error('Error fetching current profile picture:', err);
+            return res.status(500).json({ success: false, message: 'Erreur serveur.' });
+        }
+
+        const currentPhoto = result[0]?.e_photo;
+
+        // Update the profile picture in the database
+        const updatePhotoQuery = 'UPDATE e_utilisateur SET e_photo = ? WHERE e_id = ?';
+        con.query(updatePhotoQuery, [uploadedPhoto, userId], (err) => {
+            if (err) {
+                console.error('Error updating profile picture in database:', err);
+                return res.status(500).json({ success: false, message: 'Erreur serveur.' });
+            }
+
+            // Delete the old profile picture from the server, if it exists
+            if (currentPhoto && currentPhoto !== 'default.jpg') {
+                const oldPhotoPath = path.join(__dirname, '/uploads', currentPhoto);
+                fs.unlink(oldPhotoPath, (err) => {
+                    if (err) {
+                        console.error('Error deleting old profile picture:', err);
+                    }
+                });
+            }
+
+            // Update the session to reflect the new profile picture
+            req.session.user.e_photo = uploadedPhoto;
+
+            return res.json({
+                success: true,
+                message: 'Photo de profil mise à jour avec succès.',
+                photoUrl: `/uploads/${uploadedPhoto}`
+            });
+        });
+    });
+});
+
