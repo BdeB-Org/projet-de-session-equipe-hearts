@@ -44,6 +44,7 @@ DROP TABLE IF EXISTS e_likes;
 DROP TABLE IF EXISTS matches;
 DROP TABLE IF EXISTS likes;
 DROP TABLE IF EXISTS e_photo;
+DROP TABLE IF EXISTS availability;
 
 CREATE TABLE e_utilisateur (
     e_id INT AUTO_INCREMENT NOT NULL,
@@ -146,12 +147,16 @@ CREATE TABLE relation_5 (
 );
 
 CREATE TABLE availability (
-    id_availability INT AUTO_INCREMENT PRIMARY KEY,
-    user_id INT NOT NULL,
-    date DATE NOT NULL,
-    time_range VARCHAR(50) NOT NULL,
-    FOREIGN KEY (user_id) REFERENCES e_utilisateur(e_id) ON DELETE CASCADE
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  user_id INT NOT NULL,
+  match_id INT NOT NULL,
+  date DATE NOT NULL,
+  time_range VARCHAR(50) NOT NULL,
+  UNIQUE KEY (user_id, match_id, date, time_range),
+  FOREIGN KEY (user_id) REFERENCES e_utilisateur(e_id),
+  FOREIGN KEY (match_id) REFERENCES e_utilisateur(e_id)
 );
+
 
 
 GRANT ALL PRIVILEGES ON *.* TO 'scott'@'%';
