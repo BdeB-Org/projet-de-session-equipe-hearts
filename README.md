@@ -145,6 +145,15 @@ CREATE TABLE relation_5 (
     FOREIGN KEY (utilisateur_id_utilisateur) REFERENCES utilisateur(id_utilisateur)
 );
 
+CREATE TABLE availability (
+    id_availability INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    date DATE NOT NULL,
+    time_range VARCHAR(50) NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES e_utilisateur(e_id) ON DELETE CASCADE
+);
+
+
 GRANT ALL PRIVILEGES ON *.* TO 'scott'@'%';
 ALTER USER 'scott'@'%' IDENTIFIED WITH mysql_native_password BY 'oracle';
 FLUSH PRIVILEGES;
