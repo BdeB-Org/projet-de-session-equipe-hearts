@@ -702,18 +702,18 @@
         fetch('/api/user-location')
           .then((response) => response.json())
           .then((data) => {
-            const distances = data.distances;
-            const closestDistance = distances[0];
+            const closestCity = data.closestCity;  // Get the closest city from the API response
+
             cardContainer.innerHTML = `
-          <div class="card">
-            <img src="/uploads/${user.e_photo}" alt="${user.e_nom}">
-            <h2>${user.e_prenom}</h2>
-            <p>À ${closestDistance.distance} kilomètres de distance (${closestDistance.city})</p>
-            <p>Préférences de Likes: ${user.likes.length > 0 ? user.likes.join(", ") : "Aucune"}</p>
-            <button class="button like-button"><i class="fas fa-heart"></i>Aimer</button>
-            <button class="button pass-button"><i class="fas fa-times"></i>Passer</button>
-          </div>
-        `;
+                    <div class="card">
+                        <img src="/uploads/${user.e_photo}" alt="${user.e_nom}">
+                        <h2>${user.e_prenom}</h2>
+                        <p>À ${closestCity.distance} kilomètres de distance (${closestCity.city})</p> <!-- Display closest city -->
+                        <p>Préférences de Likes: ${user.likes.length > 0 ? user.likes.join(", ") : "Aucune"}</p>
+                        <button class="button like-button"><i class="fas fa-heart"></i>Aimer</button>
+                        <button class="button pass-button"><i class="fas fa-times"></i>Passer</button>
+                    </div>
+                `;
             setupButtonListeners(user);
           })
           .catch((error) => console.error('Error fetching distance data:', error));
@@ -721,6 +721,7 @@
         console.warn("No user found at current index:", currentIndex); // Warn if no user is found
       }
     }
+
 
 
     function showCountdown() {
