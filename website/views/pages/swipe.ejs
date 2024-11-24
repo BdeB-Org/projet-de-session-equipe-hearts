@@ -476,7 +476,11 @@
       <img id="modalImage" src="" alt="profile picture" style="width: 100px; height: 100px; border-radius: 50%" />
       <h4 id="modalName"></h4>
       <p id="modalDetails"></p>
-      <button class="set-date-button" data-match-id="<%= matches.user_id %>">Set Date</button>
+      <% matches.forEach(function(match) { %>
+        <button class="set-date-button" data-match-id="<%= match.match_id %>">Set Date</button>
+        <% }); %>
+          <button class="unmatch-button"> unmatch</button>
+
 
     </div>
     <div id="availabilityModal" class="modal">
@@ -517,8 +521,9 @@
 
     const loggedInUserId = "<%= userDetails.e_id %>"; // Fetch the logged-in user's ID
     const userSubscriptionId = "<%= userDetails.abonnement_id %>"; // Fetch the logged-in user's subscription ID
-    const matchesNigga = "<%= matches.match_id %>";
-    console.log(matchesNigga);
+    const matchessfasf = "<%= userDetails.e_id === matches.user_id ? matches.user_id : matches.user_id %>";
+    console.log(matchessfasf);
+
 
 
     // Fetch user preferences
@@ -605,12 +610,23 @@
 
             console.log("Filtered Users:", users);
 
-            if (users.length === 0) {
-              cardContainer.innerHTML = "<p>No other users found.</p>";
-              return;
-            }
+            fetch("/api/user/matches")
+              .then((response) => response.json())
+              .then((matches) => {
+                matchedUserIds = matches.map((match) => match.e_id);
 
-            updateUserCard();
+                users = users.filter(
+                  (user) => !matchedUserIds.includes(user.e_id)
+                );
+
+                if (users.length === 0) {
+                  cardContainer.innerHTML = "<p>No other users found.</p>";
+                  return;
+                }
+
+                updateUserCard();
+              })
+              .catch((error) => console.error("Error fetching matches:", error));
           })
           .catch((error) => console.error("Error fetching user data:", error));
       })
@@ -692,27 +708,12 @@
           li.appendChild(img);
           li.appendChild(a);
           matchesList.appendChild(li);
+
+
         })
         .catch((error) => console.error("Error fetching user details:", error));
     }
 
-    function fetchMatches() {
-      fetch("/api/user/matches")
-        .then((response) => response.json())
-        .then((matches) => {
-          const matchesList = document.querySelector(".matches");
-          matchesList.innerHTML = ""; // Clear existing matches
-          matches.forEach((match) => {
-            const li = document.createElement("li");
-            const a = document.createElement("a");
-            a.textContent = match.e_nom;
-            a.href = `/user/profile/${match.e_id}`;
-            li.appendChild(a);
-            matchesList.appendChild(li);
-          });
-        })
-        .catch((error) => console.error("Error fetching matches:", error));
-    }
 
     function likeUser(likedUserId) {
       fetch("/api/user/like", {
@@ -784,25 +785,25 @@
 
     function updateUserCard() {
       const user = users[currentIndex];
-      if (user) {
-        fetch('/api/user-location')
-          .then((response) => response.json())
-          .then((data) => {
-            const closestCity = data.closestCity;  // Get the closest city from the API response
 
-            cardContainer.innerHTML = `
-                    <div class="card">
-                        <img src="/uploads/${user.e_photo}" alt="${user.e_nom}">
-                        <h2>${user.e_prenom}</h2>
-                        <p>À ${closestCity.distance} kilomètres de distance (${closestCity.city})</p> <!-- Display closest city -->
-                        <p>Préférences de Likes: ${user.likes.length > 0 ? user.likes.join(", ") : "Aucune"}</p>
-                        <button class="button like-button"><i class="fas fa-heart"></i>Aimer</button>
-                        <button class="button pass-button"><i class="fas fa-times"></i>Passer</button>
-                    </div>
-                `;
-            setupButtonListeners(user);
-          })
-          .catch((error) => console.error('Error fetching distance data:', error));
+      if (user) {
+        // Check if this user is in the list of matched users (exclude them)
+        if (matchedUserIds.includes(user.e_id)) {
+          return;  // Skip this card and move to the next one
+        }
+
+        // Continue displaying the user card if they are not matched
+        cardContainer.innerHTML = `
+      <div class="card">
+        <img src="/uploads/${user.e_photo}" alt="${user.e_nom}">
+        <h2>${user.e_prenom}</h2>
+        <p>À ${closestCity.distance} kilomètres de distance (${closestCity.city})</p>
+        <p>Préférences de Likes: ${user.likes.length > 0 ? user.likes.join(", ") : "Aucune"}</p>
+        <button class="button like-button"><i class="fas fa-heart"></i>Aimer</button>
+        <button class="button pass-button"><i class="fas fa-times"></i>Passer</button>
+      </div>
+    `;
+        setupButtonListeners(user);
       } else {
         console.warn("No user found at current index:", currentIndex);
       }
@@ -895,10 +896,69 @@
     });
   });
 
+  fetch("/api/user/matches")
+    .then(response => response.json())
+    .then(matches => {
+      if (matches.length > 0) {
+        const matchesList = document.querySelector(".matches");
+        matches.forEach(match => {
+          const li = document.createElement("li");
+
+          const img = document.createElement("img");
+          img.src = `/uploads/${match.e_photo}`;
+          img.alt = `Photo of ${match.e_nom}`;
+
+          const a = document.createElement("a");
+          a.href = `/user/profile/${match.e_id}`;
+          a.textContent = match.e_nom;
+
+          li.appendChild(img);
+          li.appendChild(a);
+          matchesList.appendChild(li);
+        });
+      }
+    })
+    .catch((error) => console.error("Error fetching matches:", error));
+
+  document.querySelectorAll('.unmatch-button').forEach(button => {
+    button.addEventListener('click', function () {
+      const matchedUserId = this.getAttribute('data-match-id');
+
+      if (!matchedUserId) {
+        console.error("Matched User ID is missing.");
+        return;
+      }
+
+      // Send unmatch request to the server
+      fetch('/api/user/unmatch', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userId: userId,
+          matchedUserId: matchedUserId,
+        }),
+      })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            // Ensure the element is correctly targeted and removed
+            const matchItem = this.closest('li');
+            if (matchItem) {
+              matchItem.remove(); // Remove the match from the DOM
+            }
+          }
+        })
+        .catch(err => console.error('Error unmatching user:', err));
+    });
+  });
+
+
 
   document.querySelectorAll('.set-date-button').forEach(button => {
     button.addEventListener('click', function () {
-      const matchedUserId = button.getAttribute('data-match-id');
+      const matchedUserId = this.getAttribute("data-match-id");
       console.log("Matched User ID:", matchedUserId);
       if (!matchedUserId) {
         alert("Matched User ID is missing or invalid.");
@@ -960,8 +1020,6 @@
 
   function populateCalendarWithRestrictedOptions(availableSlots) {
     const calendarGrid = document.querySelector(".calendar-grid");
-    calendarGrid.innerHTML = "";
-
     const timeSlots = ["8h-12h", "12h-15h", "15h-18h", "18h-21h"];
     const daysInMonth = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).getDate();
 
@@ -977,8 +1035,7 @@
       timeSlots.forEach(slot => {
         const slotKey = `${formattedDate}-${slot}`;
         const slotElement = document.createElement("div");
-        slotElement.className = `time-slot ${availableSlots.includes(slotKey) ? "" : "disabled"
-          }`;
+        slotElement.className = `time-slot ${availableSlots.includes(slotKey) ? "" : "disabled"}`;
         slotElement.textContent = slot;
 
         if (availableSlots.includes(slotKey)) {
@@ -1036,29 +1093,29 @@
 
 
   document.getElementById("confirmAvailability").addEventListener("click", () => {
-    const matchId = document.querySelector(".set-date-button").getAttribute("data-match-id"); // Get matchId
-    if (!matchId) {
-      alert("Match ID is missing or invalid.");
-      return;
-    }
+    const matchId = document.querySelector(".set-date-button").getAttribute("data-match-id"); // Get matchId from button
+    const selectedSlots = Array.from(document.querySelectorAll(".time-slot.selected")).map(slot => {
+      const day = slot.closest(".calendar-day").querySelector("strong").textContent;
+      const date = new Date();
+      date.setDate(day);
+      const formattedDate = date.toISOString().split("T")[0];
+      return {
+        date: formattedDate,
+        time_range: slot.textContent,
+      };
+    });
 
-    const selectedSlots = Array.from(document.querySelectorAll(".time-slot.selected")).map(
-      slot => {
-        const day = slot.closest(".calendar-day").querySelector("strong").textContent;
-        const date = new Date();
-        date.setDate(day);
-        const formattedDate = date.toISOString().split("T")[0];
-        return {
-          date: formattedDate,
-          time_range: slot.textContent,
-        };
-      }
-    );
-
+    // Send the selected slots and matchId to the backend
     fetch("/api/save-availability", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ userId, matchId, availabilities: selectedSlots }),
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        userId: userId, // Get this value from the current logged-in user
+        matchId: matchId, // Include the matchId
+        availabilities: selectedSlots,
+      }),
     })
       .then(response => response.json())
       .then(data => {
@@ -1071,5 +1128,6 @@
       })
       .catch(err => console.error("Error saving availability:", err));
   });
+
 
 </script>

@@ -1093,8 +1093,14 @@ app.get("/event/swipe", (req, res) => {
             }
 
             // Fetch all users except the logged-in user
-            const getUsersQuery = 'SELECT * FROM e_utilisateur WHERE e_id != ?';
-            con.query(getUsersQuery, [userId], (err, users) => {
+            const getUsersQuery = `
+            SELECT * FROM e_utilisateur 
+            WHERE e_id != ? AND e_id NOT IN 
+            (SELECT user1_id FROM matches WHERE user2_id = ? 
+             UNION
+             SELECT user2_id FROM matches WHERE user1_id = ?)
+        `;
+            con.query(getUsersQuery, [userId, userId, userId], (err, users) => {
                 if (err) {
                     console.error('Error fetching users:', err);
                     return res.status(500).send('Error fetching users');
@@ -1360,30 +1366,42 @@ app.get('/api/user/details/:id', (req, res) => {
 
 
 app.get('/api/user/matches', (req, res) => {
-    const userId = req.session.user.e_id;
-    const fetchMatchesQuery = `
-        SELECT u.e_id, u.e_nom, u.e_photo 
-        FROM matches m
-        JOIN e_utilisateur u ON u.e_id = m.user1_id OR u.e_id = m.user2_id
-        WHERE (m.user1_id = ? OR m.user2_id = ?) AND u.e_id != ?`;
+    const userId = req.session.user.e_id; // Get logged-in user ID from session
 
-    con.query(fetchMatchesQuery, [userId, userId, userId], (err, results) => {
+    const getMatchesQuery = `
+        SELECT m.match_id, 
+               u.e_id, 
+               u.e_nom, 
+               u.e_prenom, 
+               u.e_photo, 
+               u.e_location
+        FROM matches m
+        JOIN e_utilisateur u 
+          ON (u.e_id = m.user1_id AND m.user2_id = ?)
+          OR (u.e_id = m.user2_id AND m.user1_id = ?)
+        WHERE u.e_id != ?; -- Exclude the logged-in user
+    `;
+
+    // Fetch matches for the logged-in user
+    con.query(getMatchesQuery, [userId, userId, userId], (err, matches) => {
         if (err) {
             console.error('Error fetching matches:', err);
-            return res.status(500).json({ error: 'Database error fetching matches.' });
+            return res.status(500).send('Error fetching matches');
         }
-        res.json(results);
+
+        res.json(matches); // Send the matches as a JSON response
     });
 });
 
+
 app.post('/api/save-availability', (req, res) => {
     const { userId, matchId, availabilities } = req.body;
+    console.log("Received matchId:", matchId);
 
     if (!userId || !matchId || !Array.isArray(availabilities)) {
         return res.status(400).json({ error: "Invalid data" });
     }
 
-    // Fetch availability of the first user
     const queryFirstUser = `
         SELECT date, time_range 
         FROM availability 
@@ -1408,7 +1426,6 @@ app.post('/api/save-availability', (req, res) => {
             return res.status(400).json({ error: "No valid slots selected" });
         }
 
-        // Insert filtered availabilities
         const queries = filteredAvailabilities.map(slot => {
             return new Promise((resolve, reject) => {
                 const query = `
@@ -1449,7 +1466,27 @@ app.get('/api/get-availability/:matchId', (req, res) => {
             console.error("Error fetching availability:", err);
             return res.status(500).json({ error: "Error fetching availability" });
         }
+
         res.json(results);
+    });
+});
+
+app.post('/api/user/unmatch', (req, res) => {
+    const { userId, matchedUserId } = req.body;
+
+    const unmatchQuery = `
+      DELETE FROM matches 
+      WHERE (user1_id = ? AND user2_id = ?) 
+         OR (user1_id = ? AND user2_id = ?);
+    `;
+
+    con.query(unmatchQuery, [userId, matchedUserId, matchedUserId, userId], (err, result) => {
+        if (err) {
+            console.error('Error unmatching user:', err);
+            return res.status(500).json({ error: 'Database error during unmatch' });
+        }
+
+        res.json({ success: true });
     });
 });
 
