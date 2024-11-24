@@ -1390,10 +1390,13 @@ WHERE u.e_id != ?;
 
 app.post('/api/save-availability', (req, res) => {
     const { userId, matchId, availabilities } = req.body;
-    console.log("Received matchId:", matchId);
 
-    if (!userId || !matchId || !Array.isArray(availabilities)) {
-        return res.status(400).json({ error: "Invalid data" });
+    // Log the received data to ensure it's valid
+    console.log("Received Data: userId:", userId, "matchId:", matchId, "availabilities:", availabilities);
+
+    // Check for missing or invalid data
+    if (!userId || !matchId || !Array.isArray(availabilities) || availabilities.length === 0) {
+        return res.status(400).json({ error: "Invalid data. Ensure userId, matchId, and availabilities are provided." });
     }
 
     const queryFirstUser = `
@@ -1401,25 +1404,35 @@ app.post('/api/save-availability', (req, res) => {
         FROM availability 
         WHERE user_id = ?;
     `;
+
+    // Fetch the first user's availability
     con.query(queryFirstUser, [matchId], (err, firstUserAvailabilities) => {
         if (err) {
             console.error("Error fetching first user's availability:", err);
             return res.status(500).json({ error: "Error fetching availability" });
         }
 
+        // Log the first user's available time slots
+        console.log("First User's Available Slots:", firstUserAvailabilities);
+
+        // Create a set of valid slots from first user's availability
         const validSlots = new Set(
             firstUserAvailabilities.map(slot => `${slot.date}-${slot.time_range}`)
         );
 
-        // Filter only valid slots
+        // Filter only valid slots that are common between both users
         const filteredAvailabilities = availabilities.filter(slot =>
             validSlots.has(`${slot.date}-${slot.time_range}`)
         );
 
+        // Log the filtered valid availabilities
+        console.log("Filtered Availabilities:", filteredAvailabilities);
+
         if (filteredAvailabilities.length === 0) {
-            return res.status(400).json({ error: "No valid slots selected" });
+            return res.status(400).json({ error: "No valid slots selected or no overlapping availability." });
         }
 
+        // Insert the valid slots into the database
         const queries = filteredAvailabilities.map(slot => {
             return new Promise((resolve, reject) => {
                 const query = `
@@ -1427,22 +1440,22 @@ app.post('/api/save-availability', (req, res) => {
                     VALUES (?, ?, ?, ?)
                     ON DUPLICATE KEY UPDATE time_range = VALUES(time_range);
                 `;
-                con.query(
-                    query,
-                    [userId, matchId, slot.date, slot.time_range],
-                    (err, results) => {
-                        if (err) return reject(err);
-                        resolve(results);
+                con.query(query, [userId, matchId, slot.date, slot.time_range], (err, results) => {
+                    if (err) {
+                        console.error("Error inserting availability:", err);
+                        return reject(err);
                     }
-                );
+                    resolve(results);
+                });
             });
         });
 
+        // Execute all queries
         Promise.all(queries)
             .then(() => res.json({ success: true }))
             .catch(err => {
                 console.error("Error saving availability:", err);
-                res.status(500).json({ error: "Database error" });
+                res.status(500).json({ error: "Database error saving availability." });
             });
     });
 });
