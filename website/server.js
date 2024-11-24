@@ -1042,21 +1042,10 @@ app.get("/event/swipe", (req, res) => {
         console.log('Like Preferences:', likePreferences);
 
         const getMatchesQuery = `
-        SELECT DISTINCT u.*,
-            (SELECT GROUP_CONCAT(type_card)
-             FROM preference
-             JOIN e_card ON preference.card_id = e_card.id_card
-             WHERE utilisateur_id = u.e_id) AS cards,
-            (SELECT GROUP_CONCAT(type_like)
-             FROM preference
-             JOIN e_likes ON preference.like_id = e_likes.id_like
-             WHERE utilisateur_id = u.e_id) AS likes
-        FROM matches m
-        JOIN e_utilisateur u
-            ON (u.e_id = m.user1_id AND m.user2_id = ?)
-            OR (u.e_id = m.user2_id AND m.user1_id = ?)
-        WHERE u.e_id != ?; -- Exclude the logged-in user
-    `;
+            SELECT match_id, user1_id, user2_id 
+            FROM matches
+            WHERE user1_id = ? OR user2_id = ?;
+        `;
 
         // Exécuter la requête pour récupérer les matches
         con.query(getMatchesQuery, [userId, userId, userId], (err, matches) => {
@@ -1064,6 +1053,10 @@ app.get("/event/swipe", (req, res) => {
                 console.error('Erreur en récupérant les matches:', err);
                 return res.status(500).send('Erreur en récupérant les matches');
             }
+
+            // Log the matches in the desired format
+            const formattedMatches = matches.map(match => [match.match_id, match.user1_id, match.user2_id]);
+            console.log("Matches found:", formattedMatches);
 
             console.log("Matches trouvés:", matches);
 
@@ -1141,7 +1134,7 @@ app.get("/event/swipe", (req, res) => {
                     cardPreferences2: cardPreferences2 || [],
                     sexualitePreferences: sexualitePreferences || [],
                     likePreferences: likePreferences || [],
-                    matches, matches,
+                    matches, formattedMatches,
                     usersWithDistances: usersWithDistances // Pass the users with their distances
                 });
             });
@@ -1369,17 +1362,18 @@ app.get('/api/user/matches', (req, res) => {
     const userId = req.session.user.e_id; // Get logged-in user ID from session
 
     const getMatchesQuery = `
-        SELECT m.match_id, 
-               u.e_id, 
-               u.e_nom, 
-               u.e_prenom, 
-               u.e_photo, 
-               u.e_location
-        FROM matches m
-        JOIN e_utilisateur u 
-          ON (u.e_id = m.user1_id AND m.user2_id = ?)
-          OR (u.e_id = m.user2_id AND m.user1_id = ?)
-        WHERE u.e_id != ?; -- Exclude the logged-in user
+SELECT m.match_id, 
+       u.e_id, 
+       u.e_nom, 
+       u.e_prenom, 
+       u.e_photo, 
+       u.e_location
+FROM matches m
+JOIN e_utilisateur u 
+  ON (u.e_id = m.user1_id AND m.user2_id = ?) 
+  OR (u.e_id = m.user2_id AND m.user1_id = ?)
+WHERE u.e_id != ?;  
+
     `;
 
     // Fetch matches for the logged-in user
