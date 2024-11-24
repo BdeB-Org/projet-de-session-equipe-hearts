@@ -1276,6 +1276,7 @@ app.post('/api/user/preferences', (req, res) => {
 
 app.post('/api/user/like', (req, res) => {
     const { userId, likedUserId } = req.body;
+
     // Insert the like into the likes table
     const insertLikeQuery = 'INSERT INTO likes (liker_id, liked_id) VALUES (?, ?)';
     con.query(insertLikeQuery, [userId, likedUserId], (err, result) => {
@@ -1283,6 +1284,7 @@ app.post('/api/user/like', (req, res) => {
             console.error('Error inserting like:', err);
             return res.status(500).json({ error: 'Database error during the like action.' });
         }
+
         // Check for mutual like
         const checkMutualLikeQuery = 'SELECT * FROM likes WHERE liker_id = ? AND liked_id = ?';
         con.query(checkMutualLikeQuery, [likedUserId, userId], (err, results) => {
@@ -1290,16 +1292,28 @@ app.post('/api/user/like', (req, res) => {
                 console.error('Error checking for mutual like:', err);
                 return res.status(500).json({ error: 'Database error checking for mutual like.' });
             }
+
             if (results.length > 0) { // Mutual like found
-                // Insert a match
-                const insertMatchQuery = 'INSERT INTO matches (user1_id, user2_id) VALUES (?, ?)';
-                console.log("Its inserting again")
-                con.query(insertMatchQuery, [userId, likedUserId], (matchErr, matchResult) => {
+                // Check if they are already in a match
+                const checkMatchQuery = 'SELECT * FROM matches WHERE (user1_id = ? AND user2_id = ?) OR (user1_id = ? AND user2_id = ?)';
+                con.query(checkMatchQuery, [userId, likedUserId, likedUserId, userId], (matchErr, matchResults) => {
                     if (matchErr) {
-                        console.error('Error recording match:', matchErr);
-                        return res.status(500).json({ error: 'Database error recording match.' });
+                        console.error('Error checking for existing match:', matchErr);
+                        return res.status(500).json({ error: 'Database error checking for existing match.' });
                     }
-                    res.json({ match: true, message: 'Match found!' });
+
+                    if (matchResults.length > 0) {
+                        return res.json({ match: true, message: 'You are already matched.' });
+                    } else {
+                        const insertMatchQuery = 'INSERT INTO matches (user1_id, user2_id) VALUES (?, ?)';
+                        con.query(insertMatchQuery, [userId, likedUserId], (matchErr, matchResult) => {
+                            if (matchErr) {
+                                console.error('Error recording match:', matchErr);
+                                return res.status(500).json({ error: 'Database error recording match.' });
+                            }
+                            res.json({ match: true, message: 'Match found!' });
+                        });
+                    }
                 });
             } else {
                 res.json({ match: false, message: 'Like recorded, no match found yet.' });
@@ -1307,6 +1321,7 @@ app.post('/api/user/like', (req, res) => {
         });
     });
 });
+
 
 app.get('/api/user/details/:id', (req, res) => {
     const { id } = req.params;
