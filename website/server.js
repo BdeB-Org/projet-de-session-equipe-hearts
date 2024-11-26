@@ -26,6 +26,7 @@ import fs from 'fs';
 dotenv.config();
 
 
+
 const app = express();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -49,7 +50,33 @@ app.use(express.urlencoded({ extended: true })); // For parsing application/x-ww
 app.use(express.json()); // For parsing application/json
 
 app.use('/cyberpunk-css-main', express.static(path.join(__dirname, 'cyberpunk-css-main')));
+import multer from 'multer';
 
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, path.join(__dirname, '/uploads')); // Specify uploads folder
+    },
+    filename: (req, file, cb) => {
+        const ext = path.extname(file.originalname); // Get the file extension
+        cb(null, `${file.fieldname}-${Date.now()}${ext}`); // Use the original file extension
+    }
+});
+
+// Set up multer for file uploads
+const upload = multer({
+    storage: storage,
+    fileFilter: (req, file, cb) => {
+        const filetypes = /jpeg|jpg|png|gif/; // Acceptable file types
+        const mimetype = filetypes.test(file.mimetype);
+        const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
+
+        if (mimetype && extname) {
+            return cb(null, true);
+        } else {
+            cb('Error: Images Only!'); // Reject non-image files
+        }
+    }
+});
 
 
 // Serve the cyberpunk CSS with the correct MIME type
@@ -495,7 +522,8 @@ app.get('/auth/google/callback', passport.authenticate('google', {
         e_prenom: req.user.e_prenom,
         e_courriel: req.user.e_courriel,
         e_photo: req.user.e_photo || null,
-        abonnement_id: req.user.abonnement_id || 1
+        abonnement_id: req.user.abonnement_id || 1,
+        googleId: req.user.googleId
     };
 
     console.log("User session after Google authentication:", req.session.user);
@@ -522,11 +550,14 @@ app.get('/event/google-completion', (req, res) => {
         userDetails: req.session.user
     });
 });
-
-// POST Route for completing user information
-app.post('/event/google-completion', (req, res) => {
+app.post('/event/google-completion', upload.single('profilePicture'), (req, res) => {
     const { phone, birthdate, gender, selectedCard, selectedLikes } = req.body;
     const user = req.session.user;
+    console.log("File upload:", req.file); // Check if file is being uploaded
+    console.log("Form Data:", req.body);
+    const profilePicture = req.file ? req.file.filename : null; // Ensure photo is retrieved properly
+
+    console.log("Profile Picture:", profilePicture); // Log uploaded photo
 
     if (!user) {
         return res.status(400).send("Utilisateur non connecté.");
@@ -549,14 +580,16 @@ app.post('/event/google-completion', (req, res) => {
     // Update user information in the database
     const updateUserQuery = `
         UPDATE e_utilisateur 
-        SET date_naissance = ?, e_number = ?, genre = ? 
-        WHERE googleId = ?;
+        SET date_naissance = ?, e_number = ?, genre = ?, e_photo = ? 
+        WHERE e_id = ?;
     `;
-    con.query(updateUserQuery, [birthdate, phone, validGender, user.googleId], (err) => {
+
+    con.query(updateUserQuery, [birthdate, phone, validGender, profilePicture, user.e_id], (err) => {
         if (err) {
             console.error("Erreur lors de la mise à jour de l'utilisateur:", err);
             return res.status(500).send("Erreur serveur.");
         }
+        console.log("User updated:", phone, birthdate, validGender, profilePicture);
 
         // Insert card preference
         let insertCardPromise = Promise.resolve();
@@ -627,6 +660,10 @@ app.post('/event/google-completion', (req, res) => {
                 req.session.user.date_naissance = birthdate;
                 req.session.user.e_number = phone;
                 req.session.user.genre = validGender;
+                req.session.user.e_photo = profilePicture; // Update session with photo
+                console.log("Phone:", phone);
+                console.log("Birthdate:", birthdate);
+                console.log("Gender:", gender);
                 res.redirect('/profil');
             })
             .catch((error) => {
@@ -636,6 +673,7 @@ app.post('/event/google-completion', (req, res) => {
     });
 });
 
+
 // Redirect to profile if the session user is valid
 app.get('/profil', (req, res) => {
     if (!req.session.user) {
@@ -643,9 +681,6 @@ app.get('/profil', (req, res) => {
     }
     res.redirect('/event/profil');
 });
-
-
-
 /*
 ------------------------------------------
     Connect to FACEBOOK
@@ -1866,33 +1901,7 @@ app.post('/event/delete-account', (req, res) => {
 -----------------------------
 */
 
-import multer from 'multer';
 
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, path.join(__dirname, '/uploads')); // Specify uploads folder
-    },
-    filename: (req, file, cb) => {
-        const ext = path.extname(file.originalname); // Get the file extension
-        cb(null, `${file.fieldname}-${Date.now()}${ext}`); // Use the original file extension
-    }
-});
-
-// Set up multer for file uploads
-const upload = multer({
-    storage: storage,
-    fileFilter: (req, file, cb) => {
-        const filetypes = /jpeg|jpg|png|gif/; // Acceptable file types
-        const mimetype = filetypes.test(file.mimetype);
-        const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
-
-        if (mimetype && extname) {
-            return cb(null, true);
-        } else {
-            cb('Error: Images Only!'); // Reject non-image files
-        }
-    }
-});
 
 app.post('/event/inscription', upload.single('photo'), (req, res) => {
     const { email, password, phone, firstName, lastName, birthdate, gender, selectedCard, selectedLikes, selectedSexualite } = req.body;
@@ -2162,3 +2171,54 @@ app.delete('/event/delete-photo/:photoUrl', (req, res) => {
 });
 
 
+app.post('/event/update-profile-picture', upload.single('profilePicture'), (req, res) => {
+    const userId = req.session.user.e_id; // Ensure the user is logged in
+    const uploadedPhoto = req.file ? req.file.filename : null;
+
+    if (!userId) {
+        return res.status(400).json({ success: false, message: 'Utilisateur non connecté.' });
+    }
+
+    if (!uploadedPhoto) {
+        return res.status(400).json({ success: false, message: 'Aucune photo téléchargée.' });
+    }
+
+    // Get the existing profile picture to delete later
+    const getPhotoQuery = 'SELECT e_photo FROM e_utilisateur WHERE e_id = ?';
+    con.query(getPhotoQuery, [userId], (err, result) => {
+        if (err) {
+            console.error('Error fetching current profile picture:', err);
+            return res.status(500).json({ success: false, message: 'Erreur serveur.' });
+        }
+
+        const currentPhoto = result[0]?.e_photo;
+
+        // Update the profile picture in the database
+        const updatePhotoQuery = 'UPDATE e_utilisateur SET e_photo = ? WHERE e_id = ?';
+        con.query(updatePhotoQuery, [uploadedPhoto, userId], (err) => {
+            if (err) {
+                console.error('Error updating profile picture in database:', err);
+                return res.status(500).json({ success: false, message: 'Erreur serveur.' });
+            }
+
+            // Delete the old profile picture from the server, if it exists
+            if (currentPhoto && currentPhoto !== 'default.jpg') {
+                const oldPhotoPath = path.join(__dirname, '/uploads', currentPhoto);
+                fs.unlink(oldPhotoPath, (err) => {
+                    if (err) {
+                        console.error('Error deleting old profile picture:', err);
+                    }
+                });
+            }
+
+            // Update the session to reflect the new profile picture
+            req.session.user.e_photo = uploadedPhoto;
+
+            return res.json({
+                success: true,
+                message: 'Photo de profil mise à jour avec succès.',
+                photoUrl: `/uploads/${uploadedPhoto}`
+            });
+        });
+    });
+});
