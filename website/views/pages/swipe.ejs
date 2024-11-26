@@ -69,6 +69,15 @@
         <button id="confirmAvailability">Confirmer</button>
       </div>
     </div>
+    <!-- Modal for IT'S A DATE! -->
+    <div id="dateModal" class="modal">
+      <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>IT'S A DATE!</h2>
+        <p id="dateDetails"></p>
+      </div>
+    </div>
+
 
   </div>
 </body>
@@ -541,7 +550,17 @@
     });
   });
 
+  function showDateModal(date) {
+    const dateModal = document.getElementById("dateModal");
+    const dateDetails = document.getElementById("dateDetails");
+    dateDetails.textContent = `Your date is scheduled for: ${date}`;
+    dateModal.style.display = "block";
 
+    // Close the modal
+    document.querySelector(".close").onclick = () => {
+      dateModal.style.display = "none";
+    };
+  }
 
   function openCalendarModal(matchId) {
     // Fetch the first user's available slots
@@ -549,20 +568,32 @@
       .then(response => response.json())
       .then(firstUserAvailability => {
         // Extract the available slots (date-time pairs)
-        const availableSlots = firstUserAvailability.map(
-          slot => `${slot.date}-${slot.time_range}`
-        );
-        console.log("Ngga", availableSlots);
+        const availableSlots = firstUserAvailability.map(slot => `${slot.date}-${slot.time_range}`);
+        console.log("First User's Availability:", availableSlots);
 
-        // Check if there are any available slots
-        if (availableSlots.length > 0) {
-          populateCalendarWithRestrictedOptions(availableSlots);
-        } else {
-          populateCalendar(monthName, daysInMonth);
-        }
+        // Fetch the logged-in user's selected slots
+        fetch(`/api/get-availability/${loggedInUserId}`)
+          .then(response => response.json())
+          .then(secondUserAvailability => {
+            const selectedSlots = secondUserAvailability.map(slot => `${slot.date}-${slot.time_range}`);
+            console.log("Second User's Availability:", selectedSlots);
+
+            // Find matching availability slots
+            const matchingSlots = availableSlots.filter(slot => selectedSlots.includes(slot));
+
+            if (matchingSlots.length > 0) {
+              // If matches are found, randomly select one
+              const randomSlot = matchingSlots[Math.floor(Math.random() * matchingSlots.length)];
+              showDateModal(randomSlot);
+            } else {
+              // If no matches, allow the user to select
+              populateCalendarWithRestrictedOptions(availableSlots);
+            }
+          });
       })
       .catch(err => console.error("Error fetching availability:", err));
   }
+
 
   document.querySelector('#availabilityModal .close').addEventListener('click', () => {
     document.getElementById('availabilityModal').style.display = 'none';
@@ -675,11 +706,10 @@
 
 
   document.getElementById("confirmAvailability").addEventListener("click", () => {
-
     const selectedSlots = Array.from(document.querySelectorAll(".time-slot.selected")).map(slot => {
       const day = slot.closest(".calendar-day").querySelector("strong").textContent;
       const date = new Date();
-      date.setDate(day); // Ensure this matches your desired date calculation logic
+      date.setDate(day);
       const formattedDate = date.toISOString().split("T")[0];
       return {
         date: formattedDate,
@@ -687,37 +717,56 @@
       };
     });
 
-    console.log("Selected Slots before fetch:", selectedSlots); // Debugging step
+    console.log("Selected Slots before fetch:", selectedSlots);
 
     const matchId = document.querySelector(".set-date-button").getAttribute("data-match-id");
-    userId = loggedInUserId;
 
-    if (!matchId || !userId) {
-      alert("Match ID or User ID is missing or invalid.");
+    if (!matchId) {
+      alert("Match ID is missing or invalid.");
       return;
     }
-    const payload = {
-      userId: loggedInUserId,
-      matchId: matchId,
-      availabilities: selectedSlots,
-    };
 
-    console.log("Payload being sent:", payload);
-
-    fetch("/api/save-availability", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ userId: loggedInUserId, matchId, availabilities: selectedSlots }),
-    })
+    // Fetch the first user's availability
+    fetch(`/api/get-availability/${matchId}`)
       .then(response => response.json())
-      .then(data => {
-        if (data.success) {
-          alert("Disponibilités enregistrées !");
-          document.getElementById("availabilityModal").style.display = "none";
+      .then(firstUserAvailability => {
+        const availableSlots = firstUserAvailability.map(slot => `${slot.date}-${slot.time_range}`);
+        const selectedSlotKeys = selectedSlots.map(slot => `${slot.date}-${slot.time_range}`);
+
+        // Find overlapping slots
+        const matchingSlots = availableSlots.filter(slot => selectedSlotKeys.includes(slot));
+
+        if (matchingSlots.length > 0) {
+          // Randomly pick one match
+          const randomSlot = matchingSlots[Math.floor(Math.random() * matchingSlots.length)];
+          alert(`IT'S A DATE! Selected Date: ${randomSlot}`);
+
+          // Save the availability to the database
+          const payload = {
+            userId: loggedInUserId,
+            matchId: matchId,
+            availabilities: selectedSlots,
+          };
+
+          fetch("/api/save-availability", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+          })
+            .then(response => response.json())
+            .then(data => {
+              if (data.success) {
+                console.log("Availability saved successfully!");
+              } else {
+                console.error("Error saving availability.");
+              }
+            })
+            .catch(err => console.error("Error saving availability:", err));
         } else {
-          alert("Erreur lors de l'enregistrement des disponibilités.");
+          alert("No matching slots. Please select other times.");
         }
       })
-      .catch(err => console.error("Error saving availability:", err));
+      .catch(err => console.error("Error fetching first user's availability:", err));
   });
+
 </script>
