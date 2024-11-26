@@ -1433,11 +1433,12 @@ app.post('/api/save-availability', (req, res) => {
         return res.status(400).json({ error: "Invalid data. Ensure userId, matchId, and availabilities are provided." });
     }
 
-    // Fetch the first user's availability
+
+    console.log("Validating matchId in database...");
     const queryFirstUser = `
-        SELECT date, time_range 
-        FROM availability 
-        WHERE match_id = ?;
+      SELECT date, time_range 
+      FROM availability 
+      WHERE match_id = ?;
     `;
 
     con.query(queryFirstUser, [matchId], (err, firstUserAvailabilities) => {
@@ -1448,53 +1449,72 @@ app.post('/api/save-availability', (req, res) => {
 
         console.log("First User's Available Slots:", firstUserAvailabilities);
 
-        // Create a set of the first user's availability for easy lookup
-        const validSlots = new Set(
-            firstUserAvailabilities.map(slot => `${slot.date}-${slot.time_range}`)
-        );
-
-        // Filter availabilities to keep only the overlapping slots
-        const filteredAvailabilities = availabilities.filter(slot =>
-            validSlots.has(`${slot.date}-${slot.time_range}`)
-        );
-
-        console.log("Filtered Availabilities (Overlaps Only):", filteredAvailabilities);
-
-        // If no overlaps exist, return an error
-        if (filteredAvailabilities.length === 0) {
-            console.log("No overlapping availability. Date cannot be set.");
-            return res.status(400).json({ error: "No overlapping availability. Please select matching slots." });
-        }
-
-        // Insert the overlapping slots into the database
-        const queries = filteredAvailabilities.map(slot => new Promise((resolve, reject) => {
-            const query = `
-                INSERT INTO availability (user_id, match_id, date, time_range)
-                VALUES (?, ?, ?, ?)
-                ON DUPLICATE KEY UPDATE time_range = VALUES(time_range);
+        if (firstUserAvailabilities.length === 0) {
+            const queries = availabilities.map(slot => {
+                return new Promise((resolve, reject) => {
+                    const query = `
+              INSERT INTO availability (user_id, match_id, date, time_range)
+              VALUES (?, ?, ?, ?)
+              ON DUPLICATE KEY UPDATE time_range = VALUES(time_range);
             `;
-            con.query(query, [userId, matchId, slot.date, slot.time_range], (err, results) => {
-                if (err) {
-                    console.error("Error inserting overlapping availability:", err);
-                    return reject(err);
-                }
-                resolve(results);
+                    con.query(query, [userId, matchId, slot.date, slot.time_range], (err, results) => {
+                        if (err) {
+                            console.error("Error inserting availability:", err);
+                            return reject(err);
+                        }
+                        resolve(results);
+                    });
+                });
             });
-        }));
 
-        // Save the overlapping slots and respond
-        Promise.all(queries)
-            .then(() => {
-                console.log("Overlapping slots saved successfully!");
-                res.json({ success: true, message: "It's a date!" }); // Trigger "It's a date!" for partial matches
-            })
-            .catch(err => {
-                console.error("Error saving overlapping slots:", err);
-                res.status(500).json({ error: "Database error saving availability." });
+            Promise.all(queries)
+                .then(() => res.json({ success: true }))
+                .catch(err => {
+                    console.error("Error saving availability:", err);
+                    res.status(500).json({ error: "Database error saving availability." });
+                });
+        } else {
+            const validSlots = new Set(
+                firstUserAvailabilities.map(slot => `${slot.date}-${slot.time_range}`)
+            );
+
+            const filteredAvailabilities = availabilities.filter(slot =>
+                validSlots.has(`${slot.date}-${slot.time_range}`)
+            );
+
+            console.log("Filtered Availabilities:", filteredAvailabilities);
+
+            if (filteredAvailabilities.length === 0) {
+                console.log("No valid slots selected or no overlapping availability.");
+                return res.status(400).json({ error: "No valid slots selected or no overlapping availability." });
+            }
+
+            const queries = filteredAvailabilities.map(slot => {
+                return new Promise((resolve, reject) => {
+                    const query = `
+              INSERT INTO availability (user_id, match_id, date, time_range)
+              VALUES (?, ?, ?, ?)
+              ON DUPLICATE KEY UPDATE time_range = VALUES(time_range);
+            `;
+                    con.query(query, [userId, matchId, slot.date, slot.time_range], (err, results) => {
+                        if (err) {
+                            console.error("Error inserting availability:", err);
+                            return reject(err);
+                        }
+                        resolve(results);
+                    });
+                });
             });
+
+            Promise.all(queries)
+                .then(() => res.json({ success: true }))
+                .catch(err => {
+                    console.error("Error saving availability:", err);
+                    res.status(500).json({ error: "Database error saving availability." });
+                });
+        }
     });
 });
-
 
 
 
@@ -1536,8 +1556,6 @@ app.post('/api/user/unmatch', (req, res) => {
         res.json({ success: true });
     });
 });
-
-
 
 /*
 ------------------------------------------

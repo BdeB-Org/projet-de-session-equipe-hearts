@@ -359,13 +359,15 @@
       const user = users[currentIndex];
 
       if (user) {
-        // Check if this user is in the list of matched users (exclude them)
-        if (matchedUserIds.includes(user.e_id)) {
-          return;  // Skip this card and move to the next one
-        }
+        fetch('/api/user-location')
+          .then((response) => response.json())
+          .then((data) => {
+            const closestCity = data.closestCity;
+            if (matchedUserIds.includes(user.e_id)) {
+              return;
+            }
 
-        // Continue displaying the user card if they are not matched
-        cardContainer.innerHTML = `
+            cardContainer.innerHTML = `
       <div class="card">
         <img src="/uploads/${user.e_photo}" alt="${user.e_nom}">
         <h2>${user.e_prenom}</h2>
@@ -375,7 +377,9 @@
         <button class="button pass-button"><i class="fas fa-times"></i>Passer</button>
       </div>
     `;
-        setupButtonListeners(user);
+            setupButtonListeners(user);
+          })
+          .catch((error) => console.error('Error fetching distance data:', error));
       } else {
         console.warn("No user found at current index:", currentIndex);
       }
@@ -703,19 +707,17 @@
     fetch("/api/save-availability", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
+      body: JSON.stringify({ userId: loggedInUserId, matchId, availabilities: selectedSlots }),
     })
       .then(response => response.json())
       .then(data => {
         if (data.success) {
-          alert(data.message); // "It's a date!" popup
+          alert("Disponibilités enregistrées !");
           document.getElementById("availabilityModal").style.display = "none";
         } else {
-          alert("Erreur : " + data.error); // Show error if no overlap
+          alert("Erreur lors de l'enregistrement des disponibilités.");
         }
       })
       .catch(err => console.error("Error saving availability:", err));
-
-
   });
 </script>
