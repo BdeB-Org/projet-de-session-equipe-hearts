@@ -50,7 +50,9 @@
       <% matches.forEach(function(match) { %>
         <button class="set-date-button" data-match-id="<%= match.match_id %>">Set Date</button>
         <% }); %>
-          <button class="unmatch-button"> unmatch</button>
+          <% matches.forEach(function(match) { %>
+            <button class="unmatch-button" data-unmatch-id="<%= match.match_id %>">unmatch</button>
+            <% }); %>
 
 
     </div>
@@ -71,8 +73,8 @@
   </div>
 </body>
 <script>
-  const userId = "<%= userDetails.e_id %>";
 
+  const loggedInUserId = "<%= userDetails.e_id %>";
 
   document.addEventListener("DOMContentLoaded", function () {
     let users = [];
@@ -92,8 +94,7 @@
 
     const loggedInUserId = "<%= userDetails.e_id %>"; // Fetch the logged-in user's ID
     const userSubscriptionId = "<%= userDetails.abonnement_id %>"; // Fetch the logged-in user's subscription ID
-    const matchessfasf = "<%= userDetails.e_id === matches.user_id ? matches.user_id : matches.user_id %>";
-    console.log(matchessfasf);
+
 
 
 
@@ -493,12 +494,9 @@
 
   document.querySelectorAll('.unmatch-button').forEach(button => {
     button.addEventListener('click', function () {
-      const matchedUserId = this.getAttribute('data-match-id');
+      const matchedUserId = this.getAttribute("data-unmatch-id");
+      console.error("Matched User ID is missing.");
 
-      if (!matchedUserId) {
-        console.error("Matched User ID is missing.");
-        return;
-      }
 
       // Send unmatch request to the server
       fetch('/api/user/unmatch', {
@@ -507,7 +505,7 @@
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          userId: userId,
+          userId: loggedInUserId,
           matchedUserId: matchedUserId,
         }),
       })
@@ -542,18 +540,25 @@
 
 
   function openCalendarModal(matchId) {
+    // Fetch the first user's available slots
     fetch(`/api/get-availability/${matchId}`)
       .then(response => response.json())
       .then(firstUserAvailability => {
+        // Extract the available slots (date-time pairs)
         const availableSlots = firstUserAvailability.map(
           slot => `${slot.date}-${slot.time_range}`
         );
+        console.log("Ngga", availableSlots);
 
-        populateCalendarWithRestrictedOptions(availableSlots);
+        // Check if there are any available slots
+        if (availableSlots.length > 0) {
+          populateCalendarWithRestrictedOptions(availableSlots);
+        } else {
+          populateCalendar(monthName, daysInMonth);
+        }
       })
       .catch(err => console.error("Error fetching availability:", err));
   }
-
 
   document.querySelector('#availabilityModal .close').addEventListener('click', () => {
     document.getElementById('availabilityModal').style.display = 'none';
@@ -590,37 +595,38 @@
   }
 
   function populateCalendarWithRestrictedOptions(availableSlots) {
-    const calendarGrid = document.querySelector(".calendar-grid");
-    const timeSlots = ["8h-12h", "12h-15h", "15h-18h", "18h-21h"];
-    const daysInMonth = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).getDate();
+    const timeSlots = document.querySelectorAll('.time-slot');
 
-    for (let day = 1; day <= daysInMonth; day++) {
+    timeSlots.forEach(slot => {
+      const calendarDay = slot.closest('.calendar-day');
+
+      const day = calendarDay.querySelector("strong").textContent.trim();
       const date = new Date();
       date.setDate(day);
       const formattedDate = date.toISOString().split("T")[0];
 
-      const dayElement = document.createElement("div");
-      dayElement.className = "calendar-day";
-      dayElement.innerHTML = `<strong>${day}</strong>`;
-
-      timeSlots.forEach(slot => {
-        const slotKey = `${formattedDate}-${slot}`;
-        const slotElement = document.createElement("div");
-        slotElement.className = `time-slot ${availableSlots.includes(slotKey) ? "" : "disabled"}`;
-        slotElement.textContent = slot;
-
-        if (availableSlots.includes(slotKey)) {
-          slotElement.addEventListener("click", () => {
-            slotElement.classList.toggle("selected");
-          });
-        }
-
-        dayElement.appendChild(slotElement);
+      const slotTimeRange = slot.textContent.trim();
+      const slotKey = `${formattedDate}-${slotTimeRange.replace(":", "").replace("h-", "h-")}`;
+      const normalizedAvailableSlots = availableSlots.map(slot => {
+        const formattedSlot = slot;
+        return formattedSlot;
       });
 
-      calendarGrid.appendChild(dayElement);
-    }
+      console.log(normalizedAvailableSlots);
+      console.log(slotKey);
+
+      if (!normalizedAvailableSlots.includes(slotKey)) {
+        slot.classList.add('disabled');
+        slot.disabled = false;
+      } else {
+        slot.classList.remove('disabled');
+        slot.disabled = false;
+      }
+
+    });
   }
+
+
 
 
   // Call the function when opening the modal
@@ -662,12 +668,14 @@
     console.log('Selected slots:', selectedSlots);
   }
 
+
+
   document.getElementById("confirmAvailability").addEventListener("click", () => {
-    const matchId = document.querySelector(".set-date-button").getAttribute("data-match-id");
+
     const selectedSlots = Array.from(document.querySelectorAll(".time-slot.selected")).map(slot => {
       const day = slot.closest(".calendar-day").querySelector("strong").textContent;
       const date = new Date();
-      date.setDate(day);
+      date.setDate(day); // Ensure this matches your desired date calculation logic
       const formattedDate = date.toISOString().split("T")[0];
       return {
         date: formattedDate,
@@ -675,34 +683,39 @@
       };
     });
 
-    console.log("Selected Slots:", selectedSlots);
+    console.log("Selected Slots before fetch:", selectedSlots); // Debugging step
+
+    const matchId = document.querySelector(".set-date-button").getAttribute("data-match-id");
+    userId = loggedInUserId;
+
+    if (!matchId || !userId) {
+      alert("Match ID or User ID is missing or invalid.");
+      return;
+    }
+    const payload = {
+      userId: loggedInUserId,
+      matchId: matchId,
+      availabilities: selectedSlots,
+    };
+
+    console.log("Payload being sent:", payload);
 
     fetch("/api/save-availability", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        userId: userId,
-        matchId: matchId,
-        availabilities: selectedSlots,
-      }),
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
     })
       .then(response => response.json())
       .then(data => {
         if (data.success) {
-          alert("Disponibilités enregistrées !");
+          alert(data.message); // "It's a date!" popup
           document.getElementById("availabilityModal").style.display = "none";
         } else {
-          alert("Erreur lors de l'enregistrement des disponibilités.");
+          alert("Erreur : " + data.error); // Show error if no overlap
         }
       })
-      .catch(err => {
-        console.error("Error saving availability:", err.message);
-        res.status(500).json({ error: "Database error saving availability.", details: err.message });
-      });
+      .catch(err => console.error("Error saving availability:", err));
+
+
   });
-
-
-
 </script>

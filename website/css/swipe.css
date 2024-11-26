@@ -425,3 +425,14 @@ body {
     color: white;
     font-weight: bold;
 }
+
+.time-slot.disabled {
+    background-color: #ccc;
+    pointer-events: none;
+    opacity: 0.5;
+    /* Ensure it's visually less noticeable */
+}
+
+.time-slot.disabled:hover {
+    cursor: not-allowed;
+}

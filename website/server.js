@@ -1426,80 +1426,84 @@ WHERE u.e_id != ?;
 app.post('/api/save-availability', (req, res) => {
     const { userId, matchId, availabilities } = req.body;
 
-    // Log the received data to ensure it's valid
     console.log("Received Data: userId:", userId, "matchId:", matchId, "availabilities:", availabilities);
 
-    // Check for missing or invalid data
     if (!userId || !matchId || !Array.isArray(availabilities) || availabilities.length === 0) {
+        console.log("Invalid Data:", { userId, matchId, availabilities });
         return res.status(400).json({ error: "Invalid data. Ensure userId, matchId, and availabilities are provided." });
     }
 
+    // Fetch the first user's availability
     const queryFirstUser = `
         SELECT date, time_range 
         FROM availability 
-        WHERE user_id = ?;
+        WHERE match_id = ?;
     `;
 
-    // Fetch the first user's availability
     con.query(queryFirstUser, [matchId], (err, firstUserAvailabilities) => {
         if (err) {
             console.error("Error fetching first user's availability:", err);
             return res.status(500).json({ error: "Error fetching availability" });
         }
 
-        // Log the first user's available time slots
         console.log("First User's Available Slots:", firstUserAvailabilities);
 
-        // Create a set of valid slots from first user's availability
+        // Create a set of the first user's availability for easy lookup
         const validSlots = new Set(
             firstUserAvailabilities.map(slot => `${slot.date}-${slot.time_range}`)
         );
 
-        // Filter only valid slots that are common between both users
+        // Filter availabilities to keep only the overlapping slots
         const filteredAvailabilities = availabilities.filter(slot =>
             validSlots.has(`${slot.date}-${slot.time_range}`)
         );
 
-        // Log the filtered valid availabilities
-        console.log("Filtered Availabilities:", filteredAvailabilities);
+        console.log("Filtered Availabilities (Overlaps Only):", filteredAvailabilities);
 
+        // If no overlaps exist, return an error
         if (filteredAvailabilities.length === 0) {
-            return res.status(400).json({ error: "No valid slots selected or no overlapping availability." });
+            console.log("No overlapping availability. Date cannot be set.");
+            return res.status(400).json({ error: "No overlapping availability. Please select matching slots." });
         }
 
-        // Insert the valid slots into the database
-        const queries = filteredAvailabilities.map(slot => {
-            return new Promise((resolve, reject) => {
-                const query = `
-                    INSERT INTO availability (user_id, match_id, date, time_range)
-                    VALUES (?, ?, ?, ?)
-                    ON DUPLICATE KEY UPDATE time_range = VALUES(time_range);
-                `;
-                con.query(query, [userId, matchId, slot.date, slot.time_range], (err, results) => {
-                    if (err) {
-                        console.error("Error inserting availability:", err);
-                        return reject(err);
-                    }
-                    resolve(results);
-                });
+        // Insert the overlapping slots into the database
+        const queries = filteredAvailabilities.map(slot => new Promise((resolve, reject) => {
+            const query = `
+                INSERT INTO availability (user_id, match_id, date, time_range)
+                VALUES (?, ?, ?, ?)
+                ON DUPLICATE KEY UPDATE time_range = VALUES(time_range);
+            `;
+            con.query(query, [userId, matchId, slot.date, slot.time_range], (err, results) => {
+                if (err) {
+                    console.error("Error inserting overlapping availability:", err);
+                    return reject(err);
+                }
+                resolve(results);
             });
-        });
+        }));
 
-        // Execute all queries
+        // Save the overlapping slots and respond
         Promise.all(queries)
-            .then(() => res.json({ success: true }))
+            .then(() => {
+                console.log("Overlapping slots saved successfully!");
+                res.json({ success: true, message: "It's a date!" }); // Trigger "It's a date!" for partial matches
+            })
             .catch(err => {
-                console.error("Error saving availability:", err);
+                console.error("Error saving overlapping slots:", err);
                 res.status(500).json({ error: "Database error saving availability." });
             });
     });
 });
 
 
+
+
 app.get('/api/get-availability/:matchId', (req, res) => {
     const { matchId } = req.params;
     const query = `
-        SELECT date, time_range 
+        SELECT 
+            DATE_FORMAT(date, '%Y-%m-%d') AS date, 
+            time_range 
         FROM availability 
         WHERE user_id = ?;
     `;
@@ -1508,6 +1512,7 @@ app.get('/api/get-availability/:matchId', (req, res) => {
             console.error("Error fetching availability:", err);
             return res.status(500).json({ error: "Error fetching availability" });
         }
+        console.log(results);
 
         res.json(results);
     });
