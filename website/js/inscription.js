@@ -59,7 +59,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function handleResponse() {
     const userInputValue = userInput.value.trim();
-
+    
+    if (questions[currentQuestion].id === "phone") {
+      const digitCount = userInputValue.replace(/\D/g, "").length; // Count only digits
+      if (digitCount !== 10) {
+          alert("Le numéro de téléphone doit contenir exactement 10 chiffres.");
+          return; // Stop further processing if the digit count is not 10
+      }
+  }
     // For the first question (email), check if the input is a valid email
     if (
       questions[currentQuestion].id === "email" &&
@@ -129,7 +136,16 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function showNextQuestion() {
+
+    if (currentQuestion >= questions.length) {
+      console.error("No more questions available.");
+      submitForm(); // Submit the form if all questions are answered
+      return;
+  }
+  
     const nextQuestion = questions[currentQuestion];
+
+    
 
     if (
       nextQuestion.id === "password" ||
@@ -141,7 +157,7 @@ document.addEventListener("DOMContentLoaded", () => {
       // Set input type to text and add a placeholder for phone formatting
       userInput.type = "text";
       userInput.placeholder = "XXX-XXX-XXXX";
-
+      
       // Add phone formatting logic
       userInput.addEventListener("input", formatPhoneNumber);
     } else {
@@ -455,3 +471,6 @@ document.addEventListener("DOMContentLoaded", () => {
     chatContainer.scrollTop = chatContainer.scrollHeight;
   }
 });
+function submitForm() {
+  document.getElementById("myForm").submit();
+}
