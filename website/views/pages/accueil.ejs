@@ -292,41 +292,38 @@
       const cards = document.querySelectorAll(".card");
       const modal = document.getElementById("modal");
       const modalDescription = document.getElementById("modal-description");
-
+    
+      // Ajouter un bouton pour rediriger vers la page d'inscription
+      const inscriptionButton = document.createElement("div");
+      inscriptionButton.className = "modal-close";
+      inscriptionButton.textContent = "Inscription";
+      modal.appendChild(inscriptionButton);
+    
       cards.forEach((card) => {
         card.addEventListener("click", () => {
+          // Afficher la description dans le modal
           const description = card.getAttribute("data-description");
           modalDescription.textContent = description;
-          modal.style.display = "block";
+    
+          // Ajouter le type de carte au bouton d'inscription
+          const cardType = card.getAttribute("data-card-type");
+          inscriptionButton.setAttribute(
+            "onclick",
+            `window.location.href='/event/inscription?card=${cardType}'`
+          );
+    
+          modal.style.display = "block"; // Afficher le modal
         });
       });
-
-      function closeModal() {
-        modal.style.display = "none";
-      }
-
+    
+      // Fermer le modal quand l'utilisateur clique en dehors
       window.addEventListener("click", (e) => {
         if (e.target === modal) {
-          closeModal();
+          modal.style.display = "none";
         }
       });
-
-      cards.forEach((card) => {
-        card.addEventListener("mouseover", () => {
-          cards.forEach((otherCard) => {
-            if (otherCard !== card) {
-              otherCard.classList.add("dimming");
-            }
-          });
-        });
-
-        card.addEventListener("mouseout", () => {
-          cards.forEach((otherCard) => {
-            otherCard.classList.remove("dimming");
-          });
-        });
-      });
     </script>
+    
   </body>
 </html>
 <%- include ("../partials/footer.ejs") %>
