@@ -624,11 +624,9 @@
 
 
   function openCalendarModal(matchId) {
-    // Fetch the first user's available slots
     fetch(`/api/get-availability/${matchId}`)
       .then(response => response.json())
       .then(firstUserAvailability => {
-        // Extract the available slots (date-time pairs)
         const availableSlots = firstUserAvailability.map(slot => `${slot.date}-${slot.time_range}`);
         console.log("First User's Availability:", availableSlots);
         if (availableSlots.length > 0) {
