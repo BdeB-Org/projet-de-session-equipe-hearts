@@ -62,6 +62,16 @@
         <h3 id="calendar-title">Sélectionnez vos disponibilités</h3>
         <div class="calendar-container">
           <h2 id="calendar-month">Mois : <span id="currentMonth"></span></h2>
+          <div class="calendar-header">
+            <span>Dimanche</span>
+            <span>Lundi</span>
+            <span>Mardi</span>
+            <span>Mercredi</span>
+            <span>Jeudi</span>
+            <span>Vendredi</span>
+            <span>Samedi</span>
+          </div>
+
           <div class="calendar-grid">
           </div>
         </div>
@@ -591,7 +601,6 @@
         console.log("First User's Availability:", availableSlots);
         if (availableSlots.length > 0) {
           populateCalendarWithRestrictedOptions(availableSlots);
-          // Fetch the logged-in user's selected slots
           fetch(`/api/get-availability/${loggedInUserId}`)
             .then(response => response.json())
             .then(secondUserAvailability => {
@@ -788,8 +797,6 @@
           // Randomly pick one match
           const randomSlot = matchingSlots[Math.floor(Math.random() * matchingSlots.length)];
           alert(`C'EST UNE DATE! Date choisie: ${randomSlot}`);
-
-          // Save the availability to the database
           saveAvailability(selectedSlots, matchId);
         } else {
           alert("No matching slots found with the first user's availability. Please select other times.");
@@ -808,9 +815,6 @@
       matchId: matchId,
       availabilities: selectedSlots,
     };
-
-
-    //old code
 
     fetch("/api/save-availability", {
       method: "POST",

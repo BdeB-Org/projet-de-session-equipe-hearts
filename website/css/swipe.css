@@ -336,17 +336,18 @@ body {
 }
 
 .modal-content {
-    background-color: #fefefe;
+    background-color: #1a1a1a;
+    color: #00bfff;
     margin: 10% auto;
     padding: 20px;
     border: 1px solid #888;
     width: 50%;
     border-radius: 15px;
     /*remoce cirecle*/
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1), 0 6px 20px rgba(0, 0, 0, 0.19);
-    display: flex;
+    box-shadow: 0 0 20px 10px rgba(0, 255, 255, 0.7);
     flex-direction: column;
     align-items: center;
+    transition: background-color 0.3s, transform 0.3s ease;
 }
 
 .close {
@@ -361,6 +362,34 @@ body {
     color: black;
     text-decoration: none;
     cursor: pointer;
+}
+
+.calendar-container {
+    margin-top: 80px;
+    max-width: 800px;
+    /* Adjust width for better fit */
+    margin-left: auto;
+    margin-right: auto;
+    background: rgba(0, 0, 0, 0.7);
+    /* Dark background with transparency */
+    border-radius: 15px;
+    padding: 20px;
+    box-shadow: 0 0 15px 5px rgba(0, 255, 255, 0.7);
+    /* Neon glow effect */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    /* 7 columns for each day of the week */
+    gap: 10px;
+    margin-top: 10px;
+    max-width: 100%;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .calendar-slot {
@@ -379,50 +408,60 @@ body {
     font-weight: bold;
 }
 
-.calendar-container {
-    margin-top: 20px;
-}
-
-.calendar-grid {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    gap: 10px;
-    margin-top: 10px;
-}
-
 .calendar-day {
-    background-color: rgba(255, 255, 255, 0.1);
-    border: 1px solid #00bfff;
-    border-radius: 5px;
-    padding: 10px;
+    background-color: #222;
+    border: 2px solid #00bfff;
+    border-radius: 10px;
+    padding: 15px;
     text-align: center;
     color: white;
+    font-size: 1.3em;
+    position: relative;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.calendar-day:hover {
+    transform: scale(1.1);
+    /* Hover effect for larger day boxes */
+    box-shadow: 0 0 20px 5px rgba(0, 255, 255, 0.8);
+    /* Glowing effect */
 }
 
 .calendar-day strong {
     display: block;
     margin-bottom: 5px;
-    font-size: 1.2em;
+    color: #ff007f;
+    /* Neon pink for the date number */
+    font-family: 'Orbitron', sans-serif;
+    /* Cyberpunk font */
 }
 
 .time-slot {
     margin-top: 5px;
-    padding: 5px;
+    padding: 7px;
     background-color: #333;
-    color: white;
-    border-radius: 3px;
+    color: #00bfff;
+    /* Neon cyan text */
+    border-radius: 5px;
     cursor: pointer;
     font-size: 0.9em;
+    border: 1px solid #00bfff;
+    /* Neon cyan border for time slots */
+    transition: background-color 0.3s, color 0.3s;
 }
 
 .time-slot:hover {
-    background-color: #00bfff;
+    background-color: #ff007f;
+    /* Neon pink hover effect */
     color: black;
+    /* Black text on hover for contrast */
 }
 
+
 .time-slot.selected {
-    background-color: #ff007f;
-    color: white;
+    background-color: #00bfff;
+    /* Glowing blue for selected slots */
+    color: black;
     font-weight: bold;
 }
 
@@ -430,9 +469,30 @@ body {
     background-color: #ccc;
     pointer-events: none;
     opacity: 0.5;
-    /* Ensure it's visually less noticeable */
 }
+
 
 .time-slot.disabled:hover {
     cursor: not-allowed;
+}
+
+.calendar-header {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    /* 7 columns for each day of the week */
+    color: #ff007f;
+    /* Neon pink */
+    font-size: 1.2em;
+    font-family: 'Orbitron', sans-serif;
+    text-align: center;
+    margin-bottom: 10px;
+    margin-top: 10px;
+}
+
+.calendar-header span {
+    padding: 10px;
+    background-color: #111;
+    border-radius: 5px;
+    box-shadow: 0 0 10px 3px rgba(255, 0, 127, 0.8);
+    text-transform: uppercase;
 }
