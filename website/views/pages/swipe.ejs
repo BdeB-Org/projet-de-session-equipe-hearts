@@ -63,7 +63,6 @@
         <div class="calendar-container">
           <h2 id="calendar-month">Mois : <span id="currentMonth"></span></h2>
           <div class="calendar-grid">
-            <!-- Days and Time Slots will be dynamically populated -->
           </div>
         </div>
         <button id="confirmAvailability">Confirmer</button>
@@ -72,7 +71,7 @@
     <!-- Modal for IT'S A DATE! -->
     <div id="dateModal" class="modal">
       <div class="modal-content">
-        <span class="close">&times;</span>
+        <span class="closeDate">&times;</span>
         <h2>IT'S A DATE!</h2>
         <p id="dateDetails"></p>
       </div>
@@ -553,6 +552,7 @@
   function showDateModal(date) {
     const dateModal = document.getElementById("dateModal");
     const dateDetails = document.getElementById("dateDetails");
+    const closeButton = document.querySelector(".closeDate");
 
     // Randomize location from your list
     const locations = [
@@ -561,14 +561,9 @@
       { name: 'Osteria MKT', link: 'https://www.google.com/maps/dir//Osteria+mkt,+1333+Blvd+Robert-Bourassa,+Montr%C3%A9al,+QC+H3A+1T9/@45.5038139,-73.6119378,13z/data=!3m2!4b1!5s0x4cc91a8712eb28bb:0x1e98129d4f02a5d7!4m8!4m7!1m0!1m5!1m1!1s0x4cc91a4132d9ae27:0x24e2a4fb903d30cf!2m2!1d-73.5707385!2d45.5038213?entry=ttu&g_ep=EgoyMDI0MTEyNC4xIKXMDSoJLDEwMjExMjMzSAFQAw%3D%3D' },
       { name: 'Maison Boulud', link: 'https://www.google.com/maps/dir//Maison+Boulud,+1228+Sherbrooke+St+W,+Montreal,+Quebec+H3G+1H6/@45.5000158,-73.6192413,13z/data=!3m2!4b1!5s0x4cc91a8712eb28bb:0x1e98129d4f02a5d7!4m8!4m7!1m0!1m5!1m1!1s0x4cc91a40f7f00c21:0xa794e5eccda3549d!2m2!1d-73.5780819!2d45.5000408?entry=ttu&g_ep=EgoyMDI0MTEyNC4xIKXMDSoJLDEwMjExMjMzSAFQAw%3D%3D' },
       { name: 'Yoko Luna', link: 'https://www.google.com/maps/dir//Yoko+Luna,+Rue+de+la+Montagne,+Montreal,+QC/@45.4974326,-73.6159125,13z/data=!3m2!4b1!5s0x4cc91a8712eb28bb:0x1e98129d4f02a5d7!4m8!4m7!1m0!1m5!1m1!1s0x4cc91b079d498a2f:0x6fcc0e3f80ab23be!2m2!1d-73.5746853!2d45.4974686?entry=ttu&g_ep=EgoyMDI0MTEyNC4xIKXMDSoJLDEwMjExMjMzSAFQAw%3D%3D' },
-
-      // Add more locations as needed
     ];
 
-    // Select a random location
     const randomLocation = locations[Math.floor(Math.random() * locations.length)];
-
-    // Display the date and the randomized location with a link
     dateDetails.innerHTML = `
         Votre rendez-vous est prévu pour: ${date} <br>
         Location: <a href="${randomLocation.link}" target="_blank">${randomLocation.name}</a>
@@ -576,10 +571,13 @@
 
     dateModal.style.display = "block";
 
-    // Close the modal
-    document.querySelector(".close").onclick = () => {
-      dateModal.style.display = "none";
-    };
+    if (dateModal && closeButton) {
+      closeButton.onclick = () => {
+        dateModal.style.display = "none";
+      };
+    } else {
+      console.error("Modal or close button not found");
+    }
   }
 
 
@@ -607,6 +605,7 @@
                 // If matches are found, randomly select one
                 const randomSlot = matchingSlots[Math.floor(Math.random() * matchingSlots.length)];
                 showDateModal(randomSlot);
+                closeModalCalendar();
               } else {
                 // If no matches, allow the user to select
                 populateCalendarWithRestrictedOptions(availableSlots);
@@ -619,7 +618,12 @@
       })
       .catch(err => console.error("Error fetching availability:", err));
   }
-
+  function closeModalCalendar() {
+    const availabilityModal = document.getElementById("availabilityModal");
+    if (availabilityModal) {
+      availabilityModal.style.display = "none"; // Close the modal
+    }
+  }
 
   document.querySelector('#availabilityModal .close').addEventListener('click', () => {
     document.getElementById('availabilityModal').style.display = 'none';
