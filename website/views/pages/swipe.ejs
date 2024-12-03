@@ -514,11 +514,38 @@
     })
     .catch((error) => console.error("Error fetching matches:", error));
 
+  function removeMatchedUserFromList(matchedUserId) {
+    // Remove the matched user from the `users` array
+    users = users.filter(user => user.e_id !== matchedUserId);
+
+    // Update the matches list in the UI (remove the matched user from the DOM)
+    const matchesList = document.querySelector(".matches");
+    const matchElement = Array.from(matchesList.children).find(child => {
+      return child.querySelector("a").href.includes(matchedUserId);
+    });
+
+    if (matchElement) {
+      matchesList.removeChild(matchElement);  // Remove the matched user from the UI
+    }
+
+    // Ensure swipe position is updated after unmatching
+    returnToSwipePosition();
+  }
+
+  function returnToSwipePosition() {
+    if (users.length > 0) {
+      currentIndex = currentIndex >= users.length ? users.length - 1 : currentIndex;
+      updateUserCard();  // Update the user card to show the next user
+    } else {
+      cardContainer.innerHTML = "<p>No users left to swipe.</p>";
+    }
+  }
+
+
   document.querySelectorAll('.unmatch-button').forEach(button => {
     button.addEventListener('click', function () {
       const matchedUserId = this.getAttribute("data-unmatch-id");
-      console.error("Matched User ID is missing.");
-
+      console.log("Matched User ID to unmatch:", matchedUserId);
 
       // Send unmatch request to the server
       fetch('/api/user/unmatch', {
@@ -534,16 +561,21 @@
         .then(response => response.json())
         .then(data => {
           if (data.success) {
-            // Ensure the element is correctly targeted and removed
-            const matchItem = this.closest('li');
-            if (matchItem) {
-              matchItem.remove(); // Remove the match from the DOM
-            }
+            console.log("User unmatched successfully");
+            removeMatchedUserFromList(matchedUserId);  // Remove the user from the list and the UI
+          } else {
+            console.error('Unmatch request failed:', data.message);
           }
         })
         .catch(err => console.error('Error unmatching user:', err));
     });
   });
+
+
+
+
+
+
 
 
 

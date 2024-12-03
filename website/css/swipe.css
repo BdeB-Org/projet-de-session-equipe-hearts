@@ -94,24 +94,28 @@ body {
     border-radius: 10px;
 }
 
-.button {
-    background-color: #00bfff;
-    color: white;
-    border: none;
-    padding: 10px;
-    border-radius: 5px;
+button {
+    background-color: transparent;
+    border: 2px solid #00ffff;
+    color: #00ffff;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 16px;
+    padding: 10px 20px;
+    margin: 10px;
+    border-radius: 8px;
+    text-transform: uppercase;
     cursor: pointer;
-    transition: background-color 0.3s, transform 0.3s;
-    margin-top: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 5px;
+    transition: all 0.3s ease;
 }
 
-.button:hover {
-    background-color: #007bbf;
-    transform: translateY(-3px);
+button:hover {
+    background-color: #00ffff;
+    color: #111;
+    transform: scale(1.1);
+}
+
+button:active {
+    transform: scale(0.95);
 }
 
 .sidebar {
@@ -495,4 +499,46 @@ body {
     border-radius: 5px;
     box-shadow: 0 0 10px 3px rgba(255, 0, 127, 0.8);
     text-transform: uppercase;
+}
+
+#confirmAvailability {
+    background-color: #00ff00;
+    color: #111;
+    border: none;
+}
+
+#confirmAvailability:hover {
+    background-color: #00cc00;
+}
+
+#confirmAvailability:active {
+    background-color: #009900;
+}
+
+
+.set-date-button:hover {
+    background-color: #ff00ff;
+    color: #111;
+}
+
+.set-date-button:active {
+    background-color: #cc00cc;
+    transform: scale(0.95);
+}
+
+/* Unmatch button specific styles */
+.unmatch-button {
+    background-color: transparent;
+    border-color: #ff3333;
+    color: #ff3333;
+}
+
+.unmatch-button:hover {
+    background-color: #ff3333;
+    color: #111;
+}
+
+.unmatch-button:active {
+    background-color: #cc0000;
+    transform: scale(0.95);
 }

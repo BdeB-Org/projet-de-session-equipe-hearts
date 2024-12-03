@@ -1547,15 +1547,27 @@ app.post('/api/user/unmatch', (req, res) => {
          OR (user1_id = ? AND user2_id = ?);
     `;
 
+    console.log("yes it entered the fetch");
+
     con.query(unmatchQuery, [userId, matchedUserId, matchedUserId, userId], (err, result) => {
         if (err) {
             console.error('Error unmatching user:', err);
             return res.status(500).json({ error: 'Database error during unmatch' });
         }
 
-        res.json({ success: true });
+        // Fetch updated matches list
+        con.query('SELECT * FROM matches WHERE user1_id = ? OR user2_id = ?', [userId, userId], (err, matches) => {
+            if (err) {
+                console.error('Error fetching updated matches:', err);
+                return res.status(500).json({ error: 'Error fetching updated matches' });
+            }
+
+            // Return updated matches
+            res.json({ success: true, matches: matches });
+        });
     });
 });
+
 
 /*
 ------------------------------------------
