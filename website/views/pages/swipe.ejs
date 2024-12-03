@@ -553,7 +553,27 @@
   function showDateModal(date) {
     const dateModal = document.getElementById("dateModal");
     const dateDetails = document.getElementById("dateDetails");
-    dateDetails.textContent = `Your date is scheduled for: ${date}`;
+
+    // Randomize location from your list
+    const locations = [
+      { name: 'Milky Way Cocktail Bar', link: 'https://www.google.com/maps/dir//1886+Centre+St,+Montreal,+Quebec+H3K+1H9/@45.4825594,-73.6447206,12z/data=!4m8!4m7!1m0!1m5!1m1!1s0x4cc91bc92a34ad4b:0x78ade8e46f3575a1!2m2!1d-73.56232!2d45.482589?entry=ttu&g_ep=EgoyMDI0MTEyNC4xIKXMDSoJLDEwMjExMjMzSAFQAw%3D%3D' },
+      { name: 'Gokudo', link: 'https://www.google.com/maps/dir//Gokudo,+Rue+Cathcart,+Montreal,+QC/@45.4825594,-73.6447206,12z/data=!3m1!5s0x4cc91a8712eb28bb:0x1e98129d4f02a5d7!4m8!4m7!1m0!1m5!1m1!1s0x4cc91a44fec9cd2d:0xc910756c14cef92!2m2!1d-73.5685682!2d45.5031259?entry=ttu&g_ep=EgoyMDI0MTEyNC4xIKXMDSoJLDEwMjExMjMzSAFQAw%3D%3D' },
+      { name: 'Osteria MKT', link: 'https://www.google.com/maps/dir//Osteria+mkt,+1333+Blvd+Robert-Bourassa,+Montr%C3%A9al,+QC+H3A+1T9/@45.5038139,-73.6119378,13z/data=!3m2!4b1!5s0x4cc91a8712eb28bb:0x1e98129d4f02a5d7!4m8!4m7!1m0!1m5!1m1!1s0x4cc91a4132d9ae27:0x24e2a4fb903d30cf!2m2!1d-73.5707385!2d45.5038213?entry=ttu&g_ep=EgoyMDI0MTEyNC4xIKXMDSoJLDEwMjExMjMzSAFQAw%3D%3D' },
+      { name: 'Maison Boulud', link: 'https://www.google.com/maps/dir//Maison+Boulud,+1228+Sherbrooke+St+W,+Montreal,+Quebec+H3G+1H6/@45.5000158,-73.6192413,13z/data=!3m2!4b1!5s0x4cc91a8712eb28bb:0x1e98129d4f02a5d7!4m8!4m7!1m0!1m5!1m1!1s0x4cc91a40f7f00c21:0xa794e5eccda3549d!2m2!1d-73.5780819!2d45.5000408?entry=ttu&g_ep=EgoyMDI0MTEyNC4xIKXMDSoJLDEwMjExMjMzSAFQAw%3D%3D' },
+      { name: 'Yoko Luna', link: 'https://www.google.com/maps/dir//Yoko+Luna,+Rue+de+la+Montagne,+Montreal,+QC/@45.4974326,-73.6159125,13z/data=!3m2!4b1!5s0x4cc91a8712eb28bb:0x1e98129d4f02a5d7!4m8!4m7!1m0!1m5!1m1!1s0x4cc91b079d498a2f:0x6fcc0e3f80ab23be!2m2!1d-73.5746853!2d45.4974686?entry=ttu&g_ep=EgoyMDI0MTEyNC4xIKXMDSoJLDEwMjExMjMzSAFQAw%3D%3D' },
+
+      // Add more locations as needed
+    ];
+
+    // Select a random location
+    const randomLocation = locations[Math.floor(Math.random() * locations.length)];
+
+    // Display the date and the randomized location with a link
+    dateDetails.innerHTML = `
+        Votre rendez-vous est prévu pour: ${date} <br>
+        Location: <a href="${randomLocation.link}" target="_blank">${randomLocation.name}</a>
+    `;
+
     dateModal.style.display = "block";
 
     // Close the modal
@@ -561,6 +581,7 @@
       dateModal.style.display = "none";
     };
   }
+
 
   function openCalendarModal(matchId) {
     // Fetch the first user's available slots
@@ -570,26 +591,31 @@
         // Extract the available slots (date-time pairs)
         const availableSlots = firstUserAvailability.map(slot => `${slot.date}-${slot.time_range}`);
         console.log("First User's Availability:", availableSlots);
+        if (availableSlots.length > 0) {
+          populateCalendarWithRestrictedOptions(availableSlots);
+          // Fetch the logged-in user's selected slots
+          fetch(`/api/get-availability/${loggedInUserId}`)
+            .then(response => response.json())
+            .then(secondUserAvailability => {
+              const selectedSlots = secondUserAvailability.map(slot => `${slot.date}-${slot.time_range}`);
+              console.log("Second User's Availability:", selectedSlots);
 
-        // Fetch the logged-in user's selected slots
-        fetch(`/api/get-availability/${loggedInUserId}`)
-          .then(response => response.json())
-          .then(secondUserAvailability => {
-            const selectedSlots = secondUserAvailability.map(slot => `${slot.date}-${slot.time_range}`);
-            console.log("Second User's Availability:", selectedSlots);
-
-            // Find matching availability slots
-            const matchingSlots = availableSlots.filter(slot => selectedSlots.includes(slot));
-
-            if (matchingSlots.length > 0) {
-              // If matches are found, randomly select one
-              const randomSlot = matchingSlots[Math.floor(Math.random() * matchingSlots.length)];
-              showDateModal(randomSlot);
-            } else {
-              // If no matches, allow the user to select
-              populateCalendarWithRestrictedOptions(availableSlots);
-            }
-          });
+              // Find matching availability slots
+              const matchingSlots = availableSlots.filter(slot => selectedSlots.includes(slot));
+              console.log(matchingSlots);
+              if (matchingSlots.length > 0) {
+                // If matches are found, randomly select one
+                const randomSlot = matchingSlots[Math.floor(Math.random() * matchingSlots.length)];
+                showDateModal(randomSlot);
+              } else {
+                // If no matches, allow the user to select
+                populateCalendarWithRestrictedOptions(availableSlots);
+              }
+            });
+        }
+        else {
+          populateCalendar(monthName, daysInMonth);
+        }
       })
       .catch(err => console.error("Error fetching availability:", err));
   }
@@ -717,15 +743,26 @@
       };
     });
 
-    console.log("Selected Slots before fetch:", selectedSlots);
-
+    console.log("Selected Slots before fetch:", selectedSlots); // Debugging step
     const matchId = document.querySelector(".set-date-button").getAttribute("data-match-id");
-
+    userId = loggedInUserId;
     if (!matchId) {
       alert("Match ID is missing or invalid.");
       return;
     }
 
+    if (selectedSlots.length === 0) {
+      alert("No slots selected. Please select at least one time slot.");
+      return;
+    }
+    const payload = {
+      userId: loggedInUserId,
+      matchId: matchId,
+      availabilities: selectedSlots,
+    };
+    console.log("Payload being sent:", payload);
+
+    //New Code
     // Fetch the first user's availability
     fetch(`/api/get-availability/${matchId}`)
       .then(response => response.json())
@@ -733,40 +770,65 @@
         const availableSlots = firstUserAvailability.map(slot => `${slot.date}-${slot.time_range}`);
         const selectedSlotKeys = selectedSlots.map(slot => `${slot.date}-${slot.time_range}`);
 
+        if (availableSlots.length === 0) {
+          // If no availability found for the first user, skip matching and proceed with saving selected slots
+          alert("No availability found for the first user. Proceeding to save your selected slots.");
+          saveAvailability(selectedSlots, matchId);
+          return;
+        }
+
         // Find overlapping slots
         const matchingSlots = availableSlots.filter(slot => selectedSlotKeys.includes(slot));
 
         if (matchingSlots.length > 0) {
           // Randomly pick one match
           const randomSlot = matchingSlots[Math.floor(Math.random() * matchingSlots.length)];
-          alert(`IT'S A DATE! Selected Date: ${randomSlot}`);
+          alert(`C'EST UNE DATE! Date choisie: ${randomSlot}`);
 
           // Save the availability to the database
-          const payload = {
-            userId: loggedInUserId,
-            matchId: matchId,
-            availabilities: selectedSlots,
-          };
-
-          fetch("/api/save-availability", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(payload),
-          })
-            .then(response => response.json())
-            .then(data => {
-              if (data.success) {
-                console.log("Availability saved successfully!");
-              } else {
-                console.error("Error saving availability.");
-              }
-            })
-            .catch(err => console.error("Error saving availability:", err));
+          saveAvailability(selectedSlots, matchId);
         } else {
-          alert("No matching slots. Please select other times.");
+          alert("No matching slots found with the first user's availability. Please select other times.");
+          return
         }
       })
-      .catch(err => console.error("Error fetching first user's availability:", err));
+      .catch(err => {
+        console.error("Error fetching first user's availability:", err);
+        alert("An error occurred while fetching availability.");
+      });
   });
+
+  function saveAvailability(selectedSlots, matchId) {
+    const payload = {
+      userId: loggedInUserId,
+      matchId: matchId,
+      availabilities: selectedSlots,
+    };
+
+
+    //old code
+
+    fetch("/api/save-availability", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          console.log("Availability saved successfully!");
+          alert("Your availability has been saved successfully!");
+        } else {
+          console.error("Error saving availability.");
+          alert("Error saving availability. Please try again.");
+        }
+      })
+      .catch(err => {
+        console.error("Error saving availability:", err);
+        alert("An error occurred while saving availability.");
+      });
+  }
+
+
 
 </script>
