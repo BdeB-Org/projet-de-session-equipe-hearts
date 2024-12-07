@@ -1931,59 +1931,91 @@ app.post('/event/change-password', async (req, res) => {
 -----------------------------
 */
 
-
-
 app.post('/event/delete-account', (req, res) => {
-    const userId = req.session.user ? req.session.user.e_id : null; // Ensure session exists
+    const userId = req.session.user ? req.session.user.e_id : null;
 
     if (!userId) {
         return res.status(400).send('Utilisateur non connecté.');
     }
 
-    // Delete likes where the user is either the liker or the liked
+    // Step-by-step deletion queries to remove related data
+    const deleteAvailabilityByMatchQuery = 'DELETE FROM availability WHERE match_id IN (SELECT e_id FROM e_utilisateur WHERE e_id = ?)';
+    const deleteAvailabilityByUserQuery = 'DELETE FROM availability WHERE user_id = ?';
+    const deleteDateInfoQuery = 'DELETE FROM date_info WHERE match_id IN (SELECT match_id FROM matches WHERE user1_id = ? OR user2_id = ?)';
     const deleteLikesQuery = 'DELETE FROM likes WHERE liker_id = ? OR liked_id = ?';
-    con.query(deleteLikesQuery, [userId, userId], (err) => {
+    const deleteMatchesQuery = 'DELETE FROM matches WHERE user1_id = ? OR user2_id = ?';
+    const deletePreferencesQuery = 'DELETE FROM preference WHERE utilisateur_id = ?';
+    const deletePhotosQuery = 'DELETE FROM e_photo WHERE utilisateur_id = ?';
+    const deleteUserQuery = 'DELETE FROM e_utilisateur WHERE e_id = ?';
+
+    // Execute queries sequentially to avoid dependency issues
+    con.query(deleteAvailabilityByMatchQuery, [userId], (err) => {
         if (err) {
-            console.error('Error deleting likes:', err);
-            return res.status(500).send('Erreur lors de la suppression des likes.');
+            console.error('Error deleting availability by match:', err);
+            return res.status(500).send('Erreur lors de la suppression de la disponibilité par match.');
         }
 
-        // Delete matches where the user is either user1 or user2
-        const deleteMatchesQuery = 'DELETE FROM matches WHERE user1_id = ? OR user2_id = ?';
-        con.query(deleteMatchesQuery, [userId, userId], (err) => {
+        con.query(deleteAvailabilityByUserQuery, [userId], (err) => {
             if (err) {
-                console.error('Error deleting matches:', err);
-                return res.status(500).send('Erreur lors de la suppression des matches.');
+                console.error('Error deleting availability by user:', err);
+                return res.status(500).send('Erreur lors de la suppression de la disponibilité par utilisateur.');
             }
 
-            // Delete preferences
-            const deletePreferencesQuery = 'DELETE FROM preference WHERE utilisateur_id = ?';
-            con.query(deletePreferencesQuery, [userId], (err) => {
+            con.query(deleteDateInfoQuery, [userId, userId], (err) => {
                 if (err) {
-                    console.error('Error deleting user preferences:', err);
-                    return res.status(500).send('Erreur lors de la suppression des préférences de l\'utilisateur.');
+                    console.error('Error deleting date info:', err);
+                    return res.status(500).send('Erreur lors de la suppression des informations de rendez-vous.');
                 }
 
-                // Now delete the user
-                const deleteUserQuery = 'DELETE FROM e_utilisateur WHERE e_id = ?';
-                con.query(deleteUserQuery, [userId], (err) => {
+                con.query(deleteLikesQuery, [userId, userId], (err) => {
                     if (err) {
-                        console.error('Error deleting user:', err);
-                        return res.status(500).send('Erreur lors de la suppression de l\'utilisateur.');
+                        console.error('Error deleting likes:', err);
+                        return res.status(500).send('Erreur lors de la suppression des likes.');
                     }
 
-                    req.session.destroy((err) => {
+                    con.query(deleteMatchesQuery, [userId, userId], (err) => {
                         if (err) {
-                            console.error('Error during logout:', err);
-                            return res.status(500).send('Erreur lors de la déconnexion.');
+                            console.error('Error deleting matches:', err);
+                            return res.status(500).send('Erreur lors de la suppression des correspondances.');
                         }
-                        res.redirect('/');
+
+                        con.query(deletePreferencesQuery, [userId], (err) => {
+                            if (err) {
+                                console.error('Error deleting preferences:', err);
+                                return res.status(500).send('Erreur lors de la suppression des préférences.');
+                            }
+
+                            con.query(deletePhotosQuery, [userId], (err) => {
+                                if (err) {
+                                    console.error('Error deleting photos:', err);
+                                    return res.status(500).send('Erreur lors de la suppression des photos.');
+                                }
+
+                                // Finally, delete the user
+                                con.query(deleteUserQuery, [userId], (err) => {
+                                    if (err) {
+                                        console.error('Error deleting user:', err);
+                                        return res.status(500).send('Erreur lors de la suppression de l\'utilisateur.');
+                                    }
+
+                                    req.session.destroy((err) => {
+                                        if (err) {
+                                            console.error('Error during session destruction:', err);
+                                            return res.status(500).send('Erreur lors de la déconnexion.');
+                                        }
+
+                                        res.redirect('/'); // Redirect to homepage after successful deletion
+                                    });
+                                });
+                            });
+                        });
                     });
                 });
             });
         });
     });
 });
+
 
 
 /*
