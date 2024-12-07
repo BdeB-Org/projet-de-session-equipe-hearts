@@ -56,17 +56,26 @@ document.addEventListener("DOMContentLoaded", () => {
     currentQuestion++;
     showNextQuestion();
   });
+  window.saveResponse = function (fieldId, response) {
+    const field = document.getElementById(fieldId);
+    if (field) {
+      field.value = response; // Update the value of the hidden input field
+      console.log(`Saved response: ${response} to field: ${fieldId}`);
+    } else {
+      console.error(`Field with id "${fieldId}" not found.`);
+    }
+  };
 
   function handleResponse() {
     const userInputValue = userInput.value.trim();
-    
+
     if (questions[currentQuestion].id === "phone") {
       const digitCount = userInputValue.replace(/\D/g, "").length; // Count only digits
       if (digitCount !== 10) {
-          alert("Le numéro de téléphone doit contenir exactement 10 chiffres.");
-          return; // Stop further processing if the digit count is not 10
+        alert("Le numéro de téléphone doit contenir exactement 10 chiffres.");
+        return; // Stop further processing if the digit count is not 10
       }
-  }
+    }
     // For the first question (email), check if the input is a valid email
     if (
       questions[currentQuestion].id === "email" &&
@@ -94,7 +103,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     if (!userInputValue) return;
-
+    const fieldId = questions[currentQuestion].id;
     // Display asterisks instead of the actual password in chat
     const displayValue =
       questions[currentQuestion].id === "password" ||
@@ -102,8 +111,8 @@ document.addEventListener("DOMContentLoaded", () => {
         ? "*".repeat(userInputValue.length)
         : userInputValue;
 
-    showUserResponse(displayValue); // Show hidden password as asterisks
-    saveResponse(questions[currentQuestion].id, userInputValue);
+    showUserResponse(userInputValue, fieldId); // Show hidden password as asterisks
+    saveResponse(fieldId, userInputValue);
 
     userInput.value = ""; // Clear the input field
 
@@ -136,16 +145,13 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function showNextQuestion() {
-
     if (currentQuestion >= questions.length) {
       console.error("No more questions available.");
       submitForm(); // Submit the form if all questions are answered
       return;
-  }
-  
-    const nextQuestion = questions[currentQuestion];
+    }
 
-    
+    const nextQuestion = questions[currentQuestion];
 
     if (
       nextQuestion.id === "password" ||
@@ -157,7 +163,7 @@ document.addEventListener("DOMContentLoaded", () => {
       // Set input type to text and add a placeholder for phone formatting
       userInput.type = "text";
       userInput.placeholder = "XXX-XXX-XXXX";
-      
+
       // Add phone formatting logic
       userInput.addEventListener("input", formatPhoneNumber);
     } else {
@@ -439,10 +445,17 @@ document.addEventListener("DOMContentLoaded", () => {
     messageDiv.className = "message user-message";
 
     // Add user response with a pencil icon for editing
-    messageDiv.innerHTML = `
-            <span>${response}</span>
-            <i class="fa-solid fa-pencil edit-icon" data-field-id="${fieldId}" style="cursor: pointer; margin-left: 10px;"></i>
-        `;
+    if (fieldId !== "verify-password") {
+      messageDiv.innerHTML = `
+        <span>${response}</span>
+        <i class="fa-solid fa-pencil edit-icon" data-field-id="${fieldId}" style="cursor: pointer; margin-left: 10px;"></i>
+      `;
+    } else {
+      // Only display the response for "verify-password" without the pencil icon
+      messageDiv.innerHTML = `
+        <span>${response}</span>
+      `;
+    }
 
     const chatContainer = document.querySelector(".chat-container");
     const inputContainer = document.querySelector(".input-container");
@@ -452,13 +465,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Add event listener to the pencil icon to enable editing
     const editIcon = messageDiv.querySelector(".edit-icon");
-    editIcon.addEventListener("click", () => editResponse(fieldId, response));
-  }
-
-  function saveResponse(fieldId, response) {
-    const field = document.getElementById(fieldId);
-    if (field) {
-      field.value = response;
+    if (editIcon) {
+      editIcon.addEventListener("click", () => {
+        editResponse(fieldId, response);
+      });
     }
   }
 
@@ -471,6 +481,157 @@ document.addEventListener("DOMContentLoaded", () => {
     chatContainer.scrollTop = chatContainer.scrollHeight;
   }
 });
-function submitForm() {
-  document.getElementById("myForm").submit();
+
+function editResponse(fieldId, oldResponse) {
+  console.log(`Editing field: ${fieldId} with value: ${oldResponse}`); // Debug log
+  if (isEditing) return; // Prevent multiple edits simultaneously
+  isEditing = true;
+
+  // Find the message to edit
+  const chatContainer = document.querySelector(".chat-container");
+  const messages = Array.from(chatContainer.querySelectorAll(".user-message"));
+  const messageToEdit = messages.find((message) => {
+    const icon = message.querySelector(".edit-icon");
+    return icon && icon.getAttribute("data-field-id") === fieldId;
+  });
+
+  if (!messageToEdit) {
+    isEditing = false;
+    return; // Exit if the message is not found
+  }
+
+  // Save the original content for cancellation
+  const originalContent = messageToEdit.innerHTML;
+
+  // For password fields, display both password and verification inputs
+  if (fieldId === "password") {
+    messageToEdit.innerHTML = `
+      <input
+        type="password"
+        id="new-password"
+        placeholder="Nouveau mdp"
+        class="edit-input"
+        style="margin-right: 10px; padding: 5px; border: 1px solid #555; border-radius: 5px; width: 30%;"
+      />
+      <input
+        type="password"
+        id="verify-new-password"
+        placeholder="Vérification mdp"
+        class="edit-input"
+        style="margin-right: 10px; padding: 5px; border: 1px solid #555; border-radius: 5px; width: 30%;"
+      />
+      <button class="save-edit-button" style="padding: 5px 10px; background: #00ffcc; color: #000; border: none; border-radius: 5px; cursor: pointer;">Confirm</button>
+      <button class="cancel-edit-button" style="padding: 5px 10px; background: #ff007f; color: #fff; border: none; border-radius: 5px; cursor: pointer; margin-left: 5px;">Cancel</button>
+    `;
+  } else {
+    // For other fields
+    messageToEdit.innerHTML = `
+      <input
+        type="text"
+        id="edit-${fieldId}"
+        value="${oldResponse}"
+        class="edit-input"
+        style="margin-right: 10px; padding: 5px; border: 1px solid #555; border-radius: 5px; width: 70%;"
+      />
+      <button class="save-edit-button" style="padding: 5px 10px; background: #00ffcc; color: #000; border: none; border-radius: 5px; cursor: pointer;">Confirm</button>
+      <button class="cancel-edit-button" style="padding: 5px 10px; background: #ff007f; color: #fff; border: none; border-radius: 5px; cursor: pointer; margin-left: 5px;">Cancel</button>
+    `;
+  }
+
+  // Disable the "Next" button while editing
+  const sendButton = document.querySelector(".send-button");
+  if (sendButton) sendButton.disabled = true;
+
+  const saveButton = messageToEdit.querySelector(".save-edit-button");
+  const cancelButton = messageToEdit.querySelector(".cancel-edit-button");
+
+  // Save button click event
+  saveButton.addEventListener("click", () => {
+    if (fieldId === "password") {
+      const newPassword = document.getElementById("new-password").value.trim();
+      const verifyPassword = document
+        .getElementById("verify-new-password")
+        .value.trim();
+
+      // Check if the passwords match
+      if (newPassword !== verifyPassword) {
+        alert("Les mots de passe ne correspondent pas. Veuillez réessayer.");
+        return; // Stop if passwords don't match
+      }
+
+      // Optional: Check password strength
+      if (newPassword.length < 6) {
+        alert("Le mot de passe doit contenir au moins 6 caractères.");
+        return;
+      }
+
+      // Save the new password
+      saveResponse(fieldId, newPassword);
+
+      // Automatically update the hidden "verify-password" field to match
+      saveResponse("verify-password", newPassword);
+
+      // Update the "verify-password" UI message dynamically
+      const verifyPasswordMessage = Array.from(
+        document.querySelectorAll(".user-message")
+      ).find((message) => {
+        const icon = message.querySelector(".edit-icon");
+        return icon && icon.getAttribute("data-field-id") === "verify-password";
+      });
+
+      if (verifyPasswordMessage) {
+        const spanElement = verifyPasswordMessage.querySelector("span");
+        if (spanElement) {
+          spanElement.textContent = "*".repeat(newPassword.length); // Update the displayed password as asterisks
+        }
+      }
+
+      // Replace the input with the updated response and add the pencil icon
+      messageToEdit.innerHTML = `
+        <span>${"*".repeat(newPassword.length)}</span>
+        <i class="fa-solid fa-pencil edit-icon" data-field-id="${fieldId}" style="cursor: pointer; margin-left: 10px;"></i>
+      `;
+
+      // Add the click event to the new pencil icon
+      const newEditIcon = messageToEdit.querySelector(".edit-icon");
+      newEditIcon.addEventListener("click", () =>
+        editResponse(fieldId, newPassword)
+      );
+
+      // Re-enable the "Next" button
+      if (sendButton) sendButton.disabled = false;
+
+      isEditing = false;
+    } else {
+      const newValue = document.getElementById(`edit-${fieldId}`).value.trim();
+      if (!newValue) {
+        alert("The response cannot be empty.");
+        return;
+      }
+
+      // Save the new response for other fields
+      saveResponse(fieldId, newValue);
+
+      messageToEdit.innerHTML = `
+        <span>${newValue}</span>
+        <i class="fa-solid fa-pencil edit-icon" data-field-id="${fieldId}" style="cursor: pointer; margin-left: 10px;"></i>
+      `;
+
+      const newEditIcon = messageToEdit.querySelector(".edit-icon");
+      newEditIcon.addEventListener("click", () =>
+        editResponse(fieldId, newValue)
+      );
+
+      if (sendButton) sendButton.disabled = false;
+
+      isEditing = false;
+    }
+  });
+
+  // Email validation function
+  function isValidEmail(email) {
+    // Simple email regex pattern for validation
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailPattern.test(email);
+  }
 }
