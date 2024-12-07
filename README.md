@@ -12,6 +12,7 @@
 # Packages (Terminal VS)
 
 npm install multer dotenv square nodemailer googleapis node-cron crypto-js passport-facebook passport-twitter passport-apple passport passport-google-oauth20 express-session axios
+npm install jest supertest pg --save-dev
 
 # Base de données
 
