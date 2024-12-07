@@ -350,7 +350,6 @@
     function nextUser() {
       const cardElement = document.querySelector(".card");
 
-      // Check if swipe limit reached
       if (swipeCount >= maxSwipes) {
         alert("Limit de swipe atteint. Revenez demain!");
         showCountdown();
@@ -358,10 +357,8 @@
         return;
       }
 
-      // Increment the current index
       currentIndex = (currentIndex + 1) % users.length;
 
-      // If there are no users left, show a "No more users" message
       if (currentIndex === 0 && users.every((user) => user.swiped)) {
         swipesLeftElement.textContent = maxSwipes - swipeCount;
         cardContainer.innerHTML = "<p>Plus de user. C chien be better.</p>";
@@ -572,12 +569,12 @@
   });
 
 
-
-
-
-
-
-
+  document.querySelectorAll('.set-date-button').forEach(button => {
+    button.addEventListener('click', function () {
+        const matchId = this.getAttribute('data-match-id');
+        fetchAndShowDate(matchId);
+    });
+});
 
   document.querySelectorAll('.set-date-button').forEach(button => {
     button.addEventListener('click', function () {
@@ -591,36 +588,80 @@
     });
   });
 
-  function showDateModal(date) {
+  function showDateModal(date, matchId) {
     const dateModal = document.getElementById("dateModal");
     const dateDetails = document.getElementById("dateDetails");
     const closeButton = document.querySelector(".closeDate");
 
-    // Randomize location from your list
     const locations = [
-      { name: 'Milky Way Cocktail Bar', link: 'https://www.google.com/maps/dir//1886+Centre+St,+Montreal,+Quebec+H3K+1H9/@45.4825594,-73.6447206,12z/data=!4m8!4m7!1m0!1m5!1m1!1s0x4cc91bc92a34ad4b:0x78ade8e46f3575a1!2m2!1d-73.56232!2d45.482589?entry=ttu&g_ep=EgoyMDI0MTEyNC4xIKXMDSoJLDEwMjExMjMzSAFQAw%3D%3D' },
-      { name: 'Gokudo', link: 'https://www.google.com/maps/dir//Gokudo,+Rue+Cathcart,+Montreal,+QC/@45.4825594,-73.6447206,12z/data=!3m1!5s0x4cc91a8712eb28bb:0x1e98129d4f02a5d7!4m8!4m7!1m0!1m5!1m1!1s0x4cc91a44fec9cd2d:0xc910756c14cef92!2m2!1d-73.5685682!2d45.5031259?entry=ttu&g_ep=EgoyMDI0MTEyNC4xIKXMDSoJLDEwMjExMjMzSAFQAw%3D%3D' },
-      { name: 'Osteria MKT', link: 'https://www.google.com/maps/dir//Osteria+mkt,+1333+Blvd+Robert-Bourassa,+Montr%C3%A9al,+QC+H3A+1T9/@45.5038139,-73.6119378,13z/data=!3m2!4b1!5s0x4cc91a8712eb28bb:0x1e98129d4f02a5d7!4m8!4m7!1m0!1m5!1m1!1s0x4cc91a4132d9ae27:0x24e2a4fb903d30cf!2m2!1d-73.5707385!2d45.5038213?entry=ttu&g_ep=EgoyMDI0MTEyNC4xIKXMDSoJLDEwMjExMjMzSAFQAw%3D%3D' },
-      { name: 'Maison Boulud', link: 'https://www.google.com/maps/dir//Maison+Boulud,+1228+Sherbrooke+St+W,+Montreal,+Quebec+H3G+1H6/@45.5000158,-73.6192413,13z/data=!3m2!4b1!5s0x4cc91a8712eb28bb:0x1e98129d4f02a5d7!4m8!4m7!1m0!1m5!1m1!1s0x4cc91a40f7f00c21:0xa794e5eccda3549d!2m2!1d-73.5780819!2d45.5000408?entry=ttu&g_ep=EgoyMDI0MTEyNC4xIKXMDSoJLDEwMjExMjMzSAFQAw%3D%3D' },
-      { name: 'Yoko Luna', link: 'https://www.google.com/maps/dir//Yoko+Luna,+Rue+de+la+Montagne,+Montreal,+QC/@45.4974326,-73.6159125,13z/data=!3m2!4b1!5s0x4cc91a8712eb28bb:0x1e98129d4f02a5d7!4m8!4m7!1m0!1m5!1m1!1s0x4cc91b079d498a2f:0x6fcc0e3f80ab23be!2m2!1d-73.5746853!2d45.4974686?entry=ttu&g_ep=EgoyMDI0MTEyNC4xIKXMDSoJLDEwMjExMjMzSAFQAw%3D%3D' },
+        { name: 'Milky Way Cocktail Bar', link: 'https://www.google.com/maps/dir//1886+Centre+St,+Montreal,+Quebec+H3K+1H9/' },
+        { name: 'Gokudo', link: 'https://www.google.com/maps/dir//Gokudo,+Rue+Cathcart,+Montreal,+QC/' },
+        { name: 'Osteria MKT', link: 'https://www.google.com/maps/dir//Osteria+mkt,+1333+Blvd+Robert-Bourassa,+Montr%C3%A9al,+QC/' },
+        { name: 'Maison Boulud', link: 'https://www.google.com/maps/dir//Maison+Boulud,+1228+Sherbrooke+St+W,+Montreal,+Quebec/' },
+        { name: 'Yoko Luna', link: 'https://www.google.com/maps/dir//Yoko+Luna,+Rue+de+la+Montagne,+Montreal,+QC/' },
     ];
 
     const randomLocation = locations[Math.floor(Math.random() * locations.length)];
+
     dateDetails.innerHTML = `
         Votre rendez-vous est prévu pour: ${date} <br>
         Location: <a href="${randomLocation.link}" target="_blank">${randomLocation.name}</a>
     `;
 
+    // Save the date to the backend
+    fetch('/api/save-date', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            matchId: matchId,
+            date: date,
+            time_range: "xxH", // Replace with actual time
+            location: randomLocation.name,
+        }),
+    })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                console.log('Date saved successfully!');
+            } else {
+                console.error('Error saving date:', data.error);
+            }
+        })
+        .catch(err => console.error('Error saving date:', err));
+
     dateModal.style.display = "block";
 
-    if (dateModal && closeButton) {
-      closeButton.onclick = () => {
-        dateModal.style.display = "none";
-      };
+    if (closeButton) {
+        closeButton.onclick = () => {
+            dateModal.style.display = "none";
+        };
     } else {
-      console.error("Modal or close button not found");
+        console.error("Close button not found");
     }
-  }
+}
+
+function fetchAndShowDate(matchId) {
+    fetch(`/api/get-date/${matchId}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                alert("No date information found for this match.");
+                return;
+            }
+
+            const dateModal = document.getElementById("dateModal");
+            const dateDetails = document.getElementById("dateDetails");
+
+            dateDetails.innerHTML = `
+                Votre rendez-vous est prévu pour: ${data.date} à ${data.time_range} <br>
+                Location: ${data.location}
+            `;
+
+            dateModal.style.display = "block";
+        })
+        .catch(err => console.error('Error fetching date information:', err));
+}
+
 
 
   function openCalendarModal(matchId) {
@@ -840,32 +881,36 @@
   });
 
   function saveAvailability(selectedSlots, matchId) {
+    console.log("Saving availability for matchId:", matchId);
+    console.log("Selected slots:", selectedSlots);
+
     const payload = {
-      userId: loggedInUserId,
-      matchId: matchId,
-      availabilities: selectedSlots,
+        userId: loggedInUserId,
+        matchId: matchId,
+        availabilities: selectedSlots,
     };
 
     fetch("/api/save-availability", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
     })
-      .then(response => response.json())
-      .then(data => {
-        if (data.success) {
-          console.log("Availability saved successfully!");
-          alert("Your availability has been saved successfully!");
-        } else {
-          console.error("Error saving availability.");
-          alert("Error saving availability. Please try again.");
-        }
-      })
-      .catch(err => {
-        console.error("Error saving availability:", err);
-        alert("An error occurred while saving availability.");
-      });
-  }
+        .then((response) => response.json())
+        .then((data) => {
+            if (data.success) {
+                console.log("Availability saved successfully!");
+                alert("Your availability has been saved successfully!");
+            } else {
+                console.error("Error saving availability.");
+                alert("Error saving availability. Please try again.");
+            }
+        })
+        .catch((err) => {
+            console.error("Error saving availability:", err);
+            alert("An error occurred while saving availability.");
+        });
+}
+
 
 
 

@@ -1433,12 +1433,11 @@ app.post('/api/save-availability', (req, res) => {
         return res.status(400).json({ error: "Invalid data. Ensure userId, matchId, and availabilities are provided." });
     }
 
-
     console.log("Validating matchId in database...");
     const queryFirstUser = `
-      SELECT date, time_range 
-      FROM availability 
-      WHERE match_id = ?;
+        SELECT date, time_range 
+        FROM availability 
+        WHERE match_id = ?;
     `;
 
     con.query(queryFirstUser, [matchId], (err, firstUserAvailabilities) => {
@@ -1449,14 +1448,15 @@ app.post('/api/save-availability', (req, res) => {
 
         console.log("First User's Available Slots:", firstUserAvailabilities);
 
+        // If no availability exists for the first user, save all availabilities for the second user.
         if (firstUserAvailabilities.length === 0) {
             const queries = availabilities.map(slot => {
                 return new Promise((resolve, reject) => {
                     const query = `
-              INSERT INTO availability (user_id, match_id, date, time_range)
-              VALUES (?, ?, ?, ?)
-              ON DUPLICATE KEY UPDATE time_range = VALUES(time_range);
-            `;
+                        INSERT INTO availability (user_id, match_id, date, time_range)
+                        VALUES (?, ?, ?, ?)
+                        ON DUPLICATE KEY UPDATE time_range = VALUES(time_range);
+                    `;
                     con.query(query, [userId, matchId, slot.date, slot.time_range], (err, results) => {
                         if (err) {
                             console.error("Error inserting availability:", err);
@@ -1474,6 +1474,7 @@ app.post('/api/save-availability', (req, res) => {
                     res.status(500).json({ error: "Database error saving availability." });
                 });
         } else {
+            // Match available slots with first user's availability
             const validSlots = new Set(
                 firstUserAvailabilities.map(slot => `${slot.date}-${slot.time_range}`)
             );
@@ -1482,20 +1483,16 @@ app.post('/api/save-availability', (req, res) => {
                 validSlots.has(`${slot.date}-${slot.time_range}`)
             );
 
-            console.log("Filtered Availabilities:", filteredAvailabilities);
+            console.log("Filtered Availabilities (Matching Slots):", filteredAvailabilities);
 
-            if (filteredAvailabilities.length === 0) {
-                console.log("No valid slots selected or no overlapping availability.");
-                return res.status(400).json({ error: "No valid slots selected or no overlapping availability." });
-            }
-
-            const queries = filteredAvailabilities.map(slot => {
+            // Save all availabilities regardless of match
+            const queries = availabilities.map(slot => {
                 return new Promise((resolve, reject) => {
                     const query = `
-              INSERT INTO availability (user_id, match_id, date, time_range)
-              VALUES (?, ?, ?, ?)
-              ON DUPLICATE KEY UPDATE time_range = VALUES(time_range);
-            `;
+                        INSERT INTO availability (user_id, match_id, date, time_range)
+                        VALUES (?, ?, ?, ?)
+                        ON DUPLICATE KEY UPDATE time_range = VALUES(time_range);
+                    `;
                     con.query(query, [userId, matchId, slot.date, slot.time_range], (err, results) => {
                         if (err) {
                             console.error("Error inserting availability:", err);
@@ -1507,7 +1504,17 @@ app.post('/api/save-availability', (req, res) => {
             });
 
             Promise.all(queries)
-                .then(() => res.json({ success: true }))
+                .then(() => {
+                    // If there are matching slots, send a "match alert"
+                    if (filteredAvailabilities.length > 0) {
+                        console.log("Matching slots found:", filteredAvailabilities);
+                        return res.json({ success: true, message: "It's a match!" });
+                    }
+
+                    // Otherwise, just save the availability without a match
+                    console.log("No matching slots found. Saved all availabilities.");
+                    return res.json({ success: true, message: "Availability saved, no match yet." });
+                })
                 .catch(err => {
                     console.error("Error saving availability:", err);
                     res.status(500).json({ error: "Database error saving availability." });
@@ -1567,6 +1574,55 @@ app.post('/api/user/unmatch', (req, res) => {
         });
     });
 });
+
+app.post('/api/save-date', (req, res) => {
+    const { matchId, date, time_range, location } = req.body;
+
+    if (!matchId || !date || !time_range || !location) {
+        return res.status(400).json({ error: "Missing required fields." });
+    }
+
+    const query = `
+        INSERT INTO date_info (match_id, date, time_range, location, date_bool)
+        VALUES (?, ?, ?, ?, true)
+        ON DUPLICATE KEY UPDATE date = VALUES(date), time_range = VALUES(time_range), location = VALUES(location), date_bool = VALUES(date_bool);
+    `;
+
+    con.query(query, [matchId, date, time_range, location], (err, result) => {
+        if (err) {
+            console.error('Error saving date info:', err);
+            return res.status(500).json({ error: 'Database error while saving date info.' });
+        }
+
+        res.json({ success: true });
+    });
+});
+
+
+app.get('/api/get-date/:matchId', (req, res) => {
+    const { matchId } = req.params;
+
+    const query = `
+        SELECT date, time_range, location, date_bool
+        FROM date_info
+        WHERE match_id = ?;
+    `;
+
+    con.query(query, [matchId], (err, results) => {
+        if (err) {
+            console.error('Error fetching date info:', err);
+            return res.status(500).json({ error: 'Database error while fetching date info.' });
+        }
+
+        if (results.length === 0) {
+            return res.status(404).json({ error: 'No date information found for this match.' });
+        }
+
+        res.json(results[0]); // Return the first result since match_id is unique
+    });
+});
+
+
 
 
 /*
