@@ -17,6 +17,14 @@
         transition: filter 0.5s ease-in-out;
       }
 
+      .title {
+        color: #ffffff;
+        font-size: 24px;
+        margin: 20px 0;
+        text-align: center;
+        font-family: "Orbitron", sans-serif;
+      }
+
       .cards {
         position: relative;
         transition: filter 0.5s ease-in-out;
@@ -110,7 +118,6 @@
         width: 250px;
         height: 350px;
         top: 40px;
-      
       }
 
       .card-back-3 {
@@ -213,17 +220,57 @@
         object-fit: cover;
         z-index: -1;
       }
+      .grid {
+        position: absolute;
+        top: 80;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: radial-gradient(circle, #ff007f 2px, transparent 2px),
+          radial-gradient(circle, #7f00ff 2px, transparent 2px);
+        background-size: 50px 50px;
+        background-position: 25px 25px;
+      }
+
+      .glow {
+        position: absolute;
+        width: 200px;
+        height: 200px;
+        background: radial-gradient(
+          circle,
+          rgba(255, 0, 127, 0.6),
+          transparent 70%
+        );
+        border-radius: 50%;
+        pointer-events: none; /* Ensures it doesn't block clicks */
+        transform: translate(-50%, -50%); /* Centers the glow on the cursor */
+        animation: pulse 2s infinite alternate;
+      }
+
+      @keyframes pulse {
+        0% {
+          opacity: 0.5;
+        }
+        100% {
+          opacity: 1;
+        }
+      }
     </style>
   </head>
 
   <body>
-    <video autoplay muted loop id="background-video">
+    <div class="title">
+      Cliquez sur une carte pour voir des informations supplémentaires
+    </div>
+    <div class="grid"></div>
+    <div class="glow"></div>
+    <!-- <video autoplay muted loop id="background-video">
       <source
         src="/images/vecteezy_a-nostalgic-90s-animation-captures-city-lights-and-traffic_49883292.mp4"
         type="video/mp4"
       />
       Your browser does not support the video tag.
-    </video>
+    </video> -->
     <div class="cards">
       <div
         class="card card-1"
@@ -285,45 +332,63 @@
     <!-- Modal for card description -->
     <div id="modal" class="modal">
       <p id="modal-description"></p>
-      <div class="modal-close" onclick="closeModal()">Fermer</div>
+      <div class="modal-close" id="close-modal">Fermer</div>
     </div>
 
     <script>
+      document.addEventListener("mousemove", (e) => {
+        const glow = document.querySelector(".glow");
+
+        // Update the position of the glow to follow the cursor
+        glow.style.left = `${e.pageX}px`;
+        glow.style.top = `${e.pageY}px`;
+      });
+
       const cards = document.querySelectorAll(".card");
       const modal = document.getElementById("modal");
       const modalDescription = document.getElementById("modal-description");
-    
+
       // Ajouter un bouton pour rediriger vers la page d'inscription
       const inscriptionButton = document.createElement("div");
       inscriptionButton.className = "modal-close";
       inscriptionButton.textContent = "Inscription";
       modal.appendChild(inscriptionButton);
-    
+
       cards.forEach((card) => {
         card.addEventListener("click", () => {
           // Afficher la description dans le modal
           const description = card.getAttribute("data-description");
           modalDescription.textContent = description;
-    
+
           // Ajouter le type de carte au bouton d'inscription
           const cardType = card.getAttribute("data-card-type");
           inscriptionButton.setAttribute(
             "onclick",
             `window.location.href='/event/inscription?card=${cardType}'`
           );
-    
+
           modal.style.display = "block"; // Afficher le modal
         });
       });
-    
-      // Fermer le modal quand l'utilisateur clique en dehors
-      window.addEventListener("click", (e) => {
-        if (e.target === modal) {
-          modal.style.display = "none";
+
+      document.addEventListener("DOMContentLoaded", () => {
+        const closeModalButton = document.getElementById("close-modal");
+        const modal = document.getElementById("modal");
+
+        // Ensure modal exists before adding event listener
+        if (closeModalButton && modal) {
+          closeModalButton.addEventListener("click", () => {
+            modal.style.display = "none";
+          });
         }
       });
+      function closeModal() {
+        const modal = document.getElementById("modal");
+        if (modal) {
+          modal.style.display = "none";
+        }
+      }
     </script>
-    
   </body>
 </html>
 <%- include ("../partials/footer.ejs") %>
