@@ -1433,9 +1433,9 @@ app.post('/api/save-availability', (req, res) => {
         return res.status(400).json({ error: "Invalid data. Ensure userId, matchId, and availabilities are provided." });
     }
 
-    console.log("Validating matchId in database...");
+    // Fetch existing availability for the match
     const queryFirstUser = `
-        SELECT date, time_range 
+        SELECT user_id, date, time_range 
         FROM availability 
         WHERE match_id = ?;
     `;
@@ -1446,35 +1446,31 @@ app.post('/api/save-availability', (req, res) => {
             return res.status(500).json({ error: "Error fetching availability" });
         }
 
-        console.log("First User's Available Slots:", firstUserAvailabilities);
-
-        // If no availability exists for the first user, save all availabilities for the second user.
+        // If no availability exists, save the first user's availability
         if (firstUserAvailabilities.length === 0) {
+            const insertQuery = `
+                INSERT INTO availability (user_id, match_id, date, time_range)
+                VALUES (?, ?, ?, ?)
+                ON DUPLICATE KEY UPDATE time_range = VALUES(time_range);
+            `;
+
             const queries = availabilities.map(slot => {
                 return new Promise((resolve, reject) => {
-                    const query = `
-                        INSERT INTO availability (user_id, match_id, date, time_range)
-                        VALUES (?, ?, ?, ?)
-                        ON DUPLICATE KEY UPDATE time_range = VALUES(time_range);
-                    `;
-                    con.query(query, [userId, matchId, slot.date, slot.time_range], (err, results) => {
-                        if (err) {
-                            console.error("Error inserting availability:", err);
-                            return reject(err);
-                        }
-                        resolve(results);
+                    con.query(insertQuery, [userId, matchId, slot.date, slot.time_range], (err) => {
+                        if (err) return reject(err);
+                        resolve();
                     });
                 });
             });
 
             Promise.all(queries)
-                .then(() => res.json({ success: true }))
+                .then(() => res.json({ success: true, firstUser: true }))
                 .catch(err => {
-                    console.error("Error saving availability:", err);
+                    console.error("Error saving first user's availability:", err);
                     res.status(500).json({ error: "Database error saving availability." });
                 });
         } else {
-            // Match available slots with first user's availability
+            // Validate second user's slots against the first user's availability
             const validSlots = new Set(
                 firstUserAvailabilities.map(slot => `${slot.date}-${slot.time_range}`)
             );
@@ -1483,40 +1479,31 @@ app.post('/api/save-availability', (req, res) => {
                 validSlots.has(`${slot.date}-${slot.time_range}`)
             );
 
-            console.log("Filtered Availabilities (Matching Slots):", filteredAvailabilities);
+            if (filteredAvailabilities.length === 0) {
+                console.log("No matching slots found. User cannot select unavailable times.");
+                return res.status(400).json({ error: "No matching slots found. Please select valid times." });
+            }
 
-            // Save all availabilities regardless of match
-            const queries = availabilities.map(slot => {
+            // Save the second user's valid slots
+            const insertQuery = `
+                INSERT INTO availability (user_id, match_id, date, time_range)
+                VALUES (?, ?, ?, ?)
+                ON DUPLICATE KEY UPDATE time_range = VALUES(time_range);
+            `;
+
+            const queries = filteredAvailabilities.map(slot => {
                 return new Promise((resolve, reject) => {
-                    const query = `
-                        INSERT INTO availability (user_id, match_id, date, time_range)
-                        VALUES (?, ?, ?, ?)
-                        ON DUPLICATE KEY UPDATE time_range = VALUES(time_range);
-                    `;
-                    con.query(query, [userId, matchId, slot.date, slot.time_range], (err, results) => {
-                        if (err) {
-                            console.error("Error inserting availability:", err);
-                            return reject(err);
-                        }
-                        resolve(results);
+                    con.query(insertQuery, [userId, matchId, slot.date, slot.time_range], (err) => {
+                        if (err) return reject(err);
+                        resolve();
                     });
                 });
             });
 
             Promise.all(queries)
-                .then(() => {
-                    // If there are matching slots, send a "match alert"
-                    if (filteredAvailabilities.length > 0) {
-                        console.log("Matching slots found:", filteredAvailabilities);
-                        return res.json({ success: true, message: "It's a match!" });
-                    }
-
-                    // Otherwise, just save the availability without a match
-                    console.log("No matching slots found. Saved all availabilities.");
-                    return res.json({ success: true, message: "Availability saved, no match yet." });
-                })
+                .then(() => res.json({ success: true, secondUser: true, matchingSlots: filteredAvailabilities }))
                 .catch(err => {
-                    console.error("Error saving availability:", err);
+                    console.error("Error saving second user's availability:", err);
                     res.status(500).json({ error: "Database error saving availability." });
                 });
         }
@@ -1527,23 +1514,25 @@ app.post('/api/save-availability', (req, res) => {
 
 app.get('/api/get-availability/:matchId', (req, res) => {
     const { matchId } = req.params;
+
     const query = `
-        SELECT 
-            DATE_FORMAT(date, '%Y-%m-%d') AS date, 
-            time_range 
+        SELECT user_id, DATE_FORMAT(date, '%Y-%m-%d') AS date, time_range
         FROM availability 
-        WHERE user_id = ?;
+        WHERE match_id = ?;
     `;
+
     con.query(query, [matchId], (err, results) => {
         if (err) {
             console.error("Error fetching availability:", err);
-            return res.status(500).json({ error: "Error fetching availability" });
+            return res.status(500).json({ error: "Database error." });
         }
-        console.log(results);
+
+        console.log("Fetched availability for matchId:", matchId, results);
 
         res.json(results);
     });
 });
+
 
 app.post('/api/user/unmatch', (req, res) => {
     const { userId, matchedUserId } = req.body;
@@ -1574,29 +1563,45 @@ app.post('/api/user/unmatch', (req, res) => {
         });
     });
 });
-
 app.post('/api/save-date', (req, res) => {
+    console.log("Request Payload:", req.body); // Log incoming data
+
     const { matchId, date, time_range, location } = req.body;
 
     if (!matchId || !date || !time_range || !location) {
+        console.log("Validation Failed: Missing Fields");
         return res.status(400).json({ error: "Missing required fields." });
     }
 
+    // Validate `time_range` format
+    const timeRegex = /^([01]\d|2[0-3]):([0-5]\d)$/; // Expect `hh:mm` format
+    if (!timeRegex.test(time_range)) {
+        console.log("Validation Failed: Invalid Time Range Format", time_range);
+        return res.status(400).json({ error: "Invalid time range format." });
+    }
+
+    // Process and insert into the database
     const query = `
         INSERT INTO date_info (match_id, date, time_range, location, date_bool)
         VALUES (?, ?, ?, ?, true)
-        ON DUPLICATE KEY UPDATE date = VALUES(date), time_range = VALUES(time_range), location = VALUES(location), date_bool = VALUES(date_bool);
+        ON DUPLICATE KEY UPDATE 
+            date = VALUES(date), 
+            time_range = VALUES(time_range), 
+            location = VALUES(location), 
+            date_bool = VALUES(date_bool);
     `;
 
     con.query(query, [matchId, date, time_range, location], (err, result) => {
         if (err) {
-            console.error('Error saving date info:', err);
+            console.error('Database Error:', err);
             return res.status(500).json({ error: 'Database error while saving date info.' });
         }
 
-        res.json({ success: true });
+        console.log("Date Info Saved:", result);
+        res.json({ success: true, location });
     });
 });
+
 
 
 app.get('/api/get-date/:matchId', (req, res) => {
@@ -1615,7 +1620,7 @@ app.get('/api/get-date/:matchId', (req, res) => {
         }
 
         if (results.length === 0) {
-            return res.status(404).json({ error: 'No date information found for this match.' });
+            return 
         }
 
         res.json(results[0]); // Return the first result since match_id is unique

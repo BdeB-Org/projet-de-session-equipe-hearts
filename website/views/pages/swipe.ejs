@@ -588,64 +588,13 @@
     });
   });
 
-  function showDateModal(date, matchId) {
-    const dateModal = document.getElementById("dateModal");
-    const dateDetails = document.getElementById("dateDetails");
-    const closeButton = document.querySelector(".closeDate");
 
-    const locations = [
-        { name: 'Milky Way Cocktail Bar', link: 'https://www.google.com/maps/dir//1886+Centre+St,+Montreal,+Quebec+H3K+1H9/' },
-        { name: 'Gokudo', link: 'https://www.google.com/maps/dir//Gokudo,+Rue+Cathcart,+Montreal,+QC/' },
-        { name: 'Osteria MKT', link: 'https://www.google.com/maps/dir//Osteria+mkt,+1333+Blvd+Robert-Bourassa,+Montr%C3%A9al,+QC/' },
-        { name: 'Maison Boulud', link: 'https://www.google.com/maps/dir//Maison+Boulud,+1228+Sherbrooke+St+W,+Montreal,+Quebec/' },
-        { name: 'Yoko Luna', link: 'https://www.google.com/maps/dir//Yoko+Luna,+Rue+de+la+Montagne,+Montreal,+QC/' },
-    ];
-
-    const randomLocation = locations[Math.floor(Math.random() * locations.length)];
-
-    dateDetails.innerHTML = `
-        Votre rendez-vous est prévu pour: ${date} <br>
-        Location: <a href="${randomLocation.link}" target="_blank">${randomLocation.name}</a>
-    `;
-
-    // Save the date to the backend
-    fetch('/api/save-date', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            matchId: matchId,
-            date: date,
-            time_range: "xxH", // Replace with actual time
-            location: randomLocation.name,
-        }),
-    })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                console.log('Date saved successfully!');
-            } else {
-                console.error('Error saving date:', data.error);
-            }
-        })
-        .catch(err => console.error('Error saving date:', err));
-
-    dateModal.style.display = "block";
-
-    if (closeButton) {
-        closeButton.onclick = () => {
-            dateModal.style.display = "none";
-        };
-    } else {
-        console.error("Close button not found");
-    }
-}
 
 function fetchAndShowDate(matchId) {
     fetch(`/api/get-date/${matchId}`)
         .then(response => response.json())
         .then(data => {
             if (data.error) {
-                alert("No date information found for this match.");
                 return;
             }
 
@@ -693,6 +642,8 @@ function fetchAndShowDate(matchId) {
             });
         }
         else {
+          const daysInMonth = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).getDate(); // Days in current month
+          const monthName = new Date().toLocaleString("fr-FR", { month: "long" }); // Current month in French
           populateCalendar(monthName, daysInMonth);
         }
       })
@@ -717,59 +668,58 @@ function fetchAndShowDate(matchId) {
     currentMonth.textContent = monthName;
 
     const timeSlots = ["8h-12h", "12h-15h", "15h-18h", "18h-21h"];
+    const currentYear = new Date().getFullYear();
+    const currentMonthIndex = new Date().getMonth();
 
     for (let day = 1; day <= daysInMonth; day++) {
-      const dayElement = document.createElement("div");
-      dayElement.className = "calendar-day";
-      dayElement.innerHTML = `<strong>${day}</strong>`;
+        const dayElement = document.createElement("div");
+        dayElement.className = "calendar-day";
 
-      timeSlots.forEach((slot) => {
-        const slotElement = document.createElement("div");
-        slotElement.className = "time-slot";
-        slotElement.textContent = slot;
+        // Format the date explicitly
+        const formattedDay = String(day).padStart(2, '0');
+        const month = String(currentMonthIndex + 1).padStart(2, '0'); // Month is zero-based
+        const fullDate = `${currentYear}-${month}-${formattedDay}`;
 
-        slotElement.addEventListener("click", () => {
-          slotElement.classList.toggle("selected");
+        dayElement.setAttribute("data-date", fullDate);
+        dayElement.innerHTML = `<strong>${formattedDay}</strong>`;
+
+        timeSlots.forEach((slot) => {
+            const slotElement = document.createElement("div");
+            slotElement.className = "time-slot";
+            slotElement.textContent = slot;
+
+            slotElement.addEventListener("click", () => {
+                slotElement.classList.toggle("selected");
+            });
+
+            dayElement.appendChild(slotElement);
         });
 
-        dayElement.appendChild(slotElement);
-      });
-
-      calendarGrid.appendChild(dayElement);
+        calendarGrid.appendChild(dayElement);
     }
-  }
+}
 
-  function populateCalendarWithRestrictedOptions(availableSlots) {
+
+function populateCalendarWithRestrictedOptions(availableSlots) {
     const timeSlots = document.querySelectorAll('.time-slot');
 
     timeSlots.forEach(slot => {
-      const calendarDay = slot.closest('.calendar-day');
+        const calendarDay = slot.closest('.calendar-day');
+        const day = calendarDay.getAttribute('data-date');
 
-      const day = calendarDay.querySelector("strong").textContent.trim();
-      const date = new Date();
-      date.setDate(day);
-      const formattedDate = date.toISOString().split("T")[0];
+        const slotTimeRange = slot.textContent.trim();
+        const slotKey = `${day}-${slotTimeRange}`;
 
-      const slotTimeRange = slot.textContent.trim();
-      const slotKey = `${formattedDate}-${slotTimeRange.replace(":", "").replace("h-", "h-")}`;
-      const normalizedAvailableSlots = availableSlots.map(slot => {
-        const formattedSlot = slot;
-        return formattedSlot;
-      });
-
-      console.log(normalizedAvailableSlots);
-      console.log(slotKey);
-
-      if (!normalizedAvailableSlots.includes(slotKey)) {
-        slot.classList.add('disabled');
-        slot.disabled = false;
-      } else {
-        slot.classList.remove('disabled');
-        slot.disabled = false;
-      }
-
+        if (!availableSlots.includes(slotKey)) {
+            slot.classList.add('disabled');
+            slot.disabled = true;
+        } else {
+            slot.classList.remove('disabled');
+            slot.disabled = false;
+        }
     });
-  }
+}
+
 
 
 
@@ -814,71 +764,159 @@ function fetchAndShowDate(matchId) {
   }
 
 
-
   document.getElementById("confirmAvailability").addEventListener("click", () => {
-    const selectedSlots = Array.from(document.querySelectorAll(".time-slot.selected")).map(slot => {
-      const day = slot.closest(".calendar-day").querySelector("strong").textContent;
-      const date = new Date();
-      date.setDate(day);
-      const formattedDate = date.toISOString().split("T")[0];
-      return {
-        date: formattedDate,
-        time_range: slot.textContent,
-      };
-    });
-
-    console.log("Selected Slots before fetch:", selectedSlots); // Debugging step
-    const matchId = document.querySelector(".set-date-button").getAttribute("data-match-id");
-    userId = loggedInUserId;
-    if (!matchId) {
-      alert("Match ID is missing or invalid.");
-      return;
-    }
-
-    if (selectedSlots.length === 0) {
-      alert("No slots selected. Please select at least one time slot.");
-      return;
-    }
-    const payload = {
-      userId: loggedInUserId,
-      matchId: matchId,
-      availabilities: selectedSlots,
+  // Get the selected slots
+  const selectedSlots = Array.from(document.querySelectorAll(".time-slot.selected")).map((slot) => {
+    const day = slot.closest(".calendar-day").getAttribute("data-date");
+    const timeRange = slot.textContent.trim();
+    return {
+      date: day,
+      time_range: timeRange,
     };
-    console.log("Payload being sent:", payload);
-
-    //New Code
-    // Fetch the first user's availability
-    fetch(`/api/get-availability/${matchId}`)
-      .then(response => response.json())
-      .then(firstUserAvailability => {
-        const availableSlots = firstUserAvailability.map(slot => `${slot.date}-${slot.time_range}`);
-        const selectedSlotKeys = selectedSlots.map(slot => `${slot.date}-${slot.time_range}`);
-
-        if (availableSlots.length === 0) {
-          // If no availability found for the first user, skip matching and proceed with saving selected slots
-          alert("No availability found for the first user. Proceeding to save your selected slots.");
-          saveAvailability(selectedSlots, matchId);
-          return;
-        }
-
-        // Find overlapping slots
-        const matchingSlots = availableSlots.filter(slot => selectedSlotKeys.includes(slot));
-
-        if (matchingSlots.length > 0) {
-          // Randomly pick one match
-          const randomSlot = matchingSlots[Math.floor(Math.random() * matchingSlots.length)];
-          alert(`C'EST UNE DATE! Date choisie: ${randomSlot}`);
-          saveAvailability(selectedSlots, matchId);
-        } else {
-          alert("No matching slots found with the first user's availability. Please select other times.");
-          return
-        }
-      })
-      .catch(err => {
-        console.error("Error fetching first user's availability:", err);
-        alert("An error occurred while fetching availability.");
-      });
   });
+
+  console.log("Selected Slots before fetch:", selectedSlots);
+
+  const matchId = document.querySelector(".set-date-button").getAttribute("data-match-id");
+  if (!matchId) {
+    alert("Match ID is missing or invalid.");
+    return;
+  }
+
+  if (selectedSlots.length === 0) {
+    alert("No slots selected. Please select at least one time slot.");
+    return;
+  }
+
+  // Fetch the first user's availability
+  fetch(`/api/get-availability/${matchId}`)
+    .then((response) => response.json())
+    .then((firstUserAvailability) => {
+      const availableSlots = firstUserAvailability.map((slot) => `${slot.date}-${slot.time_range}`);
+      const selectedSlotKeys = selectedSlots.map((slot) => `${slot.date}-${slot.time_range}`);
+
+      if (availableSlots.length === 0) {
+        // If no availability found for the first user, proceed with saving selected slots
+        alert("No availability found for the first user. Proceeding to save your selected slots.");
+        saveAvailability(selectedSlots, matchId);
+        return;
+      }
+
+      // Find overlapping slots
+      const matchingSlots = availableSlots.filter((slot) => selectedSlotKeys.includes(slot));
+
+      if (matchingSlots.length > 0) {
+        // Randomly pick one match
+        const randomSlot = matchingSlots[Math.floor(Math.random() * matchingSlots.length)];
+        console.log(`Matching Slot Found: ${randomSlot}`);
+        saveDate(randomSlot, matchId); // Save the matching date and show the modal
+      } else {
+        alert("No matching slots found with the first user's availability. Please select other times.");
+      }
+    })
+    .catch((err) => {
+      console.error("Error fetching first user's availability:", err);
+      alert("An error occurred while fetching availability.");
+    });
+});
+
+function saveDate(slot, matchId) {
+    const slotParts = slot.split("-");
+    const date = slotParts.slice(0, 3).join("-"); // Extract YYYY-MM-DD
+    const timeRange = slotParts.slice(3).join("-").replace("h", "");
+
+    let [startHour, endHour] = timeRange.split("-").map(Number);
+
+    // Default endHour to 0 if it's undefined
+    if (isNaN(startHour)) {
+        console.error("Invalid startHour:", startHour);
+        alert("Invalid time range. Please check the selected slot.");
+        return;
+    }
+    endHour = isNaN(endHour) ? 0 : endHour;
+
+    // Generate a random time within the range
+    const randomMinute = Math.floor(Math.random() * 60); // Random minute
+    const randomHour = Math.floor(Math.random() * (endHour - startHour)) + startHour; // Random hour
+    const formattedTime = `${String(randomHour).padStart(2, "0")}:${String(randomMinute).padStart(2, "0")}`;
+
+    // Validate the date format (ensures YYYY-MM-DD)
+    const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+    if (!dateRegex.test(date)) {
+        console.error("Invalid date format:", date);
+        alert("Invalid date format. Please check the selected date.");
+        return;
+    }
+
+    // Predefined locations with names and addresses
+    const predefinedLocations = [
+        { name: "Milky Way Cocktail Bar", address: "1886 Centre St, Montreal, QC" },
+        { name: "Gokudo", address: "Rue Cathcart, Montreal, QC" },
+        { name: "Osteria MKT", address: "1333 Blvd Robert-Bourassa, Montreal, QC" },
+        { name: "Maison Boulud", address: "1228 Sherbrooke St W, Montreal, QC" },
+        { name: "Yoko Luna", address: "Rue de la Montagne, Montreal, QC" },
+    ];
+
+    // Select a random location
+    const randomLocation = predefinedLocations[Math.floor(Math.random() * predefinedLocations.length)];
+
+    // Prepare the payload
+    const payload = {
+        matchId: matchId,
+        date: date, // Ensure it's a valid YYYY-MM-DD format
+        time_range: formattedTime, // Now sends properly formatted hh:mm time
+        location: `${randomLocation.name}, ${randomLocation.address}`,
+    };
+
+    console.log("Sending Payload:", payload); // Debugging payload
+
+    // Send data to the backend
+    fetch("/api/save-date", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+    })
+        .then((response) => response.json())
+        .then((data) => {
+            if (data.success) {
+                console.log("Date saved successfully:", data);
+
+                // Display the chosen location and time in the modal
+                showDateModal(date, formattedTime, matchId, randomLocation);
+            } else {
+                console.error("Error saving date:", data.error);
+                alert("Error saving date. Please try again.");
+            }
+        })
+        .catch((err) => console.error("Error saving date:", err));
+}
+
+
+// Function to display the date modal with location details
+function showDateModal(date, timeRange, matchId, location) {
+    const dateModal = document.getElementById("dateModal");
+    const dateDetails = document.getElementById("dateDetails");
+    const closeButton = document.querySelector(".closeDate");
+
+    // Display the matched date and time
+    dateDetails.innerHTML = `
+        <strong>Date:</strong> ${date}<br>
+        <strong>Time:</strong> ${timeRange}<br>
+        <strong>Location:</strong> ${location.name}, ${location.address}<br>
+        <strong>Match ID:</strong> ${matchId}
+    `;
+
+    dateModal.style.display = "block";
+
+    if (closeButton) {
+        closeButton.onclick = () => {
+            dateModal.style.display = "none";
+        };
+    } else {
+        console.error("Close button not found");
+    }
+}
+
 
   function saveAvailability(selectedSlots, matchId) {
     console.log("Saving availability for matchId:", matchId);
@@ -895,20 +933,21 @@ function fetchAndShowDate(matchId) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
     })
-        .then((response) => response.json())
-        .then((data) => {
-            if (data.success) {
-                console.log("Availability saved successfully!");
-                alert("Your availability has been saved successfully!");
-            } else {
-                console.error("Error saving availability.");
-                alert("Error saving availability. Please try again.");
-            }
-        })
-        .catch((err) => {
-            console.error("Error saving availability:", err);
-            alert("An error occurred while saving availability.");
-        });
+    .then((response) => response.json())
+    .then((data) => {
+        if (data.success) {
+            console.log("Availability saved successfully!");
+            alert("Your availability has been saved!");
+            closeModalCalendar(); // Close the modal after saving
+        } else {
+            console.error("Error saving availability:", data.error);
+            alert("Error saving availability. Please try again.");
+        }
+    })
+    .catch((err) => {
+        console.error("Error saving availability:", err);
+        alert("An error occurred while saving availability.");
+    });
 }
 
 
