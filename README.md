@@ -29,25 +29,34 @@ ALTER TABLE preference DROP FOREIGN KEY preference_ibfk_3; -- Like_id
 ALTER TABLE relation_5 DROP FOREIGN KEY relation_5_ibfk_1; -- Utilisateur_id_utilisateur
 ALTER TABLE relation_5 DROP FOREIGN KEY relation_5_ibfk_2; -- Lieu_id_lieu
 
-ALTER TABLE likes DROP FOREIGN KEY likes_ibfk_1; -- user
-ALTER TABLE likes DROP FOREIGN KEY likes_ibfk_2; -- user
+ALTER TABLE likes DROP FOREIGN KEY likes_ibfk_1; -- Liker_id
+ALTER TABLE likes DROP FOREIGN KEY likes_ibfk_2; -- Liked_id
 
-ALTER TABLE matches DROP FOREIGN KEY matches_ibfk_1;
-ALTER TABLE matches DROP FOREIGN KEY matches_ibfk_2;
+ALTER TABLE matches DROP FOREIGN KEY matches_ibfk_1; -- User1_id
+ALTER TABLE matches DROP FOREIGN KEY matches_ibfk_2; -- User2_id
 
-ALTER TABLE e_photo DROP FOREIGN KEY e_photo_ibfk_1;
+ALTER TABLE e_photo DROP FOREIGN KEY e_photo_ibfk_1; -- Utilisateur_id
 
-DROP TABLE IF EXISTS e_utilisateur;
-DROP TABLE IF EXISTS e_abonnement;
-DROP TABLE IF EXISTS lieu;
-DROP TABLE IF EXISTS preference;
-DROP TABLE IF EXISTS relation_5;
-DROP TABLE IF EXISTS e_card;
-DROP TABLE IF EXISTS e_likes;
+ALTER TABLE preference DROP FOREIGN KEY preference_ibfk_4; -- Sexualite_id
+
+ALTER TABLE availability DROP FOREIGN KEY availability_ibfk_1; -- User_id
+ALTER TABLE availability DROP FOREIGN KEY availability_ibfk_2; -- Match_id
+
+ALTER TABLE date_info DROP FOREIGN KEY date_info_ibfk_1; -- Match_id
+
+-- Drop all tables in reverse dependency order
+DROP TABLE IF EXISTS date_info;
+DROP TABLE IF EXISTS availability;
 DROP TABLE IF EXISTS matches;
 DROP TABLE IF EXISTS likes;
+DROP TABLE IF EXISTS preference;
+DROP TABLE IF EXISTS relation_5;
+DROP TABLE IF EXISTS e_likes;
+DROP TABLE IF EXISTS e_card;
+DROP TABLE IF EXISTS lieu;
+DROP TABLE IF EXISTS e_abonnement;
 DROP TABLE IF EXISTS e_photo;
-DROP TABLE IF EXISTS availability;
+DROP TABLE IF EXISTS e_utilisateur;
 
 CREATE TABLE e_utilisateur (
     e_id INT AUTO_INCREMENT NOT NULL,
