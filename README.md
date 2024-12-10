@@ -169,6 +169,16 @@ CREATE TABLE availability (
   FOREIGN KEY (match_id) REFERENCES e_utilisateur(e_id)
 );
 
+CREATE TABLE date_info (
+    match_id INT NOT NULL,
+    date DATE NOT NULL,
+    time_range VARCHAR(50) NOT NULL,
+    location TEXT NOT NULL,
+    date_bool BOOLEAN NOT NULL,
+    PRIMARY KEY (match_id, date, time_range),
+    FOREIGN KEY (match_id) REFERENCES matches(match_id) ON DELETE CASCADE
+);
+
 
 
 GRANT ALL PRIVILEGES ON *.* TO 'scott'@'%';
