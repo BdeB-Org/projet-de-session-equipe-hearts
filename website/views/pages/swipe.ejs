@@ -642,7 +642,7 @@
     })
     .catch((error) => console.error("Error fetching matches:", error));
 
-  function removeMatchedUserFromList(matchedUserId) {
+  function removeMatchedUserFromList(matchedUserId, users) {
     // Remove the matched user from the `users` array
     users = users.filter(user => user.e_id !== matchedUserId);
 
@@ -657,13 +657,13 @@
     }
 
     // Ensure swipe position is updated after unmatching
-    returnToSwipePosition();
+    returnToSwipePosition(users);
   }
 
-  function returnToSwipePosition() {
+  function returnToSwipePosition(users) {
     if (users.length > 0) {
       currentIndex = currentIndex >= users.length ? users.length - 1 : currentIndex;
-      updateUserCard();  // Update the user card to show the next user
+      updateUserCard();
     } else {
       cardContainer.innerHTML = "<p>No users left to swipe.</p>";
     }
@@ -678,19 +678,14 @@
       // Send unmatch request to the server
       fetch('/api/user/unmatch', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          userId: loggedInUserId,
-          matchedUserId: matchedUserId,
-        }),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: loggedInUserId, matchedUserId: matchedUserId }),
       })
         .then(response => response.json())
         .then(data => {
           if (data.success) {
             console.log("User unmatched successfully");
-            removeMatchedUserFromList(matchedUserId);  // Remove the user from the list and the UI
+            removeMatchedUserFromList(matchedUserId, users);  // Pass the `users` array here
           } else {
             console.error('Unmatch request failed:', data.message);
           }

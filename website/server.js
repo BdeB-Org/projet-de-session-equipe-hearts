@@ -1575,32 +1575,86 @@ app.get('/api/get-availability/:matchId', (req, res) => {
 app.post('/api/user/unmatch', (req, res) => {
     const { userId, matchedUserId } = req.body;
 
-    const unmatchQuery = `
-      DELETE FROM matches 
-      WHERE (user1_id = ? AND user2_id = ?) 
-         OR (user1_id = ? AND user2_id = ?);
-    `;
-
-    console.log("yes it entered the fetch");
-
-    con.query(unmatchQuery, [userId, matchedUserId, matchedUserId, userId], (err, result) => {
+    // Start a transaction to handle the deletion in the correct order
+    con.beginTransaction((err) => {
         if (err) {
-            console.error('Error unmatching user:', err);
-            return res.status(500).json({ error: 'Database error during unmatch' });
+            console.error('Error starting transaction:', err);
+            return res.status(500).json({ error: 'Database transaction error' });
         }
 
-        // Fetch updated matches list
-        con.query('SELECT * FROM matches WHERE user1_id = ? OR user2_id = ?', [userId, userId], (err, matches) => {
+        // 1. Delete likes between the users
+        const deleteLikesQuery = `
+            DELETE FROM likes 
+            WHERE (liker_id = ? AND liked_id = ?) 
+            OR (liker_id = ? AND liked_id = ?);
+        `;
+
+        con.query(deleteLikesQuery, [userId, matchedUserId, matchedUserId, userId], (err, result) => {
             if (err) {
-                console.error('Error fetching updated matches:', err);
-                return res.status(500).json({ error: 'Error fetching updated matches' });
+                console.error('Error deleting likes:', err);
+                return con.rollback(() => res.status(500).json({ error: 'Error deleting likes' }));
             }
 
-            // Return updated matches
-            res.json({ success: true, matches: matches });
+            // 2. Delete availability for the match
+            const deleteAvailabilityQuery = `
+                DELETE FROM availability 
+                WHERE match_id IN (
+                    SELECT match_id FROM matches WHERE (user1_id = ? AND user2_id = ?) 
+                    OR (user1_id = ? AND user2_id = ?)
+                );
+            `;
+
+            con.query(deleteAvailabilityQuery, [userId, matchedUserId, matchedUserId, userId], (err, result) => {
+                if (err) {
+                    console.error('Error deleting availability:', err);
+                    return con.rollback(() => res.status(500).json({ error: 'Error deleting availability' }));
+                }
+
+                // 3. Delete date_info for the match
+                const deleteDateInfoQuery = `
+                    DELETE FROM date_info 
+                    WHERE match_id IN (
+                        SELECT match_id FROM matches WHERE (user1_id = ? AND user2_id = ?) 
+                        OR (user1_id = ? AND user2_id = ?)
+                    );
+                `;
+
+                con.query(deleteDateInfoQuery, [userId, matchedUserId, matchedUserId, userId], (err, result) => {
+                    if (err) {
+                        console.error('Error deleting date_info:', err);
+                        return con.rollback(() => res.status(500).json({ error: 'Error deleting date_info' }));
+                    }
+
+                    // 4. Delete the match
+                    const deleteMatchQuery = `
+                        DELETE FROM matches 
+                        WHERE (user1_id = ? AND user2_id = ?) 
+                        OR (user1_id = ? AND user2_id = ?);
+                    `;
+
+                    con.query(deleteMatchQuery, [userId, matchedUserId, matchedUserId, userId], (err, result) => {
+                        if (err) {
+                            console.error('Error deleting match:', err);
+                            return con.rollback(() => res.status(500).json({ error: 'Error deleting match' }));
+                        }
+
+                        // Commit the transaction after successful deletion
+                        con.commit((err) => {
+                            if (err) {
+                                console.error('Error committing transaction:', err);
+                                return con.rollback(() => res.status(500).json({ error: 'Error committing transaction' }));
+                            }
+
+                            // Return success if all operations are successful
+                            res.json({ success: true });
+                        });
+                    });
+                });
+            });
         });
     });
 });
+
 app.post('/api/save-date', (req, res) => {
     console.log("Request Payload:", req.body); // Log incoming data
 
