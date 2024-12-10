@@ -1048,13 +1048,14 @@ app.get("/event/swipe", (req, res) => {
     `;
 
     // Fetch the preferences of the logged-in user
+    // Fetch the preferences of the logged-in user
     con.query(getPreferencesQuery, [userId], (err, preferenceResults) => {
         if (err) {
             console.error('Error fetching user preferences:', err);
             return res.status(500).send('Error fetching user preferences');
         }
 
-        // Fetch preferences for the logged-in user
+        // Your existing code to map preferences...
         const cardPreferences = preferenceResults
             .filter(pref => pref.card_id)
             .map(pref => cardNames[pref.card_id]);
@@ -1076,29 +1077,27 @@ app.get("/event/swipe", (req, res) => {
         console.log('Sexualite Preferences:', sexualitePreferences);
         console.log('Like Preferences:', likePreferences);
 
+        // Fetch the matches for the logged-in user
         const getMatchesQuery = `
-            SELECT match_id, user1_id, user2_id 
-            FROM matches
-            WHERE user1_id = ? OR user2_id = ?;
-        `;
-
-        // Exécuter la requête pour récupérer les matches
-        con.query(getMatchesQuery, [userId, userId, userId], (err, matches) => {
+        SELECT match_id, user1_id, user2_id 
+        FROM matches
+        WHERE user1_id = ? OR user2_id = ?;
+    `;
+        con.query(getMatchesQuery, [userId, userId], (err, matches) => {
             if (err) {
-                console.error('Erreur en récupérant les matches:', err);
-                return res.status(500).send('Erreur en récupérant les matches');
+                console.error('Error fetching matches:', err);
+                return res.status(500).send('Error fetching matches');
             }
 
-            // Log the matches in the desired format
+            // Log matches and get matchIds
+            const matchIds = matches.map(match => match.match_id);
             const formattedMatches = matches.map(match => [match.match_id, match.user1_id, match.user2_id]);
+
             console.log("Matches found:", formattedMatches);
 
-            console.log("Matches trouvés:", matches);
-
-
-            // Fetch the logged-in user's location from the session
+            // Fetch the location from the session
             const userLocation = req.session.user.e_location;
-            console.log('User Location:', userLocation); // Check if this is correct
+            console.log('User Location:', userLocation);
 
             if (!userLocation || !userLocation.includes(',')) {
                 console.error('Invalid location format or missing location data');
@@ -1106,7 +1105,7 @@ app.get("/event/swipe", (req, res) => {
             }
 
             // Split the location string and extract lat, lon
-            const locationParts = userLocation.split(','); // Assuming "Latitude: x, Longitude: y"
+            const locationParts = userLocation.split(',');
             if (locationParts.length !== 2) {
                 console.error('Location data is not in the correct format');
                 return res.status(400).send('Location format is incorrect');
@@ -1120,13 +1119,13 @@ app.get("/event/swipe", (req, res) => {
                 return res.status(400).send('Invalid latitude or longitude');
             }
 
-            // Fetch all users except the logged-in user
+            // Fetch users excluding the logged-in user and those in existing matches
             const getUsersQuery = `
-            SELECT * FROM e_utilisateur 
-            WHERE e_id != ? AND e_id NOT IN 
-            (SELECT user1_id FROM matches WHERE user2_id = ? 
-             UNION
-             SELECT user2_id FROM matches WHERE user1_id = ?)
+        SELECT * FROM e_utilisateur 
+        WHERE e_id != ? AND e_id NOT IN 
+        (SELECT user1_id FROM matches WHERE user2_id = ? 
+         UNION
+         SELECT user2_id FROM matches WHERE user1_id = ?)
         `;
             con.query(getUsersQuery, [userId, userId, userId], (err, users) => {
                 if (err) {
@@ -1134,14 +1133,13 @@ app.get("/event/swipe", (req, res) => {
                     return res.status(500).send('Error fetching users');
                 }
 
-                // Calculate distance from the logged-in user for each user
+                // Calculate distances for the users
                 const usersWithDistances = users.map(user => {
                     const userLatLon = user.e_location.split(',');
 
-                    // Ensure correct format for user's location
                     if (userLatLon.length !== 2) {
                         console.error('User location is not in the correct format');
-                        return { ...user, distance: 'Unknown' }; // Skip this user if the format is wrong
+                        return { ...user, distance: 'Unknown' };
                     }
 
                     const otherUserLat = parseFloat(userLatLon[0].split(':')[1].trim());
@@ -1149,10 +1147,10 @@ app.get("/event/swipe", (req, res) => {
 
                     if (isNaN(otherUserLat) || isNaN(otherUserLon)) {
                         console.error('Invalid latitude or longitude values for user');
-                        return { ...user, distance: 'Unknown' }; // Skip this user if the coordinates are invalid
+                        return { ...user, distance: 'Unknown' };
                     }
 
-                    // Calculate the correct distance between logged-in user and other users
+                    // Calculate the distance
                     const distance = getDistanceFromLatLonInKm(userLat, userLon, otherUserLat, otherUserLon);
                     return {
                         ...user,
@@ -1160,23 +1158,63 @@ app.get("/event/swipe", (req, res) => {
                     };
                 });
 
-                // Render the swipe page with users and their calculated distances
-                res.render("pages/swipe", {
-                    siteTitle: "Swipe",
-                    pageTitle: "Swipe",
-                    userDetails: req.session.user,
-                    cardPreferences: cardPreferences || [],
-                    cardPreferences2: cardPreferences2 || [],
-                    sexualitePreferences: sexualitePreferences || [],
-                    likePreferences: likePreferences || [],
-                    matches, formattedMatches,
-                    usersWithDistances: usersWithDistances // Pass the users with their distances
+                // Only run the date_info query if matchIds is not empty
+                if (matchIds.length === 0) {
+                    console.log("No matches found, skipping date_info query.");
+                    return res.render("pages/swipe", {
+                        siteTitle: "Swipe",
+                        pageTitle: "Swipe",
+                        userDetails: req.session.user,
+                        cardPreferences: cardPreferences || [],
+                        cardPreferences2: cardPreferences2 || [],
+                        sexualitePreferences: sexualitePreferences || [],
+                        likePreferences: likePreferences || [],
+                        matches,
+                        formattedMatches,
+                        dateInfoMap: null,
+                        usersWithDistances: usersWithDistances
+                    });
+                }
+
+                // Query for date_info if matchIds is non-empty
+                const getDateInfoQuery = `
+                SELECT * FROM date_info WHERE match_id IN (?);
+            `;
+                con.query(getDateInfoQuery, [matchIds], (err, dateInfoResults) => {
+                    if (err) {
+                        console.error('Error fetching date info:', err);
+                        return res.status(500).send('Error fetching date info');
+                    }
+
+                    // Map date info results
+                    const dateInfoMap = dateInfoResults.length > 0 ?
+                        dateInfoResults.reduce((map, info) => {
+                            map[info.match_id] = info;
+                            return map;
+                        }, {}) : null;
+
+                    console.log("Date Info Map:", dateInfoMap);
+
+                    // Render the swipe page with all data, including dateInfoMap
+                    res.render("pages/swipe", {
+                        siteTitle: "Swipe",
+                        pageTitle: "Swipe",
+                        userDetails: req.session.user,
+                        cardPreferences: cardPreferences || [],
+                        cardPreferences2: cardPreferences2 || [],
+                        sexualitePreferences: sexualitePreferences || [],
+                        likePreferences: likePreferences || [],
+                        matches,
+                        formattedMatches,
+                        dateInfoMap,
+                        usersWithDistances
+                    });
                 });
             });
-        }
-        );
+        });
     });
 });
+
 
 
 app.get('/api/users', (req, res) => {
@@ -1598,34 +1636,43 @@ app.post('/api/save-date', (req, res) => {
         }
 
         console.log("Date Info Saved:", result);
-        res.json({ success: true, location });
+
+        // Fetch the updated date_info immediately after saving
+        const getDateInfoQuery = `SELECT * FROM date_info WHERE match_id = ?`;
+        con.query(getDateInfoQuery, [matchId], (err, dateInfoResults) => {
+            if (err) {
+                console.error('Error fetching date info:', err);
+                return res.status(500).send('Error fetching date info');
+            }
+
+            // Send back the date_info to the frontend
+            res.json({
+                success: true,
+                date_info: dateInfoResults[0] || null // Send the date_info back
+            });
+        });
     });
 });
-
-
 
 app.get('/api/get-date/:matchId', (req, res) => {
     const { matchId } = req.params;
-
-    const query = `
-        SELECT date, time_range, location, date_bool
-        FROM date_info
-        WHERE match_id = ?;
-    `;
-
+    const query = 'SELECT * FROM date_info WHERE match_id = ?';
     con.query(query, [matchId], (err, results) => {
         if (err) {
             console.error('Error fetching date info:', err);
-            return res.status(500).json({ error: 'Database error while fetching date info.' });
+            return res.status(500).json({ error: 'Failed to fetch date info' });
         }
-
-        if (results.length === 0) {
-            return 
+        if (results.length > 0) {
+            res.json(results[0]);
+        } else {
+            res.status(404).json({ error: 'No date info found for this match' });
         }
-
-        res.json(results[0]); // Return the first result since match_id is unique
     });
 });
+
+
+
+
 
 
 

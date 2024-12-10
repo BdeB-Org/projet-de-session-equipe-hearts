@@ -542,3 +542,28 @@ button:active {
     background-color: #cc0000;
     transform: scale(0.95);
 }
+
+/* Style for the disabled Set Date button */
+.set-date-button.disabled {
+    background-color: #d3d3d3;
+    /* Light grey background */
+    color: #aaa;
+    /* Grey text */
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+/* Tooltip style */
+.set-date-button[disabled]::after {
+    content: attr(title);
+    position: absolute;
+    background-color: #222;
+    color: #fff;
+    padding: 5px;
+    border-radius: 5px;
+    font-size: 12px;
+    top: -30px;
+    left: 50%;
+    transform: translateX(-50%);
+    white-space: nowrap;
+}
