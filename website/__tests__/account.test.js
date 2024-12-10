@@ -24,6 +24,10 @@ describe('User Registration Tests', () => {
     await connection.end();
   });
 
+  afterEach(async () => {
+    await connection.execute(`DELETE FROM e_utilisateur WHERE e_courriel = ?`, ['john.doe@example.com']);
+  });
+
   it('should insert a new user into the database', async () => {
     const [result] = await connection.execute(
       `INSERT INTO e_utilisateur (e_nom, e_prenom, e_courriel, e_location, e_number, genre) 

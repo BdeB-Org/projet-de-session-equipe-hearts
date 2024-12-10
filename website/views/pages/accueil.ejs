@@ -234,8 +234,8 @@
 
       .glow {
         position: absolute;
-        width: 200px;
-        height: 200px;
+        width: 100px;
+        height: 100px;
         background: radial-gradient(
           circle,
           rgba(255, 0, 127, 0.6),
@@ -264,16 +264,10 @@
     </div>
     <div class="grid"></div>
     <div class="glow"></div>
-    <!-- <video autoplay muted loop id="background-video">
-      <source
-        src="/images/vecteezy_a-nostalgic-90s-animation-captures-city-lights-and-traffic_49883292.mp4"
-        type="video/mp4"
-      />
-      Your browser does not support the video tag.
-    </video> -->
     <div class="cards">
       <div
         class="card card-1"
+        data-title="Joker"
         data-description="Pour ceux qui cherchent un 'ami... avec un petit plus', sans trop de complications !"
       >
         <div class="card-inner">
@@ -288,6 +282,7 @@
 
       <div
         class="card card-2"
+        data-title="Reine"
         data-description="Pour ceux qui veulent juste apprendre à se connaître, sans se prendre la tête... et sans passer par la case lit !"
       >
         <div class="card-inner">
@@ -302,6 +297,7 @@
 
       <div
         class="card card-3"
+        data-title="Ace"
         data-description="Quand tu veux passer une bonne soirée... sans les discussions du lendemain."
       >
         <div class="card-inner">
@@ -316,6 +312,7 @@
 
       <div
         class="card card-4"
+        data-title="Roi"
         data-description="Pour les rois et reines du cœur, en quête d'une histoire qui dure et qui compte."
       >
         <div class="card-inner">
@@ -355,21 +352,28 @@
       modal.appendChild(inscriptionButton);
 
       cards.forEach((card) => {
-        card.addEventListener("click", () => {
-          // Afficher la description dans le modal
-          const description = card.getAttribute("data-description");
-          modalDescription.textContent = description;
+  card.addEventListener("click", () => {
+    // Reset the modal description content
+    modalDescription.innerHTML = "";
 
-          // Ajouter le type de carte au bouton d'inscription
-          const cardType = card.getAttribute("data-card-type");
-          inscriptionButton.setAttribute(
-            "onclick",
-            `window.location.href='/event/inscription?card=${cardType}'`
-          );
+    // Add the title and description
+    const title = card.getAttribute("data-title");
+    modalDescription.innerHTML += title + "<br>";
 
-          modal.style.display = "block"; // Afficher le modal
-        });
-      });
+    const description = card.getAttribute("data-description");
+    modalDescription.innerHTML += description.replace(/\n/g, "<br>");
+
+    // Add the card type to the inscription button
+    const cardType = card.getAttribute("data-card-type");
+    inscriptionButton.setAttribute(
+      "onclick",
+      `window.location.href='/event/inscription?card=${cardType}'`
+    );
+
+    modal.style.display = "block"; // Display the modal
+  });
+});
+
 
       document.addEventListener("DOMContentLoaded", () => {
         const closeModalButton = document.getElementById("close-modal");

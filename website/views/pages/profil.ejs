@@ -95,6 +95,9 @@
             margin: 15px 0;
             text-align: left;
         }
+        a{
+            text-decoration: none;
+        }
 
         .edit-profile,
         .change-password,
@@ -188,23 +191,22 @@
             border: 2px solid #00bfff;
         }
 
-
         .upload-label {
-            width: 30px;
-            height: 30px;
-            background: green;
-            color: white;
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            cursor: pointer;
-            font-size: 20px;
-        }
+            width: 50px;
+            height: 40px;
+}
 
-        .upload-label:hover {
-            background-color: rgba(0, 0, 0, 0.7);
-        }
+.upload-label:hover {
+    background: linear-gradient(135deg, #ff33a8, #ff66c4);
+    box-shadow: 0 6px 15px rgba(255, 102, 196, 0.7);
+    transform: scale(1.05);
+}
+
+.upload-label i {
+    font-size: 18px;
+    color: white;
+}
+
 
 
         .add-photo {
@@ -221,25 +223,145 @@
             margin: 5px;
         }
 
-        .delete-photo {
-            position: absolute;
-            top: 5px;
-            right: 5px;
-            background: rgba(255, 0, 0, 0.8);
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 30px;
-            height: 30px;
-            cursor: pointer;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            /* Center icon */
+.delete-photo {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background: linear-gradient(135deg, #ff3333, #cc0000);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 35px;
+    height: 35px;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+    font-size: 18px;
+    transition: all 0.3s ease;
+}
+
+.delete-photo:hover {
+    background: linear-gradient(135deg, #ff0000, #990000);
+    box-shadow: 0 6px 15px rgba(255, 0, 0, 0.5);
+    transform: scale(1.1);
+}
+
+
+        .modify-profile-container {
+            background: linear-gradient(135deg, #1d1f29, #2c2f3b);
+            border-radius: 15px;
+            padding: 30px;
+            width: 450px;
+            box-shadow: 0 6px 30px rgba(0, 0, 0, 0.6);
+            transition: opacity 0.5s ease;
+            opacity: 0;
+            margin-left: 20px;
+            display: none;
+            color: #f8f9fa;
         }
 
-        .delete-photo:hover {
-            background: darkred;
+        .modify-profile-container.active {
+            display: block;
+            opacity: 1;
+        }
+
+        .modify-profile-container h3 {
+            font-size: 1.8rem;
+            color: #ff66c4;
+            text-shadow: 2px 2px 4px rgba(255, 102, 196, 0.7);
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .edit-profile,
+        .change-password {
+            background: linear-gradient(135deg, #282c34, #343a46);
+            border: 2px solid #ff66c4;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 20px rgba(255, 102, 196, 0.5);
+        }
+
+        .edit-profile h3,
+        .change-password h3 {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+        }
+
+        button {
+            display: block;
+            width: 100%;
+            padding: 0.8rem;
+            background: #ff66c4;
+            color: #ffffff;
+            font-size: 1rem;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background: #ff33a8;
+            transform: translateY(-3px);
+        }
+
+        form input {
+            width: 90%;
+            padding: 10px;
+            margin: 10px 0;
+            font-size: 1rem;
+            color: #fff;
+            background: #2d2f3a;
+            border: 1px solid #ff66c4;
+            border-radius: 5px;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+
+        form input:focus {
+            border-color: #ff33a8;
+        }
+
+        form button {
+            background: #66ffcc;
+            color: #000;
+            margin-top: 15px;
+        }
+
+        form button:hover {
+            background: #33ff99;
+        }
+
+        #update-profile-picture-form {
+            margin-top: 20px;
+        }
+
+        #update-profile-picture-form label {
+            font-size: 1.1rem;
+            color: #f8f9fa;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        #profilePicture {
+            display: block;
+            margin: 15px 0;
+            padding: 10px;
+            background: #1f212b;
+            color: #fff;
+            border: 1px solid #ff66c4;
+            border-radius: 5px;
+            outline: none;
+        }
+
+        #profilePicture:hover {
+            border-color: #ff33a8;
         }
     </style>
 
@@ -256,7 +378,7 @@
                     <div class="profile-header">
                         <h1>Profil</h1>
                         <div class="add-photo-container">
-                            <button class="upload-label" id="upload-button"></button>
+                            <button class="upload-label" id="upload-button">+</button>
                             <input type="file" id="file-upload" name="photos" style="display: none;" accept="image/*"
                                 multiple>
                         </div>
@@ -274,7 +396,7 @@
                                     <img src="/uploads/<%= photo %>" alt="Uploaded Photo" class="add-photo"
                                         style="width: 100px; height: 100px; object-fit: cover;">
                                     <button class="delete-photo" data-photo="<%= photo %>">
-                                        <i class="fas fa-times"></i>
+                                        <i class="fas fa-times"></i>X
                                     </button>
                                 </div>
                                 <% }); %>
@@ -356,7 +478,7 @@
                     </p>
                     <p>Souhaitez-vous obtenir un autre abonnement ?</p>
                     <a href="/event/abonnement">
-                        <button>Changer d'abonnement</button>
+                        <button>Changer abonnement</button>
                     </a>
                 </div>
             </div>
@@ -382,17 +504,16 @@
                         <input type="password" name="new_password" placeholder="Nouveau mot de passe" required>
                         <input type="password" name="confirm_password" placeholder="Confirmer le nouveau mot de passe"
                             required>
-                            <button type="submit">Changer le Mot de Passe</button>
-                        </form>
-    
-                    </div>
-                    <form id="update-profile-picture-form" enctype="multipart/form-data">
-                        <label for="profilePicture">Upload New Profile Picture:</label>
-                        <input type="file" id="profilePicture" name="profilePicture" accept="image/*" required>
-                        <button type="submit">Update Picture</button>
+                        <button type="submit">Changer le Mot de Passe</button>
                     </form>
                 </div>
-                <div class="profile-arrow right-arrow" title="Modifier profil">&#9654;</div>
+                <form id="update-profile-picture-form" enctype="multipart/form-data">
+                    <label for="profilePicture">Upload New Profile Picture:</label>
+                    <input type="file" id="profilePicture" name="profilePicture" accept="image/*" required>
+                    <button type="submit">Update Picture</button>
+                </form>
+            </div>
+            <div class="profile-arrow right-arrow" title="Modifier profil">&#9654;</div>
 
 
         </div>
@@ -581,7 +702,7 @@
                         });
                 });
             });
-             
+
             document.getElementById('update-profile-picture-form').addEventListener('submit', function (e) {
                 e.preventDefault();
 
