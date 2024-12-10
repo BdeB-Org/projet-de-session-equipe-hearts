@@ -12,6 +12,8 @@
     <div class="user-profile">
       <img src="/uploads/<%= userDetails.e_photo %>" alt="User Profile" class="profile-picture" />
       <div class="profile-info">
+
+
         <h3 class="user-name">
           <%= userDetails.e_prenom %>
         </h3>
@@ -39,8 +41,9 @@
     <p>Vous avez atteint votre limite ! Prochains swipes disponibles en :</p>
     <p id="countdown-timer">00:00:00</p>
   </div>
-
   <div class="card-container"></div>
+
+
   <div id="userModal" class="modal">
     <div class="modal-content">
       <span class="close">&times;</span>
@@ -113,6 +116,13 @@
     let swipeCount = 0;
     let maxSwipes = 0;
     let swipeLimitReached = false;
+    let userImages = [];
+    const photoDisplay = document.querySelector('#photo-display');
+    let photoIndex = 0;
+    const allPhotos = [];
+    console.log("The user pics", allPhotos);  // Check the array of photos
+
+
 
     // Define DOM elements in a wider scope
     const swipesLeftElement = document.getElementById("swipes-left");
@@ -122,11 +132,29 @@
     const matchesList = document.querySelector(".matches");
     const modal = document.getElementById("userModal");
     const span = document.getElementsByClassName("close")[0];
+    const prevBtn = document.querySelector('#prev-btn');
+    const nextBtn = document.querySelector('#next-btn');
 
     const loggedInUserId = "<%= userDetails.e_id %>"; // Fetch the logged-in user's ID
     const userSubscriptionId = "<%= userDetails.abonnement_id %>"; // Fetch the logged-in user's subscription ID
 
 
+
+
+
+
+    fetch('/api/user/photos')
+      .then(response => response.json())
+      .then(data => {
+        // Assuming data is an array of photo URLs
+        userImages = data;  // Save the data into the userImages array
+        allPhotos.push(user.e_photo, ...userImages.map(photo => photo.photo_url)); // Combine profile photo with the additional photos
+        console.log("The user pics", allPhotos);  // Check the array of photos
+        updatePhotoDisplay();  // Update the displayed photo
+      })
+      .catch(error => {
+        console.error('Error fetching user photos:', error);
+      });
 
 
     // Fetch user preferences
@@ -382,11 +410,65 @@
       swipesLeftElement.textContent = maxSwipes - swipeCount;
       cardElement.classList.remove("swipe-right", "swipe-left");
     }
+    // Function to update the photo display
+    function updatePhotoDisplay() {
+      const photoDisplay = document.querySelector('#photo-display');  // Ensure there's a photo-display element
+      console.log("updatePicture Previous or next", photoDisplay + "other: ", allPhotos);
+
+      if (photoDisplay && allPhotos.length > 0) {
+        photoDisplay.src = `/uploads/${allPhotos[photoIndex]}`;  // Update the displayed photo based on the index
+      } else {
+        console.error('Photo display element not found or no photos available');
+      }
+    }
+
+    if (prevBtn) {
+      prevBtn.addEventListener('click', function () {
+        photoIndex = (photoIndex - 1 + allPhotos.length) % allPhotos.length;  // Cycle backward through the photos
+        updatePhotoDisplay();  // Update the photo display
+      });
+    } else {
+      console.error('Previous button not found');
+    }
+
+    if (nextBtn) {
+      nextBtn.addEventListener('click', function () {
+        photoIndex = (photoIndex + 1) % allPhotos.length;  // Cycle forward through the photos
+        updatePhotoDisplay();  // Update the photo display
+      });
+    } else {
+      console.error('Next button not found');
+    }
+
+    function deletePhoto(photoUrl) {
+      fetch(`/event/delete-photo/${photoUrl}`, {
+        method: 'DELETE',
+      })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            // Remove the photo from the userImages array
+            userImages = userImages.filter(photo => photo !== photoUrl);
+            currentIndex = currentIndex >= userImages.length ? 0 : currentIndex; // Adjust the currentIndex if needed
+            updatePhotoDisplay(); // Update the displayed photo
+          } else {
+            alert('Error deleting photo');
+          }
+        })
+        .catch(err => {
+          console.error('Error:', err);
+          alert('Error deleting photo');
+        });
+    }
+
+    // Call updatePhotoDisplay() to show the first photo initially
+    updatePhotoDisplay();
 
     function updateUserCard() {
       const user = users[currentIndex];
 
       if (user) {
+        // Fetch user location (unchanged fetch logic)
         fetch('/api/user-location')
           .then((response) => response.json())
           .then((data) => {
@@ -395,23 +477,50 @@
               return;
             }
 
-            cardContainer.innerHTML = `
-      <div class="card">
-        <img src="/uploads/${user.e_photo}" alt="${user.e_nom}">
-        <h2>${user.e_prenom}</h2>
-        <p>À ${closestCity.distance} kilomètres de distance (${closestCity.city})</p>
-        <p>Préférences de Likes: ${user.likes.length > 0 ? user.likes.join(", ") : "Aucune"}</p>
-        <button class="button like-button"><i class="fas fa-heart"></i>Aimer</button>
-        <button class="button pass-button"><i class="fas fa-times"></i>Passer</button>
-      </div>
-    `;
-            setupButtonListeners(user);
+            // Fetch additional photos from e_photo table
+            fetch(`/api/user/photos/${user.e_id}`)
+              .then(response => response.json())
+              .then(photos => {
+                if (Array.isArray(photos)) {
+                  const allPhotos = [user.e_photo, ...photos.map(photo => photo.photo_url)];
+                  console.log("The user pics", allPhotos);
+                  console.log("If pics there", photos);
+
+                  cardContainer.innerHTML = `
+                <div class="card">
+                  <img src="/uploads/${allPhotos[0]}" alt="${user.e_nom}" id="user-photo">
+                  <h2>${user.e_prenom}</h2>
+                  <p>À ${closestCity.distance} kilomètres de distance (${closestCity.city})</p>
+                  <p>Préférences de Likes: ${user.likes.length > 0 ? user.likes.join(", ") : "Aucune"}</p>
+                  <button class="button like-button"><i class="fas fa-heart"></i>Aimer</button>
+                  <button class="button pass-button"><i class="fas fa-times"></i>Passer</button>
+                  <button id="next-photo" class="button">Voir plus</button>
+                </div>
+              `;
+
+                  // Setup photo cycling functionality
+                  let photoIndex = 0;
+                  const photoDisplay = document.getElementById('user-photo');
+                  const nextPhotoButton = document.getElementById('next-photo');
+
+                  nextPhotoButton.addEventListener('click', () => {
+                    photoIndex = (photoIndex + 1) % allPhotos.length; // Cycle through the photos
+                    photoDisplay.src = `/uploads/${allPhotos[photoIndex]}`; // Change the photo
+                  });
+
+                  setupButtonListeners(user);
+                } else {
+                  console.error('Invalid photo data:', photos);
+                }
+              })
+              .catch((error) => console.error('Error fetching user photos:', error));
           })
           .catch((error) => console.error('Error fetching distance data:', error));
       } else {
         console.warn("No user found at current index:", currentIndex);
       }
     }
+
 
 
 

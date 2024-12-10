@@ -1670,6 +1670,66 @@ app.get('/api/get-date/:matchId', (req, res) => {
     });
 });
 
+app.get('/api/user/photos', (req, res) => {
+    const userId = req.session.user.e_id;
+
+    // Your SQL query to fetch profile photo and other photos
+    const profileQuery = 'SELECT e_photo FROM e_utilisateur WHERE e_id = ?';
+    const additionalPhotosQuery = 'SELECT photo_url FROM e_photo WHERE utilisateur_id = ?';
+
+    con.query(profileQuery, [userId], (err, profileResults) => {
+        if (err) {
+            console.error('Error fetching profile photo:', err);
+            return res.status(500).send('Error fetching profile photo');
+        }
+
+        // Make sure the `profileResults` is valid
+        if (profileResults.length > 0) {
+            const profilePicture = profileResults[0].e_photo;
+
+            // Now fetch additional photos from the e_photo table
+            con.query(additionalPhotosQuery, [userId], (err, additionalPhotosResults) => {
+                if (err) {
+                    console.error('Error fetching additional photos:', err);
+                    return res.status(500).send('Error fetching additional photos');
+                }
+
+                const additionalPhotos = additionalPhotosResults.map(photo => photo.photo_url);
+                const allPhotos = [profilePicture, ...additionalPhotos];
+
+                // Send back all photos to the client
+                res.json(allPhotos);
+            });
+        } else {
+            console.error('No profile photo found');
+            return res.status(404).send('Profile photo not found');
+        }
+    });
+});
+
+app.get('/api/user/photos/:userId', (req, res) => {
+    const userId = req.params.userId;
+
+    // Query to fetch the photos
+    const query = 'SELECT photo_url FROM e_photo WHERE utilisateur_id = ?';
+
+    con.query(query, [userId], (err, results) => {
+        if (err) {
+            console.error('Error fetching photos:', err);
+            return res.status(500).json({ error: 'Database error' });
+        }
+
+        if (results.length === 0) {
+            return res.status(404).json({ error: 'No photos found' });
+        }
+
+        res.json(results); // Send back the list of photo URLs
+    });
+});
+
+
+
+
 
 
 
