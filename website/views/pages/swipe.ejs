@@ -329,11 +329,11 @@
 
           const img = document.createElement("img");
           img.src = `/uploads/${user.e_photo}`;
-          img.alt = `Photo of ${user.e_nom}`;
+          img.alt = `Photo of ${user.e_prenom}`;
 
           const a = document.createElement("a");
           a.href = `/user/profile/${likedUserId}`;
-          a.textContent = user.e_nom; // Place the name inside the <a> tag
+          a.textContent = user.e_prenom; // Place the name inside the <a> tag
 
 
           li.appendChild(img);
@@ -497,7 +497,7 @@
 
                   cardContainer.innerHTML = `
                 <div class="card">
-                  <img src="/uploads/${allPhotos[0]}" alt="${user.e_nom}" id="user-photo">
+                  <img src="/uploads/${allPhotos[0]}" alt="${user.e_prenom}" id="user-photo">
                   <h2>${user.e_prenom}(${age} ans)</h2>
                   <p>À ${closestCity.distance} kilomètres de distance (${closestCity.city})</p>
                   <p>Préférences de Likes: ${user.likes.length > 0 ? user.likes.join(", ") : "Aucune"}</p>
@@ -632,7 +632,7 @@
 
           const a = document.createElement("a");
           a.href = `/user/profile/${match.e_id}`;
-          a.textContent = match.e_nom;
+          a.textContent = match.e_prenom;
 
           li.appendChild(img);
           li.appendChild(a);
