@@ -485,11 +485,20 @@
                   const allPhotos = [user.e_photo, ...photos.map(photo => photo.photo_url)];
                   console.log("The user pics", allPhotos);
                   console.log("If pics there", photos);
+                  const birthDate = new Date(user.date_naissance);
+                  const currentDate = new Date();
+                  let age = currentDate.getFullYear() - birthDate.getFullYear();
+                  const monthDifference = currentDate.getMonth() - birthDate.getMonth();
+
+                  // Adjust for birthday not yet passed this year
+                  if (monthDifference < 0 || (monthDifference === 0 && currentDate.getDate() < birthDate.getDate())) {
+                    age--;
+                  }
 
                   cardContainer.innerHTML = `
                 <div class="card">
                   <img src="/uploads/${allPhotos[0]}" alt="${user.e_nom}" id="user-photo">
-                  <h2>${user.e_prenom}</h2>
+                  <h2>${user.e_prenom}(${age} ans)</h2>
                   <p>À ${closestCity.distance} kilomètres de distance (${closestCity.city})</p>
                   <p>Préférences de Likes: ${user.likes.length > 0 ? user.likes.join(", ") : "Aucune"}</p>
                   <button class="button like-button"><i class="fas fa-heart"></i>Aimer</button>
