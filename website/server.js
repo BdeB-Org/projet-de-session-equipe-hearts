@@ -1228,6 +1228,8 @@ app.get('/api/users', (req, res) => {
             const likes = await getUserLikes(user.e_id);
             const card = await getUserCard(user.e_id);
             const sexualite = await getUserSexualite(user.e_id);
+            console.log("sexualit: ", sexualite);
+            console.log("card: ", card);
 
             return {
                 ...user,
@@ -1265,18 +1267,23 @@ function getUserLikes(userId) {
         });
     });
 }
-
 function getUserSexualite(userId) {
     const sexualiteQuery = 'SELECT sexualite_id FROM preference WHERE utilisateur_id = ?';
     return new Promise((resolve, reject) => {
         con.query(sexualiteQuery, [userId], (err, results) => {
-            if (err) return reject(err);
-            const sexualite = results[0] ? results[0].sexualite_id : null;
+            if (err) {
+                console.error('Error fetching sexualite:', err);
+                return reject(err);
+            }
+
+            // Find the first non-null sexualite_id
+            const sexualite = results.find(row => row.sexualite_id !== null)?.sexualite_id || null;
             console.log("Sexualite:", sexualite);
             resolve(sexualite);
         });
     });
 }
+
 
 
 function getUserCard(userId) {
