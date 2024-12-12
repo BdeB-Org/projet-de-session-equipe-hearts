@@ -200,72 +200,75 @@ VALUES
     ('Test9', 'User', '9@gmail.com', 'a', 'user9photo.jpg', 'Montreal', '1234567890', 1, 0, CURRENT_TIMESTAMP, 'Homme', '9'),
     ('Test10', 'User', '10@gmail.com', 'a', 'user10photo.jpg', 'Montreal', '1234567890', 1, 0, CURRENT_TIMESTAMP, 'Femme', '20');
 
+-- Preferences for Test1 (User with e_id = 1)
 INSERT INTO preference (utilisateur_id, card_id, like_id, sexualite_id)
 VALUES
-    (1, 2, 1, 1),  -- Test1: Joker, Musique, Homme
-    (1, 2, 3, 1),  -- Test1: Joker, Voyages, Homme
-    (1, 2, 4, 1);  -- Test1: Joker, Sport, Homme
+    (1, 2, 1, NULL),  -- Test1: Joker, Musique, NULL sexuality
+    (1, NULL, 3, 1),  -- Test1: NULL card, Voyages, Homme
+    (1, NULL, 4, NULL);  -- Test1: NULL card, Sport, NULL sexuality
+
 -- Preferences for Test2 (User with e_id = 2)
 INSERT INTO preference (utilisateur_id, card_id, like_id, sexualite_id)
 VALUES
-    (2, 2, 1, 1),  -- Test2: Joker, Musique, Homme
-    (2, 2, 2, 1),  -- Test2: Joker, Cinéma, Homme
-    (2, 2, 3, 1);  -- Test2: Joker, Voyages, Homme
+    (2, 2, 1, NULL),  -- Test2: Joker, Musique, NULL sexuality
+    (2, NULL, 2, 1),  -- Test2: NULL card, Cinéma, Homme
+    (2, NULL, 3, NULL);  -- Test2: NULL card, Voyages, NULL sexuality
 
 -- Preferences for Test3 (User with e_id = 3)
 INSERT INTO preference (utilisateur_id, card_id, like_id, sexualite_id)
 VALUES
-    (3, 3, 1, 2),  -- Test3: Reine, Musique, Femme
-    (3, 3, 4, 2),  -- Test3: Reine, Sport, Femme
-    (3, 3, 6, 2);  -- Test3: Reine, Cuisine, Femme
+    (3, 2, 1, NULL),  -- Test3: Joker, Musique, NULL sexuality
+    (3, NULL, 4, 2),  -- Test3: NULL card, Sport, Femme
+    (3, NULL, 6, NULL);  -- Test3: NULL card, Cuisine, NULL sexuality
 
 -- Preferences for Test4 (User with e_id = 4)
 INSERT INTO preference (utilisateur_id, card_id, like_id, sexualite_id)
 VALUES
-    (4, 4, 1, 2),  -- Test4: Roi, Musique, Femme
-    (4, 4, 3, 2),  -- Test4: Roi, Voyages, Femme
-    (4, 4, 5, 2);  -- Test4: Roi, Lecture, Femme
+    (4, 2, 1, NULL),  -- Test4: Joker, Musique, NULL sexuality
+    (4, NULL, 2, 1),  -- Test4: NULL card, Cinéma, Homme
+    (4, NULL, 3, NULL);  -- Test4: NULL card, Voyages, NULL sexuality
 
 -- Preferences for Test5 (User with e_id = 5)
 INSERT INTO preference (utilisateur_id, card_id, like_id, sexualite_id)
 VALUES
-    (5, 1, 1, 1),  -- Test5: Ace, Musique, Homme
-    (5, 1, 4, 1),  -- Test5: Ace, Sport, Homme
-    (5, 1, 6, 1);  -- Test5: Ace, Cuisine, Homme
+    (5, 2, 1, NULL),  -- Test5: Joker, Musique, NULL sexuality
+    (5, NULL, 4, 1),  -- Test5: NULL card, Sport, Homme
+    (5, NULL, 6, NULL);  -- Test5: NULL card, Cuisine, NULL sexuality
 
 -- Preferences for Test6 (User with e_id = 6)
 INSERT INTO preference (utilisateur_id, card_id, like_id, sexualite_id)
 VALUES
-    (6, 2, 2, 2),  -- Test6: Joker, Cinéma, Femme
-    (6, 2, 3, 2),  -- Test6: Joker, Voyages, Femme
-    (6, 2, 5, 2);  -- Test6: Joker, Lecture, Femme
+    (6, 2, 1, NULL),  -- Test6: Joker, Musique, NULL sexuality
+    (6, NULL, 2, 2),  -- Test6: NULL card, Cinéma, Femme
+    (6, NULL, 3, NULL);  -- Test6: NULL card, Voyages, NULL sexuality
 
 -- Preferences for Test7 (User with e_id = 7)
 INSERT INTO preference (utilisateur_id, card_id, like_id, sexualite_id)
 VALUES
-    (7, 3, 1, 1),  -- Test7: Reine, Musique, Homme
-    (7, 3, 2, 1),  -- Test7: Reine, Cinéma, Homme
-    (7, 3, 4, 1);  -- Test7: Reine, Sport, Homme
+    (7, 2, 1, NULL),  -- Test7: Joker, Musique, NULL sexuality
+    (7, NULL, 2, 1),  -- Test7: NULL card, Cinéma, Homme
+    (7, NULL, 4, NULL);  -- Test7: NULL card, Sport, NULL sexuality
 
 -- Preferences for Test8 (User with e_id = 8)
 INSERT INTO preference (utilisateur_id, card_id, like_id, sexualite_id)
 VALUES
-    (8, 4, 1, 2),  -- Test8: Roi, Musique, Femme
-    (8, 4, 2, 2),  -- Test8: Roi, Cinéma, Femme
-    (8, 4, 3, 2);  -- Test8: Roi, Voyages, Femme
+    (8, 2, 1, NULL),  -- Test8: Joker, Musique, NULL sexuality
+    (8, NULL, 2, 2),  -- Test8: NULL card, Cinéma, Femme
+    (8, NULL, 3, NULL);  -- Test8: NULL card, Voyages, NULL sexuality
 
 -- Preferences for Test9 (User with e_id = 9)
 INSERT INTO preference (utilisateur_id, card_id, like_id, sexualite_id)
 VALUES
-    (9, 1, 2, 1),  -- Test9: Ace, Cinéma, Homme
-    (9, 1, 4, 1),  -- Test9: Ace, Sport, Homme
-    (9, 1, 5, 1);  -- Test9: Ace, Lecture, Homme
+    (9, 2, 1, NULL),  -- Test9: Joker, Musique, NULL sexuality
+    (9, NULL, 4, 1),  -- Test9: NULL card, Sport, Homme
+    (9, NULL, 5, NULL);  -- Test9: NULL card, Lecture, NULL sexuality
 
 -- Preferences for Test10 (User with e_id = 10)
 INSERT INTO preference (utilisateur_id, card_id, like_id, sexualite_id)
 VALUES
-    (10, 2, 1, 2),  -- Test10: Joker, Musique, Femme
-    (10, 2, 4, 2),  -- Test10: Joker, Sport, Femme
-    (10, 2, 6, 2);  -- Test10: Joker, Cuisine, Femme
+    (10, 2, 1, NULL),  -- Test10: Joker, Musique, NULL sexuality
+    (10, NULL, 4, 2),  -- Test10: NULL card, Sport, Femme
+    (10, NULL, 6, NULL);  -- Test10: NULL card, Cuisine, NULL sexuality
+
 
 
