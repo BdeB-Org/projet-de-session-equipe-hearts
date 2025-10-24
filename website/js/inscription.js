@@ -353,8 +353,9 @@ document.addEventListener("DOMContentLoaded", () => {
         const selectedImage = event.target.closest("img");
         if (selectedImage) {
           const choice = selectedImage.alt;
-          showUserResponse(`Image choisie: ${choice}`);
-          saveResponse("selectedImage", choice);
+showUserResponse(`Image choisie: ${choice}`);
+saveResponse("selectedSexualite", choice === "Homme" ? 1 : 2);
+
           imageSection.remove();
           userInput.style.display = "";
           currentQuestion++;

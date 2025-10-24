@@ -249,6 +249,30 @@ app.get('/api/user-location', async (req, res) => {
     }
 });
 
+// --- helper: ensure we have a valid "Latitude: x, Longitude: y" in session (and DB) ---
+async function ensureUserLocation(req) {
+  let loc = req.session?.user?.e_location;
+  if (loc && loc.includes(',') && loc.toLowerCase().includes('latitude') && loc.toLowerCase().includes('longitude')) {
+    return loc; // already good
+  }
+  try {
+    const resp = await axios.get('http://ip-api.com/json/?fields=lat,lon');
+    const { lat, lon } = resp.data || {};
+    if (typeof lat !== 'number' || typeof lon !== 'number') return null;
+
+    const userLocationString = `Latitude: ${lat}, Longitude: ${lon}`;
+    // update session
+    if (req.session?.user) req.session.user.e_location = userLocationString;
+    // best-effort DB update (don’t block route)
+    if (req.session?.user?.e_id) {
+      con.query('UPDATE e_utilisateur SET e_location = ? WHERE e_id = ?', [userLocationString, req.session.user.e_id], () => {});
+    }
+    return userLocationString;
+  } catch {
+    return null;
+  }
+}
+
 /*
 ------------------------------------------
     Crypting
@@ -1083,7 +1107,7 @@ app.get("/event/swipe", (req, res) => {
         FROM matches
         WHERE user1_id = ? OR user2_id = ?;
     `;
-        con.query(getMatchesQuery, [userId, userId], (err, matches) => {
+        con.query(getMatchesQuery, [userId, userId], async (err, matches) => {
             if (err) {
                 console.error('Error fetching matches:', err);
                 return res.status(500).send('Error fetching matches');
@@ -1095,14 +1119,13 @@ app.get("/event/swipe", (req, res) => {
 
             console.log("Matches found:", formattedMatches);
 
-            // Fetch the location from the session
-            const userLocation = req.session.user.e_location;
-            console.log('User Location:', userLocation);
+let userLocation = await ensureUserLocation(req);
+console.log('User Location (resolved):', userLocation);
+if (!userLocation) {
+  // No hard fail — render page and let distances be "Unknown"
+  userLocation = 'Latitude: 0, Longitude: 0';
+}
 
-            if (!userLocation || !userLocation.includes(',')) {
-                console.error('Invalid location format or missing location data');
-                return res.status(400).send('Invalid location format');
-            }
 
             // Split the location string and extract lat, lon
             const locationParts = userLocation.split(',');
@@ -2213,6 +2236,8 @@ app.post('/event/inscription', upload.single('photo'), (req, res) => {
         if (result.length > 0) {
             return res.status(409).send("Email already in use");
         }
+        console.log('Received sexuality:', req.body.selectedSexualite);
+console.log('Full body:', req.body);
 
         // Insert the new user
         const insertUserQuery = `
@@ -2297,6 +2322,7 @@ app.post('/event/inscription', upload.single('photo'), (req, res) => {
                     });
                 });
             }
+            
 
             let sexualiteIdPromise = Promise.resolve();
             if (selectedSexualite) {
