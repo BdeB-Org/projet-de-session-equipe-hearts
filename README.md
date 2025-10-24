@@ -271,4 +271,6 @@ VALUES
     (10, NULL, 6, NULL);  -- Test10: NULL card, Cuisine, NULL sexuality
 
 
-
+# PAIEMENT CARTE TEST
+4111 1111 1111
+(Mois valide et annee valide) + chiffre random
