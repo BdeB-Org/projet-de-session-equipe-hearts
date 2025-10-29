@@ -19,7 +19,7 @@ function redirectInscription(event) {
   localStorage.setItem("password", password);
   const url = "/views/pages/inscription.html";
   console.log(url)
-  window.location.href = url;
+  // window.location.href = url;
 }
 
 function redirectAccueil(event) {
