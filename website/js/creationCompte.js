@@ -17,8 +17,9 @@ function redirectInscription(event) {
 
   localStorage.setItem("email", email);
   localStorage.setItem("password", password);
-
-  window.location.href = "/views/pages/inscription.html";
+  const url = "/views/pages/inscription.html";
+  console.log(url)
+  window.location.href = url;
 }
 
 function redirectAccueil(event) {
