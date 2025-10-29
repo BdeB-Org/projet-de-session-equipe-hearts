@@ -11,15 +11,16 @@ loginBtn.addEventListener("click", () => {
 });
 
 function redirectInscription(event) {
+  console.log('a');
   event.preventDefault();
   const email = document.getElementById("courriel_insc").value;
   const password = document.getElementById("mdp_insc").value;
 
   localStorage.setItem("email", email);
   localStorage.setItem("password", password);
-  const url = "/views/pages/inscription.html";
+  const url = "/views/pages/";
   console.log(url)
-  // window.location.href = url;
+  window.location.href = url;
 }
 
 function redirectAccueil(event) {
