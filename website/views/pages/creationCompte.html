@@ -51,7 +51,7 @@
       </div>
 
       <div class="form-container sign-in">
-        <form method="post" action="/views/pages/swipe.html">
+        <form method="post" action="views/pages/swipe.html">
           <h1>Se Connecter</h1>
           <div class="social-icons">
             <a href="#" class="icons"><i class="fa-brands fa-google"></i></a>
@@ -107,7 +107,7 @@
 
   <script src="/js/creationCompte.js"></script>
   <script>
-    fetch("/views/partials/header.html")
+    fetch("views/partials/header.html")
       .then((res) => res.text())
       .then((html) => {
         document.getElementById("header-placeholder").innerHTML = html;
