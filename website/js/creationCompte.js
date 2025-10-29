@@ -10,30 +10,15 @@ loginBtn.addEventListener("click", () => {
   container.classList.remove("active");
 });
 
-// function redirectInscription(event) {
-//   event.preventDefault();
-//   const email = document.getElementById("courriel_insc").value;
-//   const password = document.getElementById("mdp_insc").value;
-
-//   localStorage.setItem("email", email);
-//   localStorage.setItem("password", password);
-
-//   window.location.href = "/views/pages/inscription.html";
-// }
 function redirectInscription(event) {
   event.preventDefault();
-  alert("redirectInscription triggered ✅");
-
   const email = document.getElementById("courriel_insc").value;
   const password = document.getElementById("mdp_insc").value;
-  alert(`email=${email}, password=${password}`);
 
   localStorage.setItem("email", email);
   localStorage.setItem("password", password);
-  alert("localStorage saved ✅");
 
-  window.location.href = "/views/pages/inscription.html";
-  alert("Redirect executed — you should see inscription.html next!");
+  window.location.href = "/views/pages/inscription";
 }
 
 function redirectAccueil(event) {
@@ -176,20 +161,4 @@ unavailableSocials.forEach((icon) => {
     e.preventDefault();
     alert("Seule la connexion Google est disponible dans cette version démo.");
   });
-});
-
-// function redirectSwipe(event) {
-//   event.preventDefault();
-//   window.location.href = "/views/pages/swipe.html";
-// }
-
-function redirectSwipe(event) {
-  event.preventDefault();
-  alert("redirectSwipe triggered ✅");
-  window.location.href = "/views/pages/swipe.html";
-  alert("Redirect executed — you should see swipe.html next!");
-}
-
-document.addEventListener("DOMContentLoaded", () => {
-  alert("Page loaded ✅");
 });

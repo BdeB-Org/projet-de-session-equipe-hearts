@@ -6,12 +6,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Document</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+  <link rel="stylesheet" href="/cyberpunk-css-main/cyberpunk.css" />
 
 
-  <link rel="stylesheet" href="cyberpunk-css-main/cyberpunk.css" />
-  <link rel="stylesheet" href="css/creationCompte.css" />
-
-
+  <link rel="stylesheet" href="/css/creationCompte.css" />
 
 </head>
 
@@ -53,7 +51,7 @@
       </div>
 
       <div class="form-container sign-in">
-        <form onsubmit="redirectSwipe(event)">
+        <form method="post" action="/views/pages/swipe.html">
           <h1>Se Connecter</h1>
           <div class="social-icons">
             <a href="#" class="icons"><i class="fa-brands fa-google"></i></a>
@@ -107,9 +105,9 @@
     </div>
   </div>
 
-  <script src="js/creationCompte.js"></script>
+  <script src="/js/creationCompte.js"></script>
   <script>
-    fetch("./views/partials/header.html")
+    fetch("/views/partials/header.html")
       .then((res) => res.text())
       .then((html) => {
         document.getElementById("header-placeholder").innerHTML = html;
