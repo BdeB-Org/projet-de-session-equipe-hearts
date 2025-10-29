@@ -18,7 +18,7 @@ function redirectInscription(event) {
   localStorage.setItem("email", email);
   localStorage.setItem("password", password);
 
-  window.location.href = "views/pages/inscription.html";
+  window.location.href = "./views/pages/inscription.html";
 }
 
 function redirectAccueil(event) {
@@ -162,3 +162,8 @@ unavailableSocials.forEach((icon) => {
     alert("Seule la connexion Google est disponible dans cette version démo.");
   });
 });
+
+function redirectSwipe(event) {
+  event.preventDefault();
+  window.location.href = "./views/pages/swipe.html";
+}
