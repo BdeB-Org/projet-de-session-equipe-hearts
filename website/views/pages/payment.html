@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Paiement - Hearts</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400..900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/css/payment.css" />
+</head>
+
+<body>
+  <video autoplay muted loop id="background-video">
+    <source src="/images/vecteezy_abstract-cyberpunk-animated-background_4846470.mp4" type="video/mp4" />
+    Votre navigateur ne supporte pas la vidéo.
+  </video>
+
+  <div class="payment-container">
+    <h1>Payer Votre Abonnement</h1>
+    <p>Merci de choisir votre plan.</p>
+
+
+    <div class="receipt">
+      <div class="receipt-item">
+        <span><strong>Nom de l’abonnement:</strong></span>
+        <span id="subscription-name"></span>
+      </div>
+      <div class="receipt-item">
+        <span><strong>Montant initial:</strong></span>
+        <span id="initial-amount"></span>
+      </div>
+      <div class="receipt-item">
+        <span><strong>TVQ:</strong></span>
+        <span id="tvq-amount"></span>
+      </div>
+      <div class="receipt-item">
+        <span><strong>TPS:</strong></span>
+        <span id="tps-amount"></span>
+      </div>
+      <div class="receipt-item">
+        <span><strong>Total:</strong></span>
+        <span id="total-amount"></span>
+      </div>
+    </div>
+
+    <form id="payment-form">
+      <button type="submit" class="button">Payer</button>
+    </form>
+
+    <p class="demo-note">
+      💡 <em>Note :</em> Ceci est une version démo. Dans la version complète, cette
+      page utilisait l’API Square Sandbox pour simuler un paiement réel.
+    </p>
+  </div>
+
+
+  <div id="card-modal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal()">&times;</span>
+      <h2 style="color: #ff007f">Saisir les détails de la carte</h2>
+      <label for="cardholder-name">Courriel de confirmation:</label>
+      <input type="email" id="cardholder-name" placeholder="exemple@mail.com" required />
+      <button class="submit-button" id="submit-button">Soumettre le paiement</button>
+    </div>
+  </div>
+
+
+  <div id="loading-modal" class="modal">
+    <div class="modal-content">
+      <div class="spinner"></div>
+      <h2>Traitement du paiement...</h2>
+      <p>Merci de patienter pendant que nous traitons votre paiement.</p>
+    </div>
+  </div>
+
+  <script src="/js/payment.js"></script>
+</body>
+
+</html>

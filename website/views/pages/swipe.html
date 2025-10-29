@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Swipe - Hearts</title>
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400..900&display=swap" rel="stylesheet" />
+
+
+  <link rel="stylesheet" href="/css/swipe.css" />
+</head>
+
+<body>
+  <div class="glitch-background"></div>
+
+  <div class="sidebar">
+    <div class="user-profile">
+      <img src="/images/user.jpg" alt="User Profile" class="profile-picture" />
+      <div class="profile-info">
+        <h3 class="user-name" id="user-name">Utilisateur</h3>
+        <div class="user-icons">
+          <a href="/views/pages/profil.html"><i class="fas fa-user-circle icon-img"></i></a>
+          <a href="#"><i class="fas fa-comments icon-img"></i></a>
+        </div>
+      </div>
+    </div>
+    <h2 class="matches-title">Matches</h2>
+    <ul class="matches"></ul>
+  </div>
+
+  <div id="swipe-counter">
+    <p>Swipes restants : <span id="swipes-left">5</span></p>
+  </div>
+
+
+  <div id="countdown" style="display: none">
+    <p>Vous avez atteint votre limite ! Prochains swipes disponibles en :</p>
+    <p id="countdown-timer">00:00:00</p>
+  </div>
+
+
+  <div class="swipe-zone">
+    <div class="mock-card">
+
+    </div>
+  </div>
+
+  <div id="userModal" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <img id="modalImage" src="" alt="profile picture" style="width: 100px; height: 100px; border-radius: 50%" />
+      <h4 id="modalName"></h4>
+      <p id="modalDetails"></p>
+    </div>
+  </div>
+  <script src="/js/swipe.js"></script>
+</body>
+
+</html>

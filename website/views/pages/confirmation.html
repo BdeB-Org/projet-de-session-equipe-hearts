@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Confirmation - Hearts</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400..900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/css/confirmation.css" />
+</head>
+
+<body>
+  <video autoplay muted loop id="background-video">
+    <source src="/images/vecteezy_3d-rendering-seamless-loop-motion-of-pink-and-blue-neon-tunnel_6529619.mov"
+      type="video/mp4" />
+    Votre navigateur ne supporte pas la vidéo.
+  </video>
+
+
+  <div id="loading-screen">
+    <div class="spinner"></div>
+    <p>Traitement du paiement...</p>
+  </div>
+
+  <div class="confirmation-container" id="confirmation" style="display: none;">
+    <h1>Paiement confirmé</h1>
+
+    <p class="details">
+      Merci, <span class="highlight">John Doe</span> !
+    </p>
+    <p class="details">
+      Votre abonnement <span class="highlight plan">Premium</span> a été traité
+      avec succès.
+    </p>
+    <p class="details">
+      Payment ID: <span class="highlight">PAY-123456789</span>
+    </p>
+    <p class="details">
+      Email: <span class="highlight">john.doe@example.com</span>
+    </p>
+    <p class="details">
+      Le reçu a été envoyé à :
+      <span class="highlight">john.doe@example.com</span>
+    </p>
+
+    <div class="receipt">
+      <div class="receipt-item">
+        <span><strong>Prix d'abonnement:</strong></span>
+        <span>$19.47</span>
+      </div>
+      <div class="receipt-item">
+        <span><strong>TVQ:</strong></span>
+        <span>$1.95</span>
+      </div>
+      <div class="receipt-item">
+        <span><strong>TPS:</strong></span>
+        <span>$0.97</span>
+      </div>
+      <div class="receipt-item">
+        <span><strong>Total:</strong></span>
+        <span>$22.39</span>
+      </div>
+    </div>
+
+    <div class="button-container">
+      <button class="back-button" onclick="window.location.href='accueil.html'">
+        Retour à l'accueil
+      </button>
+      <button class="back-button" onclick="alert('Téléchargement désactivé dans la démo.');">
+        Télécharger le reçu en PDF
+      </button>
+    </div>
+
+    <p class="demo-note">
+      💡 <em>Note :</em> Ceci est une version démo. Dans la version complète, cette
+      page apparaîtrait après une transaction réelle via l’API de paiement.
+    </p>
+  </div>
+
+  <script src="/js/confirmation.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="/css/accueil.css" />
+  <title>Card Flip Animation</title>
+</head>
+
+<body>
+  <div id="header-placeholder"></div>
+
+
+  <div class="title">
+    Cliquez sur une carte pour voir des informations supplémentaires
+  </div>
+  <div class="grid"></div>
+  <div class="glow"></div>
+  <div class="cards">
+    <div class="card card-1" data-title="Joker"
+      data-description="Pour ceux qui cherchent un 'ami... avec un petit plus', sans trop de complications !">
+      <div class="card-inner">
+        <div class="card-front">
+          <img src="/images/CARD5-JOKER.png" alt="Joker" />
+        </div>
+        <div class="card-back card-back-1">
+        </div>
+      </div>
+    </div>
+
+    <div class="card card-2" data-title="Reine"
+      data-description="Pour ceux qui veulent juste apprendre à se connaître, sans se prendre la tête... et sans passer par la case lit !">
+      <div class="card-inner">
+        <div class="card-front">
+          <img src="/images/CARD4-QUEEN.png" alt="Card 2" />
+        </div>
+        <div class="card-back card-back-2">
+        </div>
+      </div>
+    </div>
+
+    <div class="card card-3" data-title="Ace"
+      data-description="Quand tu veux passer une bonne soirée... sans les discussions du lendemain.">
+      <div class="card-inner">
+        <div class="card-front">
+          <img src="/images/CARD1-ACE.png" alt="Card 3" />
+        </div>
+        <div class="card-back card-back-3">
+        </div>
+      </div>
+    </div>
+
+    <div class="card card-4" data-title="Roi"
+      data-description="Pour les rois et reines du cœur, en quête d'une histoire qui dure et qui compte.">
+      <div class="card-inner">
+        <div class="card-front">
+          <img src="/images/CARDS3-KING-2.png" alt="Card 4" />
+        </div>
+        <div class="card-back card-back-4">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="modal" class="modal">
+    <p id="modal-description"></p>
+    <div class="modal-close" id="close-modal">Fermer</div>
+  </div>
+
+  <script src="/js/accueil.js"></script>
+
+  <script>
+    fetch("/views/partials/header.html")
+      .then((res) => res.text())
+      .then((html) => {
+        document.getElementById("header-placeholder").innerHTML = html;
+      });
+  </script>
+
+</body>
+
+</html>

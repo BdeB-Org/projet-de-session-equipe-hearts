@@ -1,14 +1,15 @@
-/* General Body and Font Settings */
 body {
+  padding-top: 170px;
   margin: 0;
   font-family: "Orbitron", sans-serif;
   background-color: #000;
 }
 
-/* Chat Container for Chat-Style Interface */
+
 .chat-container {
   max-width: 600px;
-  max-height: 70vh; /* Limit the height so it scrolls when content overflows */
+  max-height: 70vh;
+
   margin: auto;
   padding: 20px;
   background-color: #1a1a1a;
@@ -16,15 +17,18 @@ body {
   box-shadow: 0 0 15px rgba(255, 0, 255, 0.5);
   position: relative;
   color: #fff;
-  overflow-y: auto; /* Enable vertical scrolling */
+  overflow-y: auto;
+
 }
 
 .chat-container::-webkit-scrollbar {
-  width: 6px; /* Slim scrollbar */
+  width: 6px;
+
 }
 
 .chat-container::-webkit-scrollbar-thumb {
-  background-color: #534b4f; /* Cyberpunk-themed color */
+  background-color: #534b4f;
+
   border-radius: 10px;
 }
 
@@ -40,7 +44,8 @@ body {
   flex-direction: column;
   gap: 10px;
 }
-/* Message Styles */
+
+
 .message {
   display: flex;
   align-items: center;
@@ -77,12 +82,13 @@ body {
   display: inline-block;
   width: 2px;
   height: 1em;
-  background-color: #ffcc00; /* Adjust color as needed */
+  background-color: #ffcc00;
+
   margin-left: 5px;
   animation: blink 1s step-end infinite;
 }
 
-/* Blinking animation keyframes */
+
 @keyframes blink {
   50% {
     opacity: 0;
@@ -124,17 +130,19 @@ body {
   transform: scale(1.1);
 }
 
-/* Flickering Effect */
+
 @keyframes typing {
   from {
     width: 0;
   }
+
   to {
     width: 100%;
   }
 }
 
 @keyframes flicker {
+
   0%,
   19%,
   21%,
@@ -146,6 +154,7 @@ body {
     opacity: 1;
     filter: brightness(1.1);
   }
+
   20%,
   24%,
   55% {
@@ -154,7 +163,7 @@ body {
   }
 }
 
-/* Modal and Options for Interests */
+
 .modal {
   display: none;
   position: fixed;
@@ -199,7 +208,7 @@ body {
   cursor: pointer;
 }
 
-/* Save Button in Modal */
+
 #save-options-btn {
   background-color: #ffcc00;
   color: #24043a;
@@ -210,7 +219,7 @@ body {
   margin-top: 10px;
 }
 
-/* Styles for Selected Interests */
+
 #pick-options-btn {
   background-color: #ff7991;
   color: #fff;
@@ -226,8 +235,7 @@ body {
   font-size: 14px;
 }
 
-/*  style pour icones */
-/* Container for the icons */
+
 .icon-container {
   display: flex;
   justify-content: space-around;
@@ -238,7 +246,7 @@ body {
   box-shadow: 0 0 10px rgba(255, 0, 255, 0.5);
 }
 
-/* Styling for each icon */
+
 .icon-container .icon {
   width: 70px;
   height: 70px;
@@ -247,19 +255,19 @@ body {
   transition: transform 0.3s, box-shadow 0.3s;
 }
 
-/* Hover effect for icons */
+
 .icon-container .icon:hover {
   transform: scale(1.1);
   box-shadow: 0 0 15px rgba(255, 165, 0, 0.7);
 }
 
-/* Selected icon styling for better visual feedback */
+
 .icon-container .icon:active {
   transform: scale(0.9);
   box-shadow: 0 0 10px rgba(0, 255, 255, 0.7);
 }
 
-/* Optional: Add a border effect to make icons stand out more */
+
 .icon-container label {
   padding: 5px;
   border-radius: 10px;
@@ -270,21 +278,19 @@ body {
   background-color: rgba(255, 255, 255, 0.1);
 }
 
-/* Style pour pop-up prefs*/
 
-/* Modal background styling */
 .modal {
-  display: none; /* Hidden by default */
+  display: none;
   position: fixed;
   z-index: 1000;
   left: 0;
   top: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.7); /* Semi-transparent background */
+  background-color: rgba(0, 0, 0, 0.7);
 }
 
-/* Modal content styling */
+
 .modal-content {
   background-color: #1a1a1a;
   margin: 10% auto;
@@ -297,7 +303,7 @@ body {
   text-align: center;
 }
 
-/* Scrollable options styling */
+
 .scrollable-options {
   max-height: 200px;
   overflow-y: auto;
@@ -307,14 +313,14 @@ body {
   color: #fff;
 }
 
-/* Individual option label styling */
+
 .scrollable-options label {
   display: block;
   padding: 5px 0;
   cursor: pointer;
 }
 
-/* Close button styling */
+
 .close-btn {
   color: #ffcc00;
   float: right;
@@ -322,7 +328,7 @@ body {
   cursor: pointer;
 }
 
-/* Save button styling */
+
 #save-options-btn {
   background-color: #ff007f;
   color: #fff;
@@ -333,7 +339,7 @@ body {
   margin-top: 10px;
 }
 
-/* Trigger button styling */
+
 #pick-options-btn {
   background-color: #ffcc00;
   color: #24043a;
@@ -344,9 +350,7 @@ body {
   margin-top: 10px;
 }
 
-/* style pour quand select image (H/F) */
 
-/* Cyberpunk Edge Effect for Image Selection */
 .image-section {
   position: relative;
   display: inline-block;
@@ -364,7 +368,7 @@ body {
   box-shadow: 0 0 15px rgba(255, 0, 255, 0.7), 0 0 25px rgba(0, 255, 255, 0.7);
 }
 
-/* Cyberpunk glow and edge effect */
+
 .image-section::before {
   content: "";
   position: absolute;
@@ -373,18 +377,16 @@ body {
   right: -8px;
   bottom: -8px;
   border-radius: 12px;
-  background: linear-gradient(
-    135deg,
-    rgba(255, 0, 255, 0.5),
-    rgba(0, 255, 255, 0.5)
-  );
+  background: linear-gradient(135deg,
+      rgba(255, 0, 255, 0.5),
+      rgba(0, 255, 255, 0.5));
   opacity: 0.9;
   filter: blur(15px);
   transition: transform 0.4s ease, opacity 0.4s ease;
   z-index: -1;
 }
 
-/* Hover effects */
+
 .image-section:hover {
   transform: scale(1.05);
 }
@@ -394,14 +396,15 @@ body {
   filter: blur(20px);
 }
 
-/* Holographic-like color cycling effect on hover */
+
 .image-section:hover img {
   transform: scale(1.1);
   box-shadow: 0 0 20px rgba(0, 255, 255, 0.8), 0 0 10px rgba(255, 0, 255, 0.8);
 }
 
-/* Flicker effect for a glitchy look */
+
 @keyframes flicker {
+
   0%,
   19%,
   21%,
@@ -412,6 +415,7 @@ body {
   100% {
     opacity: 1;
   }
+
   20%,
   24%,
   55% {
@@ -423,7 +427,7 @@ body {
   animation: flicker 1.5s infinite alternate;
 }
 
-/* Style for labels to keep them aligned with the cyberpunk theme */
+
 .image-section label {
   display: block;
   padding: 5px;
@@ -436,60 +440,75 @@ body {
 }
 
 #dateInput {
-  appearance: none; /* Removes default browser styles */
-  background-color: #1a1a1a; /* Background matching chat container */
-  color: #ffcc00; /* Cyberpunk yellow text */
-  border: 2px solid #ff00ff; /* Neon purple border */
+  appearance: none;
+
+  background-color: #1a1a1a;
+
+  color: #ffcc00;
+
+  border: 2px solid #ff00ff;
+
   border-radius: 10px;
   padding: 10px;
   font-size: 16px;
   font-family: "Orbitron", sans-serif;
   outline: none;
-  width: 100%; /* Full width for better alignment */
+  width: 100%;
+
   box-shadow: 0 0 10px rgba(255, 0, 255, 0.5), 0 0 20px rgba(0, 255, 255, 0.5);
   transition: transform 0.3s, box-shadow 0.3s;
 }
 
 #dateInput:hover {
-  transform: scale(1.05); /* Slight scaling on hover */
+  transform: scale(1.05);
+
   box-shadow: 0 0 15px rgba(255, 255, 0, 0.7), 0 0 25px rgba(255, 0, 255, 0.7);
 }
 
 #dateInput:focus {
   outline: none;
-  border-color: #00ffff; /* Neon cyan on focus */
+  border-color: #00ffff;
+
   box-shadow: 0 0 15px rgba(0, 255, 255, 0.7), 0 0 25px rgba(255, 255, 0, 0.7);
 }
 
-/* Customize the file input */
+
 #photoUpload {
-  appearance: none; /* Removes default browser styles */
-  background-color: #1a1a1a; /* Background matching chat container */
-  color: #ffcc00; /* Cyberpunk yellow text */
-  border: 2px solid #ff00ff; /* Neon purple border */
+  appearance: none;
+
+  background-color: #1a1a1a;
+
+  color: #ffcc00;
+
+  border: 2px solid #ff00ff;
+
   border-radius: 10px;
   padding: 10px;
   font-size: 16px;
   font-family: "Orbitron", sans-serif;
   outline: none;
-  width: 70%; /* Full width for better alignment */
-  cursor: pointer; /* Indicate clickable area */
+  width: 70%;
+
+  cursor: pointer;
+
   box-shadow: 0 0 10px rgba(255, 0, 255, 0.5), 0 0 20px rgba(0, 255, 255, 0.5);
   transition: transform 0.3s, box-shadow 0.3s;
 }
 
 #photoUpload:hover {
-  transform: scale(1.05); /* Slight scaling on hover */
+  transform: scale(1.05);
+
   box-shadow: 0 0 15px rgba(255, 255, 0, 0.7), 0 0 25px rgba(255, 0, 255, 0.7);
 }
 
 #photoUpload:focus {
   outline: none;
-  border-color: #00ffff; /* Neon cyan on focus */
+  border-color: #00ffff;
+
   box-shadow: 0 0 15px rgba(0, 255, 255, 0.7), 0 0 25px rgba(255, 255, 0, 0.7);
 }
 
-/* Optional: Add a custom label for better styling */
+
 .custom-file-label {
   display: inline-block;
   background-color: #1a1a1a;

@@ -150,61 +150,61 @@ button:active {
 .matches li {
     position: relative;
     width: 100px;
-    /* Set a fixed width for the match entries */
+
     height: 100px;
-    /* Make the height equal to the width to form a square */
+
     margin: 10px auto;
-    /* Center the matches in the sidebar */
+
     overflow: hidden;
-    /* Ensures no overflow of content outside the boundary */
+
     border-radius: 10px;
-    /* Optional: rounded corners for the image */
+
 }
 
 .matches img {
     width: 100%;
-    /* Cover the width of the parent li */
+
     height: 100%;
-    /* Cover the height to maintain aspect ratio */
+
     object-fit: cover;
-    /* Ensures the image covers the area without distorting */
+
     transition: transform 0.3s ease-in-out;
-    /* Smooth transform effect on hover */
+
 }
 
 .matches a {
     position: absolute;
-    /* Positioning inside the li */
+
     bottom: 0;
-    /* Align at the bottom */
+
     left: 0;
     width: 100%;
-    /* Full width of the li */
+
     background-color: rgba(0, 0, 0, 0.5);
-    /* Semi-transparent overlay */
+
     color: white;
-    /* Text color */
+
     text-align: center;
-    /* Center the text horizontally */
+
     padding: 5px 0;
-    /* Padding to give some spacing */
+
     font-size: 0.9rem;
-    /* Smaller font size */
+
     text-decoration: none;
-    /* Remove underline from links */
+
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
-    /* Optional: some shadow for depth */
+
 }
 
 .matches a:hover {
     background-color: rgba(0, 0, 0, 0.7);
-    /* Darken the overlay on hover */
+
 }
 
-/* Additional hover effect for the image */
+
 .matches li:hover img {
     transform: scale(1.1);
-    /* Zoom effect on hover */
+
 }
 
 .user-profile {
@@ -278,7 +278,7 @@ button:active {
     color: #ffcc00;
 }
 
-/* Add tilt animations */
+
 .card.swipe-right {
     transform: translateX(100%) rotate(15deg);
     opacity: 0;
@@ -291,7 +291,7 @@ button:active {
     transition: transform 0.5s ease, opacity 0.5s ease;
 }
 
-/* Heart bounce animation */
+
 .heart-bounce {
     position: absolute;
     font-size: 40px;
@@ -317,7 +317,6 @@ button:active {
     }
 }
 
-/* X bounce animation */
 .x-bounce {
     position: absolute;
     font-size: 40px;
@@ -347,7 +346,7 @@ button:active {
     border: 1px solid #888;
     width: 50%;
     border-radius: 15px;
-    /*remoce cirecle*/
+
     box-shadow: 0 0 20px 10px rgba(0, 255, 255, 0.7);
     flex-direction: column;
     align-items: center;
@@ -371,15 +370,15 @@ button:active {
 .calendar-container {
     margin-top: 80px;
     max-width: 800px;
-    /* Adjust width for better fit */
+
     margin-left: auto;
     margin-right: auto;
     background: rgba(0, 0, 0, 0.7);
-    /* Dark background with transparency */
+
     border-radius: 15px;
     padding: 20px;
     box-shadow: 0 0 15px 5px rgba(0, 255, 255, 0.7);
-    /* Neon glow effect */
+
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -388,7 +387,7 @@ button:active {
 .calendar-grid {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
-    /* 7 columns for each day of the week */
+
     gap: 10px;
     margin-top: 10px;
     max-width: 100%;
@@ -426,18 +425,18 @@ button:active {
 
 .calendar-day:hover {
     transform: scale(1.1);
-    /* Hover effect for larger day boxes */
+
     box-shadow: 0 0 20px 5px rgba(0, 255, 255, 0.8);
-    /* Glowing effect */
+
 }
 
 .calendar-day strong {
     display: block;
     margin-bottom: 5px;
     color: #ff007f;
-    /* Neon pink for the date number */
+
     font-family: 'Orbitron', sans-serif;
-    /* Cyberpunk font */
+
 }
 
 .time-slot {
@@ -445,26 +444,26 @@ button:active {
     padding: 7px;
     background-color: #333;
     color: #00bfff;
-    /* Neon cyan text */
+
     border-radius: 5px;
     cursor: pointer;
     font-size: 0.9em;
     border: 1px solid #00bfff;
-    /* Neon cyan border for time slots */
+
     transition: background-color 0.3s, color 0.3s;
 }
 
 .time-slot:hover {
     background-color: #ff007f;
-    /* Neon pink hover effect */
+
     color: black;
-    /* Black text on hover for contrast */
+
 }
 
 
 .time-slot.selected {
     background-color: #00bfff;
-    /* Glowing blue for selected slots */
+
     color: black;
     font-weight: bold;
 }
@@ -483,9 +482,9 @@ button:active {
 .calendar-header {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
-    /* 7 columns for each day of the week */
+
     color: #ff007f;
-    /* Neon pink */
+
     font-size: 1.2em;
     font-family: 'Orbitron', sans-serif;
     text-align: center;
@@ -526,7 +525,7 @@ button:active {
     transform: scale(0.95);
 }
 
-/* Unmatch button specific styles */
+
 .unmatch-button {
     background-color: transparent;
     border-color: #ff3333;
@@ -543,17 +542,14 @@ button:active {
     transform: scale(0.95);
 }
 
-/* Style for the disabled Set Date button */
+
 .set-date-button.disabled {
     background-color: #d3d3d3;
-    /* Light grey background */
     color: #aaa;
-    /* Grey text */
     cursor: not-allowed;
     pointer-events: none;
 }
 
-/* Tooltip style */
 .set-date-button[disabled]::after {
     content: attr(title);
     position: absolute;
@@ -566,4 +562,60 @@ button:active {
     left: 50%;
     transform: translateX(-50%);
     white-space: nowrap;
+}
+
+
+.mock-card {
+    width: 320px;
+    height: 480px;
+    background: rgba(20, 20, 20, 0.8);
+    border: 2px solid #00bfff;
+    border-radius: 15px;
+    padding: 16px;
+    margin: 20px;
+    box-shadow: 0 0 20px rgba(0, 255, 255, .7), 0 0 40px rgba(0, 255, 255, .5);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    overflow: hidden;
+}
+
+.mock-card img {
+    width: 100%;
+    height: 60%;
+    object-fit: cover;
+    border-radius: 10px;
+    display: block;
+    flex: 0 0 auto;
+}
+
+
+.mock-card h2,
+.mock-card p {
+    margin: 6px 0;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+
+.mock-card .swipe-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 6px;
+}
+
+
+.mock-card.swipe-right {
+    transform: translateX(100%) rotate(15deg);
+    opacity: 0;
+    transition: transform .5s ease, opacity .5s ease;
+}
+
+.mock-card.swipe-left {
+    transform: translateX(-100%) rotate(-15deg);
+    opacity: 0;
+    transition: transform .5s ease, opacity .5s ease;
 }

@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Erreur 404 - Page introuvable</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      height: 100vh;
+      overflow: hidden;
+      font-family: "Orbitron", sans-serif;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(circle at center, #0d001f 0%, #000000 80%);
+      position: relative;
+    }
+
+
+    body::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, #ff00ff33, #00ffff33, #ff00ff33);
+      animation: moveBackground 6s linear infinite;
+      z-index: 0;
+    }
+
+    @keyframes moveBackground {
+      0% {
+        transform: translateX(0) translateY(0);
+      }
+
+      50% {
+        transform: translateX(-20px) translateY(20px);
+      }
+
+      100% {
+        transform: translateX(0) translateY(0);
+      }
+    }
+
+
+    .container {
+      position: relative;
+      z-index: 2;
+      background: rgba(0, 0, 0, 0.8);
+      border: 2px solid #ff00ff;
+      border-radius: 15px;
+      box-shadow: 0 0 25px #ff00ff, 0 0 60px #00ffff33;
+      text-align: center;
+      padding: 50px 40px;
+      width: 80%;
+      max-width: 600px;
+      backdrop-filter: blur(10px);
+      animation: fadeIn 1s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: scale(0.9);
+      }
+
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 20px;
+      text-shadow: 0 0 15px #ff00ff, 0 0 25px #00ffff;
+    }
+
+    p {
+      font-size: 1.2rem;
+      line-height: 1.6;
+      margin-bottom: 30px;
+      color: #f0f0f0;
+      text-shadow: 0 0 8px #ff00ff55;
+    }
+
+
+    a {
+      display: inline-block;
+      color: #000;
+      background: linear-gradient(135deg, #ff00ff, #ff66c4);
+      text-decoration: none;
+      padding: 12px 25px;
+      border-radius: 8px;
+      font-weight: bold;
+      font-size: 1.1rem;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      box-shadow: 0 0 10px #ff00ff, 0 0 30px #ff33aa;
+      transition: all 0.3s ease-in-out;
+    }
+
+    a:hover {
+      background: linear-gradient(135deg, #00ffff, #00bfff);
+      box-shadow: 0 0 25px #00ffff, 0 0 60px #00bfff;
+      transform: scale(1.05);
+    }
+
+
+    .glitch {
+      position: absolute;
+      top: 10%;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 6rem;
+      color: #ff00ff;
+      text-shadow: 2px 2px 15px #ff00ff, -2px -2px 15px #00ffff;
+      animation: glitchAnim 2s infinite alternate;
+      z-index: 1;
+    }
+
+    @keyframes glitchAnim {
+      0% {
+        text-shadow: 3px 3px 10px #ff00ff, -3px -3px 10px #00ffff;
+      }
+
+      50% {
+        text-shadow: -3px -3px 10px #ff00ff, 3px 3px 10px #00ffff;
+      }
+
+      100% {
+        text-shadow: 3px -3px 15px #00ffff, -3px 3px 15px #ff00ff;
+      }
+    }
+
+
+    .scanlines {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: repeating-linear-gradient(to bottom,
+          rgba(255, 255, 255, 0.02),
+          rgba(255, 255, 255, 0.02) 1px,
+          transparent 2px,
+          transparent 3px);
+      z-index: 3;
+      pointer-events: none;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="glitch">404</div>
+
+  <div class="container">
+    <h1>Oups... Page introuvable</h1>
+    <p>On dirait que vous avez dérivé dans le cyber-espace. <br>
+      La page que vous cherchez n’existe pas (encore).</p>
+    <a href="/views/pages/accueil.html">Retour à l'accueil</a>
+  </div>
+
+  <div class="scanlines"></div>
+</body>
+
+</html>

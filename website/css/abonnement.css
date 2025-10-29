@@ -1,0 +1,193 @@
+  html,
+  body {
+      height: 100%;
+      margin: 0;
+      padding: 140px;
+      overflow-y: auto;
+  }
+
+  body {
+      height: 100vh;
+      justify-content: center;
+      align-items: center;
+      background-color: #000000;
+      margin: 0;
+      padding: 0;
+      font-family: "Orbitron", sans-serif;
+      color: white;
+      overflow: hidden;
+  }
+
+  #screens-container {
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      width: 100%;
+  }
+
+  .screen {
+      width: 350px;
+      display: flex;
+      flex-direction: column;
+      border: 3px solid rgba(255, 20, 147, 0.8);
+      aspect-ratio: 10 / 16;
+      border-radius: 1rem;
+      background-color: rgba(255, 20, 147, 0.15);
+      overflow: hidden;
+      position: relative;
+      z-index: 10;
+      margin: 10px 5px;
+      top: 50px;
+      transition: box-shadow 0.3s ease;
+      backdrop-filter: blur(8px);
+  }
+
+
+  .screen:hover {
+      box-shadow: 0 0 20px #1E90FF;
+  }
+
+  .screen-image {
+      background-image: url("https://images.unsplash.com/photo-1561344640-2453889cde5b?q=80&w=1934&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D");
+      height: 100%;
+      width: 100%;
+      position: absolute;
+      z-index: 1;
+      background-size: cover;
+      background-position: center;
+      opacity: 0.6;
+  }
+
+  .screen-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      flex-grow: 1;
+      gap: 1.5rem;
+      position: relative;
+      z-index: 3;
+      margin: 1rem;
+      padding: 2rem 1rem;
+
+      text-align: center;
+
+  }
+
+  .screen-content h2 {
+      font-size: 2.5rem;
+      margin: 0;
+      text-shadow: 0 0 10px rgba(255, 20, 147, 0.9);
+  }
+
+  .screen-content p {
+      font-size: 2rem;
+      margin: 0;
+      text-shadow: 0 0 5px rgba(255, 20, 147, 0.7);
+  }
+
+  .screen-content ul {
+      font-size: 1.5rem;
+      margin: 0;
+      padding: 0;
+      text-shadow: 0 0 5px rgba(255, 20, 147, 0.7);
+      list-style-type: disc;
+      padding-left: 20px;
+  }
+
+  .screen-content .custom_butt {
+      background-color: #A82D75;
+      color: white;
+      padding: 10px 20px;
+      font-size: 20px;
+      border: none;
+      border-radius: 0.5rem;
+      transition: background-color 0.3s ease;
+      width: 100%;
+  }
+
+  .custom_butt:disabled {
+      background-color: #A82D75;
+      opacity: 0.5;
+      cursor: not-allowed;
+      transition: none;
+  }
+
+  .custom_butt:hover {
+      background-color: #000000;
+  }
+
+
+  .offset {
+      box-shadow:
+          0.3em 0.3em 0 0 #3498db,
+          inset 0.3em 0.3em 0 0 #3498db;
+
+      &:hover,
+      &:focus {
+          box-shadow:
+              0 0 0 0 #91077a,
+              inset 6em 3.5em 0 0 #7a0971;
+      }
+  }
+
+  button {
+      color: #ff00d4;
+      transition: 0.25s;
+
+      &:hover,
+      &:focus {
+          border-color: #7e328d;
+          color: #270303;
+      }
+  }
+
+
+  button {
+      background: none;
+      border: 2px solid;
+      font: inherit;
+      line-height: 1;
+      margin: 0.5em;
+      padding: 1em 2em;
+  }
+
+  @keyframes pan-overlay {
+      from {
+          background-position: 0% 0%;
+      }
+
+      to {
+          background-position: 0% -100%;
+      }
+  }
+
+  .screen-overlay {
+      background: linear-gradient(rgba(250, 0, 134, 0.263),
+              rgba(177, 4, 96, 0.764) 3px,
+              transparent 3px,
+              transparent 9px);
+      background-size: 100% 9px;
+      height: 100%;
+      width: 100%;
+      animation: pan-overlay 22s infinite linear;
+      position: absolute;
+      z-index: 2;
+      left: 0;
+      top: 0;
+  }
+
+  #background-video {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      z-index: -1;
+  }
+
+  .screen.flashy-border {
+      box-shadow: 0 0 30px #1E90FF, 0 0 60px #FF1493, 0 0 90px #1E90FF !important;
+      border-color: #FF1493;
+  }

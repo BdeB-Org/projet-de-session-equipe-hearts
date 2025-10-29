@@ -6,7 +6,7 @@
 
 body {
   background-image: radial-gradient(circle at 50% 50%, #24043a, #000000);
-
+    padding-top: 140px;
   align-items: center;
   font-family: "Orbitron", sans-serif;
   justify-content: center;
@@ -272,8 +272,8 @@ nav,
 }
 
 .logo {
-  z-index: 1001; /* Make sure this is higher than the particles-js */
-  position: relative; /* Ensures z-index takes effect */
+  z-index: 1001; 
+  position: relative;
 }
 
 input:-webkit-autofill {

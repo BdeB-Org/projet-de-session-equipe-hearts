@@ -1,0 +1,130 @@
+body {
+    background: radial-gradient(circle at top, #0a0a0a, #000);
+    color: #fff;
+    font-family: "Orbitron", sans-serif;
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.container {
+    width: 90%;
+    max-width: 700px;
+    background: rgba(15, 15, 15, 0.9);
+    padding: 40px 50px;
+    border-radius: 15px;
+    box-shadow: 0 0 25px #ff00ff88;
+    text-align: center;
+    animation: fadeIn 0.8s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+h1 {
+    color: #ffcc00;
+    text-shadow: 0 0 15px #ffcc00;
+    margin-bottom: 30px;
+    font-size: 2rem;
+}
+
+label {
+    display: block;
+    text-align: left;
+    margin: 12px 0 6px;
+    color: #ffcc00;
+    font-size: 0.95rem;
+}
+
+input,
+select {
+    width: 100%;
+    padding: 12px;
+    background: rgba(255, 255, 255, 0.05);
+    color: #fff;
+    border: 2px solid #ff00ff;
+    border-radius: 6px;
+    margin-bottom: 15px;
+    font-family: inherit;
+    outline: none;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+input:focus,
+select:focus {
+    border-color: #ffcc00;
+    box-shadow: 0 0 10px #ffcc00;
+}
+
+select option {
+    background: #111;
+    color: #fff;
+}
+
+.checkbox-group {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px;
+    margin: 20px 0;
+}
+
+.checkbox-group label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid #ff00ff;
+    border-radius: 5px;
+    padding: 8px 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.checkbox-group label:hover {
+    background: rgba(255, 0, 255, 0.15);
+    transform: scale(1.05);
+}
+
+input[type="checkbox"] {
+    accent-color: #ff00ff;
+    transform: scale(1.2);
+}
+
+.submit-btn {
+    background: linear-gradient(135deg, #ff00ff, #ff1493);
+    color: white;
+    border: none;
+    padding: 14px 40px;
+    border-radius: 8px;
+    font-size: 1.2em;
+    cursor: pointer;
+    transition: 0.3s;
+    box-shadow: 0 0 15px #ff00ff;
+    font-family: inherit;
+}
+
+.submit-btn:hover {
+    background: linear-gradient(135deg, #ff33cc, #ff66cc);
+    transform: scale(1.05);
+    box-shadow: 0 0 25px #ff33cc;
+}
+
+.demo-note {
+    margin-top: 20px;
+    color: #aaa;
+    font-size: 0.9em;
+    font-style: italic;
+}

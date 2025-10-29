@@ -1,8 +1,0 @@
-<?xml version = '1.0' encoding = 'UTF-8'?>
-<OSDM_Design class="oracle.dbtools.crest.model.design.Design" name="fichier_dmd" id="3D305B70-462D-E669-4382-FA68F8EDF52B" version="3.5">
-<createdBy>2249463</createdBy>
-<createdTime>2024-08-27 14:21:08 UTC</createdTime>
-<ownerDesignName>fichier_dmd</ownerDesignName>
-<capitalNames>false</capitalNames>
-<designId>3D305B70-462D-E669-4382-FA68F8EDF52B</designId>
-</OSDM_Design>

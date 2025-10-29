@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Abonnements - Hearts</title>
+  <link rel="stylesheet" href="/css/abonnement.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400..900&display=swap" rel="stylesheet" />
+</head>
+
+<body>
+  <div id="header-placeholder"></div>
+
+  <video autoplay muted loop id="background-video">
+    <source src="/images/vecteezy_the-view-from-the-spaceship-looks-out-onto-a-parallel_49886908.mp4"
+      type="video/mp4" />
+    Votre navigateur ne supporte pas la vidéo.
+  </video>
+
+  <div id="screens-container">
+    <div class="screen flashy-border">
+      <div class="screen-image"></div>
+      <div class="screen-overlay"></div>
+      <div class="screen-content">
+        <div class="screen-user-abonnementActuel">
+          <h2 class="name" data-value="Basique">Basique</h2>
+          <p class="price" data-value="0€/ Mois">0$ / Mois</p>
+          <ul class="features" data-value="5 Swipes/J">
+            <li>5 Swipes/J</li>
+          </ul>
+        </div>
+        <button class="custom_butt" disabled>
+          Abonnement actuel
+        </button>
+      </div>
+    </div>
+
+
+    <div class="screen">
+      <div class="screen-image"></div>
+      <div class="screen-overlay"></div>
+      <div class="screen-content">
+        <div class="screen-user">
+          <h2 class="name" data-value="Premium">Premium</h2>
+          <p class="price" data-value="19,47$/ Mois">19,47$ / Mois</p>
+          <ul class="features" data-value="100 Swipes/j">
+            <li>100 Swipes/j</li>
+          </ul>
+        </div>
+        <button class="custom_butt" onclick="window.location.href='payment.html?subscriptionType=Premium&amount=19.47'">
+          Changer de plan
+        </button>
+      </div>
+    </div>
+
+
+    <div class="screen">
+      <div class="screen-image"></div>
+      <div class="screen-overlay"></div>
+      <div class="screen-content">
+        <div class="screen-user">
+          <h2 class="name" data-value="Diamant">Diamant</h2>
+          <p class="price" data-value="25,47$/ Mois">25,47$ / Mois</p>
+          <ul class="features" data-value="Swipes Illimités">
+            <li>Swipes Illimités</li>
+          </ul>
+        </div>
+        <button class="custom_butt" onclick="window.location.href='payment.html?subscriptionType=Diamant&amount=25.47'">
+          Changer de plan
+        </button>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="/js/abonnement.js"></script>
+  <script>
+    fetch("/views/partials/header.html")
+      .then(res => res.text())
+      .then(html => document.getElementById("header-placeholder").innerHTML = html);
+  </script>
+</body>
+
+</html>

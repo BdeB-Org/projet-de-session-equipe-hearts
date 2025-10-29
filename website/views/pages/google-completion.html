@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Complétez votre profil - Hearts</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400..900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/css/google-completion.css" />
+</head>
+
+<body>
+  <div class="container">
+    <h1>Complétez votre profil</h1>
+
+    <form id="completion-form">
+      <label for="phone">Numéro de téléphone</label>
+      <input type="text" id="phone" name="phone" placeholder="000-000-0000" required />
+
+      <label for="birthdate">Date de naissance</label>
+      <input type="date" id="birthdate" name="birthdate" required />
+
+      <label for="gender">Genre</label>
+      <select id="gender" name="gender" required>
+        <option value="" disabled selected>-- Sélectionnez --</option>
+        <option value="Homme">Homme</option>
+        <option value="Femme">Femme</option>
+        <option value="Non spécifié">Non spécifié</option>
+      </select>
+
+      <label for="profilePicture">Photo de profil</label>
+      <input type="file" id="profilePicture" name="profilePicture" accept="image/*" required />
+
+      <div class="checkbox-group">
+        <label><input type="checkbox" value="Musique" /> Musique</label>
+        <label><input type="checkbox" value="Cinéma" /> Cinéma</label>
+        <label><input type="checkbox" value="Sport" /> Sport</label>
+        <label><input type="checkbox" value="Cuisine" /> Cuisine</label>
+        <label><input type="checkbox" value="Voyage" /> Voyage</label>
+        <label><input type="checkbox" value="Lecture" /> Lecture</label>
+      </div>
+
+      <button type="submit" class="submit-btn">Soumettre</button>
+    </form>
+
+    <p class="demo-note">
+      💡 Ceci est une version démo. Dans la version originale, cette étape
+      suivait la connexion Google OAuth pour compléter le profil utilisateur.
+    </p>
+  </div>
+
+  <script>
+    document
+      .getElementById("completion-form")
+      .addEventListener("submit", (e) => {
+        e.preventDefault();
+        alert("Profil complété (version démo) !");
+        window.location.href = "/views/pages/swipe.html";
+      });
+  </script>
+</body>
+
+</html>

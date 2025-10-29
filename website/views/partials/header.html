@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Header</title>
+  <link rel="stylesheet" href="/css/header.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400..900&display=swap" rel="stylesheet" />
+</head>
+
+<body>
+  <header class="header">
+    <div class="top">
+      <div class="logo">
+        <a href="/views/pages/accueil.html">
+          <img src="/images/HEARTS-LOGO-1.png" alt="Hearts Logo" />
+        </a>
+      </div>
+
+      <div class="right-wrapper" style="display: flex; align-items: center">
+        <div class="user-info" style="display: flex; align-items: center; margin-right: 20px">
+          <img src="/images/user.jpg" alt="User Photo" style="
+                border-radius: 50%;
+                height: 40px;
+                width: 40px;
+                background: white;
+                margin-right: 10px;
+              " />
+          <span id="user-name" class="user-name">John Doe</span>
+        </div>
+
+
+      </div>
+    </div>
+
+    <nav class="navbar" id="navbar">
+      <a class="navbar-item" href="/views/pages/accueil.html">Accueil</a>
+      <a class="navbar-item" href="/views/pages/creationCompte.html">Connexion</a>
+      <a class="navbar-item" href="/views/pages/inscription.html">Inscription</a>
+      <a class="navbar-item" href="/views/pages/abonnement.html">Abonnement</a>
+      <a class="navbar-item" href="/views/pages/swipe.html">Swipe</a>
+      <a class="navbar-item" href="/views/pages/profil.html">Profil</a>
+    </nav>
+
+    <div class="animation-square" id="animationSquare"></div>
+  </header>
+
+  <script src="/js/header.js"></script>
+</body>
+
+</html>

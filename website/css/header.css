@@ -1,0 +1,91 @@
+body {
+    font-family: "Orbitron", sans-serif;
+    margin: 0;
+    background-color: #000;
+    height: 100vh;
+    overflow: hidden;
+}
+
+.header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 9999;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.5);
+    transition: height 0.5s ease;
+}
+
+.top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 5%;
+}
+
+.logo img {
+    height: 55px;
+    width: auto;
+}
+
+.right-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.app-menu {
+    cursor: pointer;
+    transition: transform 0.2s ease, filter 0.3s ease;
+}
+
+.navbar {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 10px 0;
+    background: linear-gradient(45deg, #d44fdc, #e38be3, #f0b7f5, #d44fdc);
+    box-shadow: 0 0 10px #d44fdc, 0 0 15px #e38be3, 0 0 20px #d44fdc;
+    transition: transform 0.5s ease, opacity 0.5s ease;
+}
+
+.navbar-item {
+    margin: 0 15px;
+    font-size: 16px;
+    color: #ffffff;
+    text-decoration: none;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    transition: color 0.3s ease;
+}
+
+.navbar-item:hover {
+    color: #ffe600;
+}
+
+.animation-square {
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%) scale(0);
+    background-color: rgba(212, 79, 220, 0.8);
+    height: 100%;
+    width: 100%;
+    z-index: 999;
+    transition: transform 0.5s ease, opacity 0.5s ease;
+    opacity: 0;
+}
+
+.animation-square.active {
+    transform: translateX(-50%) scale(1);
+    opacity: 1;
+}
+
+.navbar-placeholder {
+    height: 50px;
+    display: block;
+}
+
+.user-name {
+    color: white;
+    margin-left: 5px;
+}

@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Profil - Hearts</title>
+    <link rel="stylesheet" href="/css/profil.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+</head>
+
+<body>
+    <div id="header-placeholder"></div>
+
+
+    <video autoplay muted loop id="background-video">
+        <source src="/images/vecteezy_polygon-cyberpunk-sci-fi-background_1807028.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+
+    <div class="main-content">
+        <div class="profile-arrow left-arrow" title="Preview">&#9664;</div>
+
+
+        <div class="preview" style="display: none;">
+            <div class="preview-container active">
+                <h3>Preview</h3>
+                <div class="profile-header">
+                    <h1>Profil</h1>
+                    <div class="add-photo-container">
+                        <button class="upload-label" id="upload-button">+</button>
+                        <input type="file" id="file-upload" name="photos" style="display: none;" accept="image/*"
+                            multiple>
+                    </div>
+                </div>
+
+                <div class="profile-details">
+                    <p><strong>Nom:</strong> <span id="user-nom">Doe</span></p>
+                </div>
+
+                <div class="uploaded-photos" style="display: flex; flex-wrap: wrap; gap: 10px;">
+                    <div class="photo-container">
+                        <img src="/images/date1.jpg" alt="Uploaded Photo" class="add-photo"
+                            style="width: 100px; height: 100px; object-fit: cover;">
+                        <button class="delete-photo"><i class="fas fa-times"></i>X</button>
+                    </div>
+                    <div class="photo-container">
+                        <img src="/images/date1_2.jpg" alt="Uploaded Photo" class="add-photo"
+                            style="width: 100px; height: 100px; object-fit: cover;">
+                        <button class="delete-photo"><i class="fas fa-times"></i>X</button>
+                    </div>
+                </div>
+
+                <div class="user-preference">
+                    <h3>Préférence de Carte:</h3>
+                    <ul>
+                        <li>Roi</li>
+                        <li>Reine</li>
+                    </ul>
+                </div>
+
+                <div class="user-likes">
+                    <h3>Préférences de Likes:</h3>
+                    <ul>
+                        <li>Musique</li>
+                        <li>Voyage</li>
+                        <li>Sport</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="profile-container">
+            <div class="profile-header">
+                <h1>Profil</h1>
+                <img src="/images/user.jpg" alt="Photo de Profil" class="profile-picture">
+            </div>
+
+            <div class="profile-details">
+                <p><strong>Prénom:</strong> <span id="user-prenom">Ava</span></p>
+                <p><strong>Nom:</strong> <span id="user-nom">Doe</span></p>
+                <p><strong>Email:</strong> <span id="user-email">ava.doe@email.com</span></p>
+                <p><strong>Votre abonnement actuel:</strong> <span>Basique</span></p>
+            </div>
+
+            <button
+                onclick="alert('Compte supprimé (démo)'); window.location.href='/views/pages/accueil.html'">Supprimer
+                le Compte</button>
+
+
+            <div class="subscription-block">
+                <h3>Votre abonnement actuel :</h3>
+                <p>Basique</p>
+                <p>Souhaitez-vous obtenir un autre abonnement ?</p>
+                <a href="/views/pages/abonnement.html">
+                    <button>Changer abonnement</button>
+                </a>
+            </div>
+        </div>
+
+        <div class="modify-profile-container" style="display: none;">
+            <h3>Modifier le Profil</h3>
+
+            <div class="edit-profile">
+                <h3>Modifier les informations du profil</h3>
+                <button id="edit-profile-btn">Modifier le Profil</button>
+                <form id="update-profile-form" style="display: none;">
+                    <input type="text" name="new_firstName" placeholder="Prénom" required>
+                    <input type="text" name="new_lastName" placeholder="Nom" required>
+                    <input type="email" name="new_email" placeholder="Email" required>
+                    <button type="submit">Mettre à jour le profil</button>
+                </form>
+            </div>
+
+            <div class="change-password">
+                <h3>Changer le Mot de Passe</h3>
+                <button id="change-password-btn">Changer le Mot de Passe</button>
+                <form id="change-password-form" style="display: none;">
+                    <input type="password" name="old_password" placeholder="Ancien mot de passe" required>
+                    <input type="password" name="new_password" placeholder="Nouveau mot de passe" required>
+                    <input type="password" name="confirm_password" placeholder="Confirmer le nouveau mot de passe"
+                        required>
+                    <button type="submit">Changer le Mot de Passe</button>
+                </form>
+            </div>
+
+            <form id="update-profile-picture-form" enctype="multipart/form-data">
+                <label for="profilePicture">Upload New Profile Picture:</label>
+                <input type="file" id="profilePicture" name="profilePicture" accept="image/*" required>
+                <button type="submit">Update Picture</button>
+            </form>
+        </div>
+
+        <div class="profile-arrow right-arrow" title="Modifier profil">&#9654;</div>
+    </div>
+
+    <script src="/js/profil.js"></script>
+
+    <script>
+        fetch("/views/partials/header.html")
+            .then((res) => res.text())
+            .then((html) => {
+                document.getElementById("header-placeholder").innerHTML = html;
+            });
+    </script>
+</body>
+
+</html>
